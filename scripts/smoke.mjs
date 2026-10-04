@@ -30,7 +30,14 @@ try {
     const page = await browser.newPage({ viewport: { width, height }, isMobile: width < 600, hasTouch: true, deviceScaleFactor: 2 });
     page.on('pageerror', error => errors.push(error.message));
     page.on('response', response => { if (response.status() >= 400) errors.push(`${response.status()}: ${response.url()}`); });
-    await page.addInitScript(() => { Math.random = () => 0.01; });
+    await page.addInitScript(() => {
+      Math.random=()=>0.01;
+      const rotate=CanvasRenderingContext2D.prototype.rotate;
+      CanvasRenderingContext2D.prototype.rotate=function(angle){
+        if(this.canvas===document.querySelector('canvas'))window.__jellyPreviewAngle=angle;
+        return rotate.call(this,angle);
+      };
+    });
     await page.goto(base, { waitUntil: 'networkidle' });
     await page.waitForFunction(() => !document.querySelector('.loading'));
     await page.waitForTimeout(400);
@@ -44,9 +51,26 @@ try {
       return Math.abs(field.y-canvas.y)<1 && Math.abs(field.height-canvas.height)<1 && document.fonts.check('900 14px Nunito');
     }), 'Canvas stays inside its field; Nunito loaded');
     assert.ok(metrics.x >= -1 && metrics.y >= -1 && metrics.bottom <= height + 1 && metrics.right <= width + 1, `Scene fits ${width}×${height}`);
+    assert.ok(await page.locator('.ambient-background').evaluate(el=>{
+      const r=el.getBoundingClientRect();return r.left<=0&&r.right>=innerWidth&&r.top<=0&&r.bottom>=innerHeight&&getComputedStyle(el,'::before').filter.includes('blur');
+    }),'Blurred background fills the entire viewport');
     if (width === 390) {
       const canvas = page.locator('canvas'), bounds = await canvas.boundingBox();
       assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
+      assert.ok(await page.locator('.score-card').evaluate(el=>{
+        const number=el.querySelector('strong'),label=el.querySelector('.small-label');
+        return Math.abs(number.getBoundingClientRect().left-label.getBoundingClientRect().left)<1&&parseFloat(getComputedStyle(number).webkitTextStrokeWidth)>0;
+      }),'Score is left aligned and outlined');
+      const aimTouch=await page.context().newCDPSession(page),aimY=bounds.y+60;
+      await aimTouch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.3,y:aimY}]});
+      for(let step=1;step<=6;step++){
+        await aimTouch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:bounds.x+bounds.width*(.3+step*.075),y:aimY}]});
+        await page.waitForTimeout(20);
+      }
+      await page.waitForFunction(()=>window.__jellyPreviewAngle>.03);
+      await aimTouch.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+      await page.waitForFunction(()=>Math.abs(window.__jellyPreviewAngle)<.01);
+      await aimTouch.detach();
       await page.screenshot({path:'test-results/empty-start.png'});
       await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.13);
       await page.waitForTimeout(1000);
@@ -59,11 +83,15 @@ try {
       await shakeButton.click();
       assert.match(await shakeButton.textContent(), /2/);
       await page.getByRole('button', {name:'Пауза', exact:true}).click();
+      assert.ok(await page.getByRole('dialog').evaluate(el=>el.getAnimations().some(a=>a.playState==='running')),'Dialog animates into view');
       await page.waitForTimeout(100);
       const paused = await canvas.evaluate(c => c.toDataURL());
       await page.waitForTimeout(500);
       assert.equal(await canvas.evaluate(c => c.toDataURL()), paused, 'Pause freezes the world');
       await page.getByRole('button', {name:'Продолжить',exact:true}).click();
+      await page.locator('.overlay.is-leaving').waitFor();
+      assert.equal(await page.getByRole('dialog').getAttribute('aria-label'),'Пауза','Exit retains the previous dialog');
+      await page.locator('.overlay').waitFor({state:'detached'});
       await page.getByRole('button', {name:'Как играть',exact:true}).click();
       await page.getByRole('button', {name:'Понятно, играем!'}).click();
       assert.equal(await page.locator('.chain-fruit').count(),11);
@@ -76,20 +104,59 @@ try {
       const strip=await page.locator('.fruit-scroller').boundingBox();
       const cdp=await page.context().newCDPSession(page);
       const swipeX=strip.x+strip.width-20,swipeY=strip.y+strip.height/2;
+      const pull=async(dx)=>{
+        const x=strip.x+strip.width/2;
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y:swipeY}]});
+        for(let step=1;step<=6;step++){
+          await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+dx*step/6,y:swipeY}]});
+          await page.waitForTimeout(20);
+        }
+      };
+      const translate=()=>page.locator('.fruit-chain').evaluate(el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).m41);
+      assert.ok(await page.locator('.fruit-scroller').evaluate(el=>getComputedStyle(el).maskImage!=='none'),'Carousel edges fade');
+      assert.equal(await page.locator('.chain-arrow svg').count(),10,'Fruit progression uses arrow icons');
+      await pull(100);
+      const leftStretch=await translate();assert.ok(leftStretch>15&&leftStretch<100,'Left edge stretches with resistance');
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+      await page.waitForFunction(()=>Math.abs(new DOMMatrixReadOnly(getComputedStyle(document.querySelector('.fruit-chain')).transform).m41)<.1&&document.querySelector('.fruit-scroller').scrollLeft<1);
+      await page.locator('.fruit-scroller').focus();await page.keyboard.press('End');
+      await page.waitForFunction(()=>document.querySelector('.carousel-arrow.next').disabled);
+      await pull(-100);
+      assert.ok(await translate() < -15,'Right edge also stretches');
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+      await page.waitForFunction(()=>Math.abs(new DOMMatrixReadOnly(getComputedStyle(document.querySelector('.fruit-chain')).transform).m41)<.1&&document.querySelector('.carousel-arrow.next').disabled);
+      await page.locator('.fruit-scroller').focus();await page.keyboard.press('Home');
+      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft<1);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:swipeX,y:swipeY}]});
       for(let dx=20;dx<=140;dx+=20) {
         await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:swipeX-dx,y:swipeY}]});
         await page.waitForTimeout(20);
       }
+      const releasedAt=await page.locator('.fruit-scroller').evaluate(el=>el.scrollLeft);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft>60);
-      await page.waitForTimeout(400);
-      await page.locator('.fruit-scroller').evaluate(el=>el.scrollTo({left:0,behavior:'instant'}));
+      await page.waitForFunction(x=>document.querySelector('.fruit-scroller').scrollLeft>x+10,releasedAt);
+      await page.locator('.fruit-scroller').focus();await page.keyboard.press('Home');
+      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft<1);
       await cdp.detach();
+      await page.mouse.move(strip.x+strip.width/2,swipeY);
+      await page.mouse.wheel(0,120);
+      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft>70);
+      await page.locator('.fruit-scroller').focus();await page.keyboard.press('Home');
+      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft<1);
+      await page.mouse.move(swipeX,swipeY);await page.mouse.down();
+      await page.mouse.move(swipeX-110,swipeY,{steps:6});await page.mouse.up();
+      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft>90);
+      await page.locator('.fruit-scroller').focus();await page.keyboard.press('Home');
+      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft<1);
       await page.screenshot({path:'test-results/collection.png'});
       await page.getByRole('button',{name:'Баланс монет'}).click();
       assert.match(await page.getByRole('dialog').textContent(),/25 монет/);
       await page.getByRole('button',{name:'За сочным урожаем!'}).click();
+      await page.locator('.overlay').waitFor({state:'detached'});
+      assert.ok(await page.locator('.scene').evaluate((el,original)=>{
+        const r=el.getBoundingClientRect(),shell=document.querySelector('.game-screen');
+        return Math.abs(r.x-original.x)<1&&Math.abs(r.y-original.y)<1&&shell.scrollLeft===0&&shell.scrollTop===0;
+      },metrics),'Focus, edge gestures and dialogs never shift the game screen');
       await page.screenshot({path:'test-results/mobile.png'});
       const record = await page.locator('.best-card strong').textContent();
       const coins=await page.getByTestId('coins').textContent();
@@ -101,6 +168,7 @@ try {
       assert.equal(await page.locator('.chain-fruit[data-discovered="true"]').count(),discoveries,'Discoveries survive a reload');
       await page.getByRole('button', {name:'Начать заново'}).click();
       await page.getByRole('dialog').getByRole('button', {name:'Начать заново',exact:true}).click();
+      await page.locator('.overlay').waitFor({state:'detached'});
       assert.equal(await page.getByTestId('score').textContent(), '0');
       assert.equal(await page.getByTestId('coins').textContent(),coins,'Restart keeps earned coins');
     }
@@ -120,5 +188,5 @@ try {
   assert.ok(await shake.isDisabled(),'An unaffordable shake is disabled');
   await paid.close();
   assert.deepEqual(errors, [], 'No browser errors or missing assets');
-  console.log('✓ touch drop, merge, carousel, coin rewards, paid shakes, pause, dialogs and saved progress');
+  console.log('✓ preview tilt, elastic edges, inertia, fading masks, animated dialogs, touch drop, merges and saved progress');
 } finally { await browser.close(); }

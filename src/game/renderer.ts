@@ -1,6 +1,7 @@
 import { asset, FRUITS, fruitAsset } from './fruits';
 import { BOARD, type Cube, type FruitWorld, type MergeEvent } from './physics';
 import { bodyUV, FRUIT_BODY, SPRITE_FANS, textureTransform, type UV } from './spriteShape';
+import { AimPreview } from './aimPreview';
 
 interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; texture: number; size: number; angle: number; spin: number }
 interface Burst { x: number; y: number; age: number; color: string; radius: number }
@@ -23,9 +24,12 @@ export class GameRenderer {
   private sleepingSprites = new Map<number, {canvas: HTMLCanvasElement; x: number; y: number; w: number; h: number}>();
   private floats: Float[] = [];
   private resizeObserver: ResizeObserver;
+  private preview: AimPreview;
+  private reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   paused = false;
 
   constructor(private canvas: HTMLCanvasElement, public world: FruitWorld) {
+    this.preview=new AimPreview(world.aim);
     const context = canvas.getContext('2d', { alpha: true });
     if (!context) throw new Error('Canvas недоступен');
     this.ctx = context;
@@ -63,6 +67,7 @@ export class GameRenderer {
         this.world.step(1 / 60); this.accumulator -= 1 / 60; steps++;
       }
       if (steps === 3) this.accumulator = 0;
+      this.preview.step(this.world.aim,this.world.state.drops,dt,this.reducedMotion);
       for (const p of this.particles) { p.age += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 320 * dt; p.vx *= Math.pow(0.985, dt * 60); p.angle += p.spin * dt; }
       this.particles = this.particles.filter(p => p.age < p.life);
       for (const b of this.bursts) b.age += dt;
@@ -107,14 +112,14 @@ export class GameRenderer {
       }
       ghostY = Math.max(BOARD.dropY + size, ghostY);
       ctx.save(); ctx.setLineDash([3, 8]); ctx.lineWidth = 2; ctx.strokeStyle = '#fffbedb3';
-      ctx.beginPath(); ctx.moveTo(aim, BOARD.dropY + size * 0.6); ctx.lineTo(aim, ghostY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(this.preview.x, BOARD.dropY + size * 0.6); ctx.lineTo(aim, ghostY); ctx.stroke();
       ctx.restore();
       ctx.save(); ctx.globalAlpha = state.ready ? 1 : 0.55;
-      this.sprite(state.current, aim, BOARD.dropY + Math.sin(this.world.time * 3) * 1.5, 0, size);
+      this.sprite(state.current, this.preview.x, BOARD.dropY + Math.sin(this.world.time * 3) * 1.5 - Math.abs(this.preview.angle)*5, this.preview.angle, size*this.preview.scale);
       ctx.restore();
       // Small release chevron above the current cube.
       ctx.strokeStyle = '#fffae6'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(aim - 5, BOARD.dropY - size * 0.72 - 7); ctx.lineTo(aim, BOARD.dropY - size * 0.72 - 2); ctx.lineTo(aim + 5, BOARD.dropY - size * 0.72 - 7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(this.preview.x - 5, BOARD.dropY - size * 0.72 - 7); ctx.lineTo(this.preview.x, BOARD.dropY - size * 0.72 - 2); ctx.lineTo(this.preview.x + 5, BOARD.dropY - size * 0.72 - 7); ctx.stroke();
     }
 
     ctx.save(); ctx.setLineDash([5, 7]); ctx.lineWidth = 1.5;
