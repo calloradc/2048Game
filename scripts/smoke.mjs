@@ -23,9 +23,18 @@ try {
       return { w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight, x: r.x, y: r.y, bottom: r.bottom, right: r.right };
     });
     assert.equal(metrics.w, width); assert.equal(metrics.h, height);
+    assert.ok(await page.evaluate(() => {
+      const field=document.querySelector('.playfield').getBoundingClientRect(),canvas=document.querySelector('canvas').getBoundingClientRect();
+      return Math.abs(field.y-canvas.y)<1 && Math.abs(field.height-canvas.height)<1 && document.fonts.check('900 14px Montserrat');
+    }), 'Canvas stays inside its field; Montserrat loaded');
     assert.ok(metrics.x >= -1 && metrics.y >= -1 && metrics.bottom <= height + 1 && metrics.right <= width + 1, `Scene fits ${width}×${height}`);
     if (width === 390) {
       const canvas = page.locator('canvas'), bounds = await canvas.boundingBox();
+      assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
+      await page.screenshot({path:'test-results/empty-start.png'});
+      await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.13);
+      await page.waitForTimeout(1000);
+      assert.equal(await page.getByTestId('score').textContent(), '0', 'One fruit cannot merge');
       await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.13);
       await page.waitForFunction(() => Number(document.querySelector('[data-testid="score"]').textContent.replace(/\D/g, '')) >= 4);
       await page.getByRole('button', {name:'Встряхнуть'}).click();
@@ -40,6 +49,7 @@ try {
       await page.getByRole('button', {name:'Понятно, играем!'}).click();
       await page.getByRole('button', {name:'Посмотреть все 11 фруктов'}).click();
       assert.equal(await page.locator('.collection-grid > div').count(), 11);
+      assert.equal(await page.locator('.collection-grid b').count(), 0, 'No numeric fruit labels');
       await page.screenshot({path:'test-results/collection.png'});
       await page.getByRole('button', {name:'За арбузом!'}).click();
       await page.screenshot({path:'test-results/mobile.png'});

@@ -1,5 +1,5 @@
 import { asset, FRUITS, fruitAsset } from './fruits';
-import { BOARD, type Cube, type FruitWorld, type MergeEvent } from './physics';
+import { BOARD, type Cube, type FruitWorld, type MergeEvent, REST_POINTS } from './physics';
 
 interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; color: string; size: number }
 interface Float { x: number; y: number; text: string; age: number; combo: number }
@@ -17,6 +17,7 @@ export class GameRenderer {
   private accumulator = 0;
   private destroyed = false;
   private particles: Particle[] = [];
+  private sleepingSprites = new Map<number, {canvas: HTMLCanvasElement; x: number; y: number; w: number; h: number}>();
   private floats: Float[] = [];
   private resizeObserver: ResizeObserver;
   paused = false;
@@ -40,6 +41,7 @@ export class GameRenderer {
   private resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const width = Math.max(1, Math.round(this.canvas.getBoundingClientRect().width * dpr));
+    this.sleepingSprites.clear();
     this.canvas.width = width; this.canvas.height = Math.round(width * BOARD.height / BOARD.width);
   }
 
@@ -64,7 +66,7 @@ export class GameRenderer {
 
   merge(event: MergeEvent) {
     const { x, y, level, combo } = event;
-    this.floats.push({ x, y: y - FRUITS[level].size / 2, text: `+${FRUITS[level].value}`, age: 0, combo });
+    this.floats.push({ x, y: y - FRUITS[level].size / 2, text: combo > 1 ? 'КОМБО!' : 'СОЧНО!', age: 0, combo });
     const count = Math.min(18, 9 + level);
     for (let i = 0; i < count && this.particles.length < 140; i++) {
       const a = Math.random() * Math.PI * 2, speed = 45 + Math.random() * 100;
@@ -76,28 +78,25 @@ export class GameRenderer {
     const ctx = this.ctx, scale = this.canvas.width / BOARD.width;
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     ctx.clearRect(0, 0, BOARD.width, BOARD.height);
-    // The generated glass is layered behind fruit and only its rims in front.
-    ctx.fillStyle = '#23583b22'; ctx.beginPath(); ctx.ellipse(210, 497, 184, 13, 0, 0, Math.PI * 2); ctx.fill();
-    if (this.glass) { ctx.globalAlpha = 0.35; ctx.drawImage(this.glass, 25, 130, 370, 370); ctx.globalAlpha = 1; }
-    ctx.save(); ctx.beginPath(); ctx.roundRect(48, 151, 324, 326, 8); ctx.clip();
-    const wash = ctx.createLinearGradient(0, 151, 0, 477); wash.addColorStop(0, '#e5fbef12'); wash.addColorStop(1, '#c9f5e63a');
-    ctx.fillStyle = wash; ctx.fillRect(48, 151, 324, 326); ctx.restore();
+    // Use the original glass image once; no drawn tint, duplicate rim or wash.
+    if (this.glass) ctx.drawImage(this.glass, 25, 130, 370, 370);
+    for (const id of this.sleepingSprites.keys()) if (!this.world.cubes.has(id)) this.sleepingSprites.delete(id);
 
     const { state, aim } = this.world;
     if (state.status === 'playing' && !this.paused) {
       const size = FRUITS[state.current].size;
       let ghostY = BOARD.floor - size / 2;
       for (const cube of this.world.cubes.values()) {
-        if (aim + size / 2 > cube.body.bounds.min.x && aim - size / 2 < cube.body.bounds.max.x) {
-          ghostY = Math.min(ghostY, cube.body.bounds.min.y - size / 2 - 2);
+        if (aim + size / 2 > cube.bounds.min.x && aim - size / 2 < cube.bounds.max.x) {
+          ghostY = Math.min(ghostY, cube.bounds.min.y - size / 2 - 2);
         }
       }
       ghostY = Math.max(BOARD.dropY + size, ghostY);
       ctx.save(); ctx.setLineDash([3, 8]); ctx.lineWidth = 2; ctx.strokeStyle = '#fffbedb3';
       ctx.beginPath(); ctx.moveTo(aim, BOARD.dropY + size * 0.6); ctx.lineTo(aim, ghostY); ctx.stroke();
-      ctx.globalAlpha = 0.21; this.sprite(state.current, aim, ghostY, 0, size, 0, 0, false); ctx.restore();
+      ctx.restore();
       ctx.save(); ctx.globalAlpha = state.ready ? 1 : 0.55;
-      this.sprite(state.current, aim, BOARD.dropY, 0, size, Math.sin(this.world.time * 3) * 0.025, 0);
+      this.sprite(state.current, aim, BOARD.dropY + Math.sin(this.world.time * 3) * 1.5, 0, size);
       ctx.restore();
       // Small release chevron above the current cube.
       ctx.strokeStyle = '#fffae6'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
@@ -108,10 +107,6 @@ export class GameRenderer {
     ctx.strokeStyle = state.danger ? '#ff666bdd' : '#fffdf082';
     ctx.beginPath(); ctx.moveTo(57, BOARD.danger); ctx.lineTo(363, BOARD.danger); ctx.stroke(); ctx.restore();
     for (const cube of this.world.cubes.values()) this.cube(cube);
-    if (this.glass) {
-      ctx.save(); ctx.beginPath(); ctx.rect(25, 130, 370, 370); ctx.rect(49, 165, 322, 309); ctx.clip('evenodd');
-      ctx.globalAlpha = 0.91; ctx.drawImage(this.glass, 25, 130, 370, 370); ctx.restore();
-    }
     for (const p of this.particles) {
       ctx.globalAlpha = Math.max(0, 1 - p.age / p.life); ctx.fillStyle = p.color;
       ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
@@ -119,51 +114,56 @@ export class GameRenderer {
     ctx.globalAlpha = 1;
     for (const f of this.floats) {
       ctx.save(); ctx.globalAlpha = Math.min(1, (1.1 - f.age) * 3); ctx.textAlign = 'center';
-      ctx.font = '900 25px Nunito, sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#fff8e5'; ctx.fillStyle = '#438952';
+      ctx.font = '900 18px Montserrat, sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#fff8e5'; ctx.fillStyle = '#438952';
       const y = f.y - f.age * 45; ctx.strokeText(f.text, f.x, y); ctx.fillText(f.text, f.x, y);
-      if (f.combo > 1) { ctx.font = '900 12px Nunito, sans-serif'; ctx.fillStyle = '#df8633'; ctx.fillText(`КОМБО ×${f.combo}`, f.x, y + 17); }
+
       ctx.restore();
     }
   }
 
   private cube(cube: Cube) {
-    this.sprite(cube.level, cube.body.position.x, cube.body.position.y, cube.body.angle, FRUITS[cube.level].size, cube.strain, cube.shear);
-  }
-
-  private sprite(level: number, x: number, y: number, angle: number, size: number, strain: number, shear: number, label = true) {
-    const ctx = this.ctx, image = this.sprites[level]; if (!image) return;
-    ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.transform(1 + strain, 0, shear, 1 / (1 + strain), 0, 0);
-    const display = size * 1.17;
-    if (Math.abs(strain) > 0.013) this.mesh(image, display, strain);
-    else ctx.drawImage(image, -display / 2, -display / 2 - size * 0.05, display, display);
-    if (label) {
-      const value = FRUITS[level].value.toString(), font = Math.max(9, size * 0.16);
-      ctx.font = `900 ${font}px Nunito, sans-serif`;
-      const w = Math.max(font * 1.6, ctx.measureText(value).width + font * 0.7), h = font * 1.35;
-      const bx = size * 0.22 - w / 2, by = size * 0.30 - h / 2;
-      ctx.fillStyle = '#fffbeaeb'; ctx.beginPath(); ctx.roundRect(bx, by, w, h, h / 2); ctx.fill();
-      ctx.fillStyle = '#68512e'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(value, size * 0.22, size * 0.30 + 0.3);
-    }
-    ctx.restore();
-  }
-
-  /** Only moving jelly uses eight textured triangles; resting fruit uses one draw. */
-  private mesh(image: HTMLImageElement, size: number, strain: number) {
-    const points: Point[] = [];
-    for (let row = 0; row < 3; row++) for (let col = 0; col < 3; col++) {
-      const px = (col / 2 - 0.5) * size, py = (row / 2 - 0.5) * size - size * 0.043;
-      points.push({ x: px + Math.sin(row * 1.8 + this.world.time * 15) * strain * size * 0.13 * (col === 1 ? 0.3 : 1), y: py + Math.sin(col * 2 + this.world.time * 17) * strain * size * 0.10 });
-    }
-    for (let row = 0; row < 2; row++) for (let col = 0; col < 2; col++) {
-      const tl = row * 3 + col, tr = tl + 1, bl = tl + 3, br = bl + 1;
-      const sx = col * image.width / 2, sy = row * image.height / 2, hw = image.width / 2, hh = image.height / 2;
-      this.triangle(image, [{ x: sx, y: sy }, { x: sx + hw, y: sy }, { x: sx, y: sy + hh }], [points[tl], points[tr], points[bl]]);
-      this.triangle(image, [{ x: sx + hw, y: sy + hh }, { x: sx, y: sy + hh }, { x: sx + hw, y: sy }], [points[br], points[bl], points[tr]]);
-    }
-  }
-
-  private triangle(image: HTMLImageElement, s: Point[], d: Point[]) {
     const ctx = this.ctx;
+    if (cube.sleeping) {
+      let cached = this.sleepingSprites.get(cube.id);
+      if (!cached) {
+        const margin = FRUITS[cube.level].size * 0.23;
+        const x = cube.bounds.min.x - margin, y = cube.bounds.min.y - margin;
+        const w = cube.bounds.max.x - cube.bounds.min.x + margin * 2, h = cube.bounds.max.y - cube.bounds.min.y + margin * 2;
+        const canvas = document.createElement('canvas');
+        const resolution = Math.min(this.canvas.width / BOARD.width, 2);
+        canvas.width = Math.ceil(w * resolution); canvas.height = Math.ceil(h * resolution);
+        const offscreen = canvas.getContext('2d')!;
+        offscreen.setTransform(resolution,0,0,resolution,-x*resolution,-y*resolution);
+        this.mesh(cube,offscreen);
+        cached = {canvas,x,y,w,h}; this.sleepingSprites.set(cube.id,cached);
+      }
+      ctx.drawImage(cached.canvas,cached.x,cached.y,cached.w,cached.h);
+    } else {
+      this.sleepingSprites.delete(cube.id);
+      this.mesh(cube,ctx);
+    }
+  }
+
+  private sprite(level: number, x: number, y: number, angle: number, size: number) {
+    const ctx = this.ctx, image = this.sprites[level]; if (!image) return;
+    const display = size * 1.10;
+    ctx.save(); ctx.translate(x,y); ctx.rotate(angle);
+    ctx.drawImage(image,-display/2,-display/2-size*0.035,display,display); ctx.restore();
+  }
+
+  /** The texture follows the same eight collision nodes, joined to the centre. */
+  private mesh(cube: Cube, ctx: CanvasRenderingContext2D) {
+    const image = this.sprites[cube.level]; if (!image) return;
+    const size = FRUITS[cube.level].size;
+    const points: Point[] = cube.nodes.map(p => ({x:cube.x+(p.x-cube.x)*1.10,y:cube.y+(p.y-cube.y)*1.10-size*0.035}));
+    const source: Point[] = REST_POINTS.map(([u,v]) => ({x:(u+0.5)*image.width,y:(v+0.5)*image.height}));
+    for(let i=0;i<8;i++) {
+      const next=(i+1)%8;
+      this.triangle(ctx,image,[source[8],source[i],source[next]],[points[8],points[i],points[next]]);
+    }
+  }
+
+  private triangle(ctx: CanvasRenderingContext2D, image: HTMLImageElement, s: Point[], d: Point[]) {
     const den = s[0].x * (s[1].y - s[2].y) + s[1].x * (s[2].y - s[0].y) + s[2].x * (s[0].y - s[1].y);
     const affine = (values: number[]) => [
       (values[0] * (s[1].y - s[2].y) + values[1] * (s[2].y - s[0].y) + values[2] * (s[0].y - s[1].y)) / den,
@@ -171,9 +171,12 @@ export class GameRenderer {
       (values[0] * (s[1].x * s[2].y - s[2].x * s[1].y) + values[1] * (s[2].x * s[0].y - s[0].x * s[2].y) + values[2] * (s[0].x * s[1].y - s[1].x * s[0].y)) / den,
     ];
     const a = affine(d.map(p => p.x)), b = affine(d.map(p => p.y));
-    ctx.save(); ctx.beginPath(); ctx.moveTo(d[0].x, d[0].y); ctx.lineTo(d[1].x, d[1].y); ctx.lineTo(d[2].x, d[2].y); ctx.closePath(); ctx.clip();
+    // Overlap clips by a fraction of a pixel to avoid anti-alias seams.
+    const cx=(d[0].x+d[1].x+d[2].x)/3,cy=(d[0].y+d[1].y+d[2].y)/3;
+    const clip=d.map(p=>{const dx=p.x-cx,dy=p.y-cy,len=Math.max(1,Math.hypot(dx,dy));return{x:p.x+dx/len*0.3,y:p.y+dy/len*0.3};});
+    ctx.save();ctx.beginPath();ctx.moveTo(clip[0].x,clip[0].y);ctx.lineTo(clip[1].x,clip[1].y);ctx.lineTo(clip[2].x,clip[2].y);ctx.closePath();ctx.clip();
     ctx.transform(a[0], b[0], a[1], b[1], a[2], b[2]); ctx.drawImage(image, 0, 0); ctx.restore();
   }
 
-  destroy() { this.destroyed = true; cancelAnimationFrame(this.frame); this.resizeObserver.disconnect(); }
+  destroy() { this.destroyed = true; cancelAnimationFrame(this.frame); this.resizeObserver.disconnect(); this.sleepingSprites.clear(); }
 }
