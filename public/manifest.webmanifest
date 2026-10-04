@@ -1,0 +1,11 @@
+{
+  "name": "Jelly Fruit — фруктовый переполох",
+  "short_name": "Jelly Fruit",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#72bd8a",
+  "theme_color": "#72bd8a",
+  "icons": [{ "src": "assets/icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }]
+}
