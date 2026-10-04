@@ -13,7 +13,7 @@ export const FRUITS = [
 ] as const;
 
 export const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}`;
-export const fruitAsset = (level: number) => asset(`fruit-${level}.webp`);
+export const fruitAsset = (level: number,skin='fruit') => asset(skin==='fruit'?`fruit-${level}.webp`:`skins/${skin}/${level}.webp`);
 
 export function randomDrop(random = Math.random): number {
   const n = random();

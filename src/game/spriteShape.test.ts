@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FruitWorld } from './physics';
-import { bodyUV, SPRITE_FANS, textureTransform, type UV } from './spriteShape';
+import { bodyUV, bodyRect, SPRITE_FANS, spriteFans, textureTransform, type UV } from './spriteShape';
+import { CATALOG } from './catalog';
 
 const area = (points: UV[]) => Math.abs(points.reduce((sum,p,i)=>{
   const q=points[(i+1)%points.length];return sum+p.x*q.y-q.x*p.y;
@@ -32,6 +33,17 @@ describe('Fruit texture follows the physical flesh',()=>{
         }
       }
       world.destroy();
+    }
+  });
+  it('maps every new square face uniformly and covers all decorations',()=>{
+    for(const skin of CATALOG.skins)for(let level=0;level<11;level++){
+      if(skin.id==='fruit'&&level<7)continue;
+      const [left,top,right,bottom]=bodyRect(level,skin.id);
+      expect(right-left).toBe(bottom-top);
+      expect(spriteFans(skin.id)[level].reduce((sum,polygon)=>sum+area(polygon),0)).toBeCloseTo(256*256,6);
+      const world=new FruitWorld(),cube=world.add(level,210,250),uv=bodyUV(level,skin.id);
+      const {x,y}=textureTransform([uv[8],uv[0],uv[1]],[cube.nodes[8],cube.nodes[0],cube.nodes[1]]);
+      expect(x[0]).toBeCloseTo(y[1],8);expect(x[1]).toBeCloseTo(0,8);expect(y[0]).toBeCloseTo(0,8);world.destroy();
     }
   });
 });

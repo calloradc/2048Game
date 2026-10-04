@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
+import { checkShop } from './shop-smoke.mjs';
+import { checkGameover } from './gameover-smoke.mjs';
 
 const browser = await chromium.launch({
   ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
@@ -82,15 +84,15 @@ try {
       const shakeButton=page.getByRole('button',{name:/Встряхнуть/});
       await shakeButton.click();
       assert.match(await shakeButton.textContent(), /2/);
-      await page.getByRole('button', {name:'Пауза', exact:true}).click();
+      await page.getByRole('button', {name:'Настройки', exact:true}).click();
       assert.ok(await page.getByRole('dialog').evaluate(el=>el.getAnimations().some(a=>a.playState==='running')),'Dialog animates into view');
       await page.waitForTimeout(100);
       const paused = await canvas.evaluate(c => c.toDataURL());
       await page.waitForTimeout(500);
       assert.equal(await canvas.evaluate(c => c.toDataURL()), paused, 'Pause freezes the world');
-      await page.getByRole('button', {name:'Продолжить',exact:true}).click();
+      await page.getByRole('button', {name:'Вернуться в игру',exact:true}).click();
       await page.locator('.overlay.is-leaving').waitFor();
-      assert.equal(await page.getByRole('dialog').getAttribute('aria-label'),'Пауза','Exit retains the previous dialog');
+      assert.equal(await page.getByRole('dialog').getAttribute('aria-label'),'Настройки','Exit retains the previous dialog');
       await page.locator('.overlay').waitFor({state:'detached'});
       await page.getByRole('button', {name:'Как играть',exact:true}).click();
       await page.getByRole('button', {name:'Понятно, играем!'}).click();
@@ -166,7 +168,8 @@ try {
       assert.equal(await page.locator('.best-card strong').textContent(), record, 'Record survives a reload');
       assert.equal(await page.getByTestId('coins').textContent(),coins,'Wallet survives a reload');
       assert.equal(await page.locator('.chain-fruit[data-discovered="true"]').count(),discoveries,'Discoveries survive a reload');
-      await page.getByRole('button', {name:'Начать заново'}).click();
+      await page.getByRole('button', {name:'Настройки',exact:true}).click();
+      await page.getByRole('button', {name:'Начать заново',exact:true}).click();
       await page.getByRole('dialog').getByRole('button', {name:'Начать заново',exact:true}).click();
       await page.locator('.overlay').waitFor({state:'detached'});
       assert.equal(await page.getByTestId('score').textContent(), '0');
@@ -187,6 +190,8 @@ try {
   assert.equal(await paid.getByTestId('coins').textContent(),'0','Extra shake costs 25 coins');
   assert.ok(await shake.isDisabled(),'An unaffordable shake is disabled');
   await paid.close();
+  await checkShop(browser,base,errors);
+  await checkGameover(browser,base,errors);
   assert.deepEqual(errors, [], 'No browser errors or missing assets');
   console.log('✓ preview tilt, elastic edges, inertia, fading masks, animated dialogs, touch drop, merges and saved progress');
 } finally { await browser.close(); }

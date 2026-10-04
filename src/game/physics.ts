@@ -6,6 +6,7 @@ export interface GameState {
   score: number; best: number; current: number; next: number;
   highest: number; drops: number; shakes: number; status: Status;
   danger: number; combo: number; ready: boolean; coins: number; discovered: number;
+  earned: number; doubled: boolean; bonusCoins: number; revives: number;
 }
 export interface Node { x: number; y: number; px: number; py: number }
 interface Link { a: number; b: number; rest: number; lambda: number }
@@ -17,12 +18,13 @@ export interface Cube {
 }
 export interface MergeEvent { x: number; y: number; level: number; combo: number }
 export const SHAKE_PRICE = 25;
-export const initialState = (best = 0, coins = 0, discovered = 1): GameState => ({ score: 0, best, current: 0, next: 1, highest: 0, drops: 0, shakes: 3, status: 'playing', danger: 0, combo: 0, ready: true, coins, discovered });
+export const initialState = (best = 0, coins = 0, discovered = 1): GameState => ({ score: 0, best, current: 0, next: 1, highest: 0, drops: 0, shakes: 3, status: 'playing', danger: 0, combo: 0, ready: true, coins, discovered, earned:0, doubled:false, bonusCoins:0, revives:0 });
 // Clockwise perimeter: corners and edge midpoints. Ninth point is the centre.
 export const REST_POINTS = [[-0.5,-0.5],[0,-0.5],[0.5,-0.5],[0.5,0],[0.5,0.5],[0,0.5],[-0.5,0.5],[-0.5,0],[0,0]] as const;
 const ITERATIONS = 6;
 const CELL = 100;
 const MAX_CUBES = 70;
+const OVERFLOW_SECONDS = 2.2;
 
 /** Nine Verlet particles, compliant distance/area constraints and polygon contacts. */
 export class FruitWorld {
@@ -42,7 +44,23 @@ export class FruitWorld {
   private contactB = new Float64Array(8);
 
   constructor(best = 0, coins = 0, discovered = 1) { this.state = initialState(best,coins,discovered); this.reset(); }
+  get overflowProgress() { return Math.min(1,this.overflowTime/OVERFLOW_SECONDS); }
   emit() { this.onChange({ ...this.state }); }
+  grantCoins(amount: number) { if(!Number.isFinite(amount)||amount<=0)return;this.state.coins+=Math.floor(amount);this.emit(); }
+  spendCoins(amount: number) { if(amount<0||!Number.isFinite(amount)||this.state.coins<amount)return false;this.state.coins-=Math.floor(amount);this.emit();return true; }
+  grantShake() { this.state.shakes++;this.emit(); }
+  doubleEarnings() {
+    if(this.state.status==='playing'||this.state.doubled||!this.state.earned)return false;
+    this.state.doubled=true;this.state.bonusCoins=this.state.earned;this.grantCoins(this.state.bonusCoins);return true;
+  }
+  revive() {
+    if(this.state.status!=='gameover'||this.state.revives>=1)return false;
+    const upper=[...this.cubes.values()].sort((a,b)=>a.bounds.min.y-b.bounds.min.y);
+    for(let i=0;i<upper.length;i++)if(i<3||upper[i].bounds.min.y<BOARD.danger+55)this.cubes.delete(upper[i].id);
+    for(const cube of this.cubes.values())this.setVelocity(cube,0,-0.3);
+    this.state.status='playing';this.state.revives++;this.state.danger=0;this.state.ready=true;
+    this.overflowTime=0;this.overDanger=false;this.emit();return true;
+  }
   reset() {
     const {best,coins,discovered} = this.state;
     this.cubes.clear(); this.time = 0; this.lastDrop = -2; this.lastMerge = -2;
@@ -240,7 +258,7 @@ export class FruitWorld {
     this.state.combo=this.time-this.lastMerge<1.4?this.state.combo+1:1;this.lastMerge=this.time;
     this.state.score+=FRUITS[level].value;this.state.best=Math.max(this.state.best,this.state.score);
     this.state.highest=Math.max(this.state.highest,level);
-    this.state.discovered |= 1 << level; this.state.coins += level;
+    this.state.discovered |= 1 << level; this.state.coins += level;this.state.earned+=level;
     this.onMerge({x,y,level,combo:this.state.combo});
     if(level===10)this.state.status='won';this.emit();
   }
@@ -276,10 +294,12 @@ export class FruitWorld {
       const a=this.cubes.get(aid),b=this.cubes.get(bid);if(a&&b&&a.level===b.level)this.merge(a,b);
     }
     if(!this.state.ready&&this.time-this.lastDrop>=0.42){this.state.ready=true;this.emit();}
-    const danger=[...this.cubes.values()].some(c=>this.time-c.born>2&&c.bounds.min.y<BOARD.danger&&c.speed<2.5);
-    this.overflowTime=danger?this.overflowTime+dt:0;
+    // Motion in a crowded jelly pile must not reset the loss countdown.
+    // Only the newly released/merged fruit gets a short falling grace period.
+    const danger=this.cubes.size>=MAX_CUBES||[...this.cubes.values()].some(c=>this.time-c.born>1.3&&c.bounds.min.y<BOARD.danger);
+    this.overflowTime=danger?this.overflowTime+dt:Math.max(0,this.overflowTime-dt*2);
     if(danger!==this.overDanger){this.overDanger=danger;this.state.danger=danger?1:0;this.emit();}
-    if(this.overflowTime>2){this.state.status='gameover';this.emit();}
+    if(this.overflowTime>=OVERFLOW_SECONDS){this.state.status='gameover';this.emit();}
     if(this.state.combo&&this.time-this.lastMerge>1.4){this.state.combo=0;this.emit();}
   }
   continue(){this.state.status='playing';this.emit();}

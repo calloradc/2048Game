@@ -1,7 +1,8 @@
 import { asset, FRUITS, fruitAsset } from './fruits';
 import { BOARD, type Cube, type FruitWorld, type MergeEvent } from './physics';
-import { bodyUV, FRUIT_BODY, SPRITE_FANS, textureTransform, type UV } from './spriteShape';
+import { bodyUV, bodyRect, spriteFans, textureTransform, type UV } from './spriteShape';
 import { AimPreview } from './aimPreview';
+import { backgroundAsset, boxAsset } from './catalog';
 
 interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; texture: number; size: number; angle: number; spin: number }
 interface Burst { x: number; y: number; age: number; color: string; radius: number }
@@ -25,6 +26,8 @@ export class GameRenderer {
   private floats: Float[] = [];
   private resizeObserver: ResizeObserver;
   private preview: AimPreview;
+  private skin='fruit';
+  private appearanceVersion=0;
   private reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   paused = false;
 
@@ -38,9 +41,10 @@ export class GameRenderer {
     this.resize();
   }
 
-  async start(progress: (loaded: number, total: number) => void = () => {}) {
-    const icons=['sound','mute','pause','restart','help','shake','hand','leaf','trophy','play','close','fullscreen','right','left','sparkle'];
-    const files=[...FRUITS.map((_,level)=>fruitAsset(level)),asset('glass.webp'),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),asset('wood-sign.webp'),asset('countryside.webp'),...icons.map(name=>asset(`ui/icon-${name}.webp`))];
+  async start(progress: (loaded: number, total: number) => void = () => {},skin='fruit',box='glass',background='meadow') {
+    this.skin=skin;
+    const icons=['sound','mute','restart','help','shake','hand','leaf','trophy','play','close','fullscreen','right','left','sparkle','settings','shop','video','gift','skin','background','box','check','lock','double','rescue','vibrate'];
+    const files=[...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),asset('wood-sign.webp'),backgroundAsset(background),...icons.map(name=>asset(`ui/icon-${name}.webp`))];
     let completed=0;const total=files.length+1;
     const images=await Promise.all(files.map(async src=>{const image=await loadImage(src);if(!this.destroyed)progress(++completed,total);return image;}));
     await document.fonts.ready;
@@ -48,6 +52,13 @@ export class GameRenderer {
     progress(++completed,total);
     this.sprites=images.slice(0,11);this.glass=images[11];this.particleTextures=images.slice(12,24);
     this.frame=requestAnimationFrame(this.tick);
+  }
+
+  async setAppearance(skin:string,box:string,background:string) {
+    const version=++this.appearanceVersion;
+    const images=await Promise.all([...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),backgroundAsset(background)].map(loadImage));
+    if(this.destroyed||version!==this.appearanceVersion)return false;
+    this.skin=skin;this.sprites=images.slice(0,11);this.glass=images[11];this.sleepingSprites.clear();return true;
   }
 
   private resize() {
@@ -125,6 +136,7 @@ export class GameRenderer {
     ctx.save(); ctx.setLineDash([5, 7]); ctx.lineWidth = 1.5;
     ctx.strokeStyle = state.danger ? '#ff666bdd' : '#fffdf082';
     ctx.beginPath(); ctx.moveTo(57, BOARD.danger); ctx.lineTo(363, BOARD.danger); ctx.stroke(); ctx.restore();
+    if(state.danger){ctx.fillStyle='#ff7066';ctx.fillRect(57,BOARD.danger+5,306*this.world.overflowProgress,3);}
     for (const cube of this.world.cubes.values()) this.cube(cube);
     for(const b of this.bursts) {
       const t=b.age/0.35;ctx.save();ctx.globalAlpha=(1-t)*0.5;ctx.strokeStyle=b.color;ctx.lineWidth=3*(1-t);
@@ -153,12 +165,12 @@ export class GameRenderer {
       let cached = this.sleepingSprites.get(cube.id);
       if (!cached) {
         // Cache only the mapped image bounds, including leaves beyond the flesh.
-        const uv = bodyUV(cube.level);
+        const uv = bodyUV(cube.level,this.skin);
         let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
         for(let i=0;i<8;i++) {
           const next=(i+1)%8;
           const {x:a,y:b}=textureTransform([uv[8],uv[i],uv[next]],[cube.nodes[8],cube.nodes[i],cube.nodes[next]]);
-          for(const p of SPRITE_FANS[cube.level][i]) {
+          for(const p of spriteFans(this.skin)[cube.level][i]) {
             const px=a[0]*p.x+a[1]*p.y+a[2],py=b[0]*p.x+b[1]*p.y+b[2];
             minX=Math.min(minX,px);maxX=Math.max(maxX,px);minY=Math.min(minY,py);maxY=Math.max(maxY,py);
           }
@@ -182,7 +194,7 @@ export class GameRenderer {
 
   private sprite(level: number, x: number, y: number, angle: number, size: number) {
     const ctx=this.ctx,image=this.sprites[level];if(!image)return;
-    const [left,top,right,bottom]=FRUIT_BODY[level],sx=size/(right-left),sy=size/(bottom-top);
+    const [left,top,right,bottom]=bodyRect(level,this.skin),sx=size/(right-left),sy=size/(bottom-top);
     ctx.save();ctx.translate(x,y);ctx.rotate(angle);
     ctx.drawImage(image,-size/2-left*sx,-size/2-top*sy,256*sx,256*sy);ctx.restore();
   }
@@ -190,10 +202,10 @@ export class GameRenderer {
   /** Measured flesh UVs map directly to collider nodes; leaves extend outside. */
   private mesh(cube: Cube, ctx: CanvasRenderingContext2D) {
     const image=this.sprites[cube.level];if(!image)return;
-    const uv=bodyUV(cube.level);
+    const uv=bodyUV(cube.level,this.skin);
     for(let i=0;i<8;i++) {
       const next=(i+1)%8;
-      this.triangle(ctx,image,[uv[8],uv[i],uv[next]],[cube.nodes[8],cube.nodes[i],cube.nodes[next]],SPRITE_FANS[cube.level][i]);
+      this.triangle(ctx,image,[uv[8],uv[i],uv[next]],[cube.nodes[8],cube.nodes[i],cube.nodes[next]],spriteFans(this.skin)[cube.level][i]);
     }
   }
 
