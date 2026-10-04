@@ -15,6 +15,8 @@ export async function checkShop(browser,base,errors){
   assert.equal(await page.locator('.drop-label,.footer-caption').count(),0,'Removed surplus plaques');
   assert.equal(await page.locator('.score-card strong').evaluate(el=>getComputedStyle(el).color),'rgb(255, 253, 243)','White score on wood');
   assert.equal(await page.getByRole('tab').count(),3);
+  assert.deepEqual(await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox(),{x:0,y:0,width:390,height:844},'Shop fills the actual viewport outside the scaled game');
+  assert.ok(await page.locator('.scene').evaluate(el=>el.inert),'Game controls are inert beneath the shop');
   assert.ok(await page.locator('.snap-viewport').evaluate(el=>getComputedStyle(el).scrollSnapType.includes('mandatory')),'Shop snaps natively');
   await next('Шушистики');
   assert.ok(await page.locator('.shop-card').evaluateAll(cards=>{
@@ -27,7 +29,7 @@ export async function checkShop(browser,base,errors){
   await page.getByRole('tab',{name:'Фоны',exact:true}).click();await next('Сакура на закате');
   await page.getByRole('button',{name:'Купить за 120'}).click();assert.equal(await coins(),100);
   await page.getByRole('button',{name:'Выбрать',exact:true}).click();await page.getByRole('button',{name:'Уже в игре'}).waitFor();
-  assert.ok(await page.locator('.scene').evaluate(el=>getComputedStyle(el,'::before').backgroundImage.includes('backgrounds/sunset.webp')));
+  assert.ok(await page.locator('.ambient-background').evaluate(el=>getComputedStyle(el,'::before').backgroundImage.includes('backgrounds/sunset.webp')));
   await page.screenshot({path:'test-results/shop-backgrounds.png'});
   await page.getByRole('tab',{name:'Боксы',exact:true}).click();await next('Розовый кварц');
   assert.ok(await page.getByRole('button',{name:'Нужно ещё 50'}).isDisabled());
@@ -73,9 +75,25 @@ export async function checkShop(browser,base,errors){
   await page.touchscreen.tap(field.x+field.width*.5,field.y+field.height*.13);await page.waitForTimeout(1500);
   await page.screenshot({path:'test-results/selected-theme.png'});
   await openShop();
+  await page.waitForTimeout(350);
+  const rail=await page.locator('.snap-viewport').boundingBox(),touch=await page.context().newCDPSession(page);
+  await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:rail.x+rail.width*.8,y:rail.y+rail.height*.3}]});
+  for(let i=1;i<=8;i++){
+    await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:rail.x+rail.width*(.8-i*.075),y:rail.y+rail.height*.3}]});
+    await page.waitForTimeout(70);
+  }
+  await page.waitForTimeout(100);
+  await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await touch.detach();
+  await page.waitForFunction(()=>document.querySelector('.shop-current')?.textContent==='Шушистики');
+  await page.getByRole('button',{name:'Показать Кристаллики',exact:true}).click();
+  await page.waitForFunction(()=>{const card=document.querySelector('.shop-card[data-theme=crystals]').getBoundingClientRect(),rail=document.querySelector('.snap-viewport').getBoundingClientRect();return Math.abs(card.left+card.width/2-rail.left-rail.width/2)<2;});
+  assert.equal(await page.locator('.shop-card[data-centred=true]').getAttribute('data-theme'),'crystals','Visible card and purchase target agree after dot navigation');
+  await page.locator('.snap-viewport').focus();await page.keyboard.press('ArrowLeft');
+  await page.waitForFunction(()=>document.querySelector('.shop-current')?.textContent==='Вкусный переполох');
   for(const [w,h] of [[320,568],[360,640],[844,390]]){
     await page.setViewportSize({width:w,height:h});await page.waitForTimeout(300);
-    const rect=await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox();assert.ok(rect.x>=0&&rect.y>=0&&rect.x+rect.width<=w+1&&rect.y+rect.height<=h+1,`Shop fits ${w}×${h}`);
+    const rect=await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox();assert.deepEqual(rect,{x:0,y:0,width:w,height:h},`Shop fills ${w}×${h}`);
+    const play=await page.getByRole('button',{name:'Играть',exact:true}).boundingBox();assert.ok(play.y>=0&&play.y+play.height<=h+1,'Return to game is visible without scrolling');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth&&document.documentElement.scrollHeight===innerHeight));
     await page.screenshot({path:`test-results/shop-${w}x${h}.png`});
   }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { asset, fruitAsset } from './game/fruits';
 import { BOARD, FruitWorld, initialState, SHAKE_PRICE } from './game/physics';
 import { GameRenderer } from './game/renderer';
@@ -140,38 +141,11 @@ export default function App() {
   };
   const daily=()=>{if(profileRef.current.daily===today())return;commitProfile({...profileRef.current,daily:today()});worldRef.current?.grantCoins(25);notify('Ежедневный подарок: +25 монет!');};
   const skin=profile.selected.skins;
-  return <main className="game-screen" ref={shellRef} aria-busy={!loaded} style={{'--scenery':`url("${new URL(backgroundAsset(profile.selected.backgrounds),document.baseURI).href}")`} as CSSProperties}>
-    <div className="ambient-background" aria-hidden="true" />
-    <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={!loaded} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
-      <header className="header">
-        <div className="brand"><span className="brand-leaf"><Icon name="leaf" size={25} /></span><div className="brand-text">jelly<span>fruit<span className="brand-dot">.</span></span></div></div>
-        <button className="wallet" aria-label="Баланс монет" onClick={()=>setModal('wallet')}><img src={asset('particles/11.webp')} alt="" /><strong key={state.coins} data-testid="coins">{format(state.coins)}</strong></button>
-        <div className="header-buttons"><button className="round-button" aria-label="Магазин" onClick={()=>setModal('shop')}><Icon name="shop" size={23}/></button><button className="round-button" aria-label="Настройки" onClick={()=>setModal('settings')}><Icon name="settings" size={23}/></button></div>
-      </header>
-      <section className="scoreboard" aria-label="Результат">
-        <img className="score-sign-art" src={asset('wood-sign.webp')} alt="" draggable={false}/>
-        <div className="score-card"><span className="small-label">ТВОЙ СЧЁТ</span><strong key={state.score} data-testid="score">{format(state.score)}</strong></div>
-        <div className="best-card"><span className="small-label"><Icon name="trophy" size={13}/> РЕКОРД</span><strong key={state.best}>{format(state.best)}</strong></div>
-      </section>
-      <div className={`playfield ${shaking?'shaking':''} ${state.danger?'danger':''}`}>
-        <div className="next-fruit"><span>ДАЛЬШЕ</span><img key={`${skin}-${state.drops}`} src={fruitAsset(state.next,skin)} alt="Следующий кубик" draggable={false}/></div>
-        <canvas ref={canvasRef} aria-label="Игровой контейнер. Веди пальцем и отпусти, чтобы бросить фрукт." tabIndex={0}
-          onPointerDown={pointerDown} onPointerMove={e=>{if(dragRef.current===e.pointerId||e.pointerType==='mouse')aim(e);}} onPointerUp={pointerUp} onPointerCancel={()=>{dragRef.current=null;}} onLostPointerCapture={()=>{dragRef.current=null;}}
-          onKeyDown={e=>{if(overlay||state.status!=='playing'||!loaded)return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();if(world.drop())audioRef.current?.play('drop');}}}/>
-        {state.danger>0&&<div className="danger-message">Контейнер почти полон! {state.status==='playing'?'Освободи место':''}</div>}
-      </div>
-      <div className="hint"><Icon name="hand" size={15}/> Веди пальцем и отпускай</div>
-      <FruitCarousel discovered={state.discovered} skin={skin}/>
-      <footer className="controls">
-        <button className="utility-button" onClick={()=>setModal('help')} aria-label="Как играть"><Icon name="help" size={24}/><span>Как играть</span></button>
-        <button className="shake-button" onClick={shake} disabled={(!state.shakes&&state.coins<SHAKE_PRICE)||!loaded||state.status!=='playing'}><Icon name="shake" size={28}/><span>Встряхнуть</span><b>{state.shakes>0?state.shakes:<><img src={asset('particles/11.webp')} alt="монет"/>{SHAKE_PRICE}</>}</b></button>
-        <button className="utility-button" onClick={()=>setModal('rewards')} aria-label="Подарки"><Icon name="gift" size={24}/><span>Подарки</span></button>
-      </footer>
-      {overlay&&<div className={`overlay ${dialogLeaving?'is-leaving':''}`} onPointerDown={e=>e.stopPropagation()}>
+  const dialog=overlay&&<div className={`overlay ${dialogKind==='shop'?'shop-fullscreen':''} ${dialogLeaving?'is-leaving':''}`} onPointerDown={e=>e.stopPropagation()}>
         <div className={`dialog ${dialogKind==='shop'?'shop-dialog':''}`} role="dialog" aria-modal="true" aria-label={dialogKind?dialogLabels[dialogKind]:''} tabIndex={-1} ref={dialogRef}>
           <div className="dialog-content" inert={!!ad}>
             {dialogKind!=='gameover'&&dialogKind!=='won'&&<button className="dialog-close" aria-label="Закрыть" onClick={()=>setModal(null)}><Icon name="close" size={21}/></button>}
-            {dialogKind==='shop'?<Shop profile={profile} coins={state.coins} busy={appearanceBusy} onBuy={buy} onSelect={item=>void apply(item)} onVideo={item=>watch({type:'unlock',key:item.key})} onCoins={()=>watch({type:'coins'})}/>:dialogKind==='settings'?<>
+            {dialogKind==='shop'?<Shop profile={profile} coins={state.coins} busy={appearanceBusy} onBuy={buy} onSelect={item=>void apply(item)} onVideo={item=>watch({type:'unlock',key:item.key})} onCoins={()=>watch({type:'coins'})} onClose={()=>setModal(null)}/>:dialogKind==='settings'?<>
               <Icon name="settings" size={65}/><span className="eyebrow">УСТРОИМ ВСЁ ПО-ТВОЕМУ</span><h1>Настройки</h1>
               <div className="settings-list">
                 <button className="setting-row" role="switch" aria-checked={!muted} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={27}/><span>Звук</span><i className={!muted?'on':''}/></button>
@@ -203,9 +177,39 @@ export default function App() {
           </div>
           {ad&&<RewardedAd key={ad.id} reward={ad.reward} onComplete={()=>completeAd(ad.id)} onCancel={cancelAd}/>}
         </div>
-      </div>}
-      {toast&&<div className="toast" role="status"><Icon name="check" size={19}/>{toast}</div>}
+      </div>;
+
+  return <main className="game-screen" ref={shellRef} aria-busy={!loaded} style={{'--scenery':`url("${new URL(backgroundAsset(profile.selected.backgrounds),document.baseURI).href}")`} as CSSProperties}>
+    <div className="ambient-background" aria-hidden="true" />
+    <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={!loaded||overlay} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
+      <header className="header">
+        <div className="brand"><span className="brand-leaf"><Icon name="leaf" size={25} /></span><div className="brand-text">jelly<span>fruit<span className="brand-dot">.</span></span></div></div>
+        <button className="wallet" aria-label="Баланс монет" onClick={()=>setModal('wallet')}><img src={asset('particles/11.webp')} alt="" /><strong key={state.coins} data-testid="coins">{format(state.coins)}</strong></button>
+        <div className="header-buttons"><button className="round-button sound-button" aria-label={muted?'Включить звук':'Выключить звук'} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={26}/></button><button className="round-button" aria-label="Настройки" onClick={()=>setModal('settings')}><Icon name="settings" size={23}/></button></div>
+      </header>
+      <section className="scoreboard" aria-label="Результат">
+        <img className="score-sign-art" src={asset('wood-sign.webp')} alt="" draggable={false}/>
+        <div className="score-card"><span className="small-label">ТВОЙ СЧЁТ</span><strong key={state.score} data-testid="score">{format(state.score)}</strong></div>
+        <div className="best-card"><span className="small-label"><Icon name="trophy" size={13}/> РЕКОРД</span><strong key={state.best}>{format(state.best)}</strong></div>
+      </section>
+      <div className={`playfield ${shaking?'shaking':''} ${state.danger?'danger':''}`}>
+        <button className="shop-launch" aria-label="Магазин" onClick={()=>setModal('shop')}><Icon name="shop" size={35}/><span>Магазин<small>Образы и фоны</small></span></button>
+        <div className="next-fruit"><span>ДАЛЬШЕ</span><img key={`${skin}-${state.drops}`} src={fruitAsset(state.next,skin)} alt="Следующий кубик" draggable={false}/></div>
+        <canvas ref={canvasRef} aria-label="Игровой контейнер. Веди пальцем и отпусти, чтобы бросить фрукт." tabIndex={0}
+          onPointerDown={pointerDown} onPointerMove={e=>{if(dragRef.current===e.pointerId||e.pointerType==='mouse')aim(e);}} onPointerUp={pointerUp} onPointerCancel={()=>{dragRef.current=null;}} onLostPointerCapture={()=>{dragRef.current=null;}}
+          onKeyDown={e=>{if(overlay||state.status!=='playing'||!loaded)return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();if(world.drop())audioRef.current?.play('drop');}}}/>
+        {state.danger>0&&<div className="danger-message">Контейнер почти полон! {state.status==='playing'?'Освободи место':''}</div>}
+      </div>
+      <div className="hint"><Icon name="hand" size={15}/> Веди пальцем и отпускай</div>
+      <FruitCarousel discovered={state.discovered} skin={skin}/>
+      <footer className="controls">
+        <button className="utility-button" onClick={()=>setModal('help')} aria-label="Как играть"><Icon name="help" size={24}/><span>Как играть</span></button>
+        <button className="shake-button" onClick={shake} disabled={(!state.shakes&&state.coins<SHAKE_PRICE)||!loaded||state.status!=='playing'}><Icon name="shake" size={28}/><span>Встряхнуть</span><b>{state.shakes>0?state.shakes:<><img src={asset('particles/11.webp')} alt="монет"/>{SHAKE_PRICE}</>}</b></button>
+        <button className="utility-button" onClick={()=>setModal('rewards')} aria-label="Подарки"><Icon name="gift" size={24}/><span>Подарки</span></button>
+      </footer>
     </div>
+    {shellRef.current&&createPortal(dialog,shellRef.current)}
+    {toast&&<div className="toast" role="status"><Icon name="check" size={19}/>{toast}</div>}
     {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label="Загрузка игры"><div className="loading-content"><div className="loading-logo">jelly <span>fruit.</span></div><div className="loading-mascots"><img className="loading-side left" src={fruitAsset(1)} alt=""/><img className="loading-hero" src={fruitAsset(0)} alt=""/><img className="loading-side right" src={fruitAsset(2)} alt=""/><span className="loading-spark s1">✦</span><span className="loading-spark s2">✦</span></div><h1>{error?'Фрукты задержались':'Скоро будет сочно!'}</h1><p>{error?'Не удалось загрузить ассеты. Попробуй ещё раз.':'Собираем маленькую фруктовую семью'}</p>{!error?<><div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{width:`${progress}%`}}/></div><span className="loading-percent">{progress}%</span></>:<button className="primary-button" onClick={()=>window.location.reload()}>Попробовать ещё</button>}</div><span className="loading-caption">НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА</span></section>}
     <div className="desktop-note"><Icon name="left" size={14}/><span>Наведи мышку и нажми, чтобы бросить</span><Icon name="right" size={14}/></div>
   </main>;

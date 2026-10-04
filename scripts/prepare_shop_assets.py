@@ -74,9 +74,7 @@ for i in range(4):
 sheet.save('/workspace/scratch/shop-body-check.jpg')
 
 (dest/'backgrounds').mkdir(exist_ok=True)
-atlas=Image.open(source/'exec-b92405d7-0776-49ee-b982-78527274ead4.png')
-for i,name in enumerate(['sunset','moonlight','candy']):
-    cell(atlas,i,3,1).save(dest/'backgrounds'/f'{name}.webp',quality=87,method=6)
+# Backgrounds now come from four individual edits of countryside.webp.
 
 (dest/'boxes').mkdir(exist_ok=True)
 atlas=Image.open(source/'exec-dd411683-606e-4d39-b485-37e708e59f18.png').convert('RGBA')
@@ -86,4 +84,6 @@ for i,name in enumerate(['rose','amber','ice']):
 atlas=Image.open(source/'exec-5208a442-df88-4fa0-8b36-85dc0848f73a.png').convert('RGBA')
 for i,name in enumerate(['settings','shop','video','gift','skin','background','box','check','lock','double','rescue','vibrate']):
     sprite(cell(atlas,i,4,3),96,6).save(dest/'ui'/f'icon-{name}.webp',quality=92,method=6)
-print('Exported 55 characters, 4 repaired fruits, 3 backgrounds, 3 boxes and 12 icons.')
+print('Exported 55 characters, 4 large fruits, 3 boxes and legacy icon sources.')
+from refresh_visual_assets import refresh
+refresh()

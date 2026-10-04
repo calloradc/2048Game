@@ -75,9 +75,15 @@ describe('FruitWorld: rules and soft bodies', () => {
     expect(world.shake()).toBe(false);expect(world.state.coins).toBe(1);world.destroy();
   });
   it('gives a new fruit time before sustained overflow ends the game', () => {
-    const world=new FruitWorld();const cube=world.add(3,200,157);cube.sleeping=true;
-    advance(world,3);expect(world.state.status).toBe('playing');
-    advance(world,2);expect(world.state.status).toBe('gameover');expect(world.drop()).toBe(false);world.destroy();
+    const world=new FruitWorld();const cube=world.add(3,200,BOARD.danger+FRUITS[3].size/2-5);cube.sleeping=true;
+    advance(world,1.25);expect(world.state.danger).toBe(0);expect(world.overflowProgress).toBe(0);
+    advance(world,.1);expect(world.state.danger).toBe(1);
+    advance(world,1.05);expect(world.state.status).toBe('playing');
+    advance(world,.15);expect(world.state.status).toBe('gameover');expect(world.drop()).toBe(false);world.destroy();
+  });
+  it('does not count fruit resting just beneath the lower danger line', () => {
+    const world=new FruitWorld();const cube=world.add(3,200,BOARD.danger+FRUITS[3].size/2+1);cube.sleeping=true;
+    advance(world,5);expect(world.state.danger).toBe(0);expect(world.state.status).toBe('playing');world.destroy();
   });
   it('keeps a busy container finite and uses local broadphase pairs', () => {
     const world=new FruitWorld();

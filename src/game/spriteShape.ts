@@ -1,13 +1,14 @@
 import { REST_POINTS, type Node } from './physics';
 import bodies from './generatedBodies.json';
+const {fruitRepaired,...collections}=bodies;
 export interface UV { x: number; y: number }
 // Visible flesh bounds, excluding transparent padding and decorative leaves.
 // Each rectangle was measured on the exported 256px sprite, independently.
 export const FRUIT_BODY = [
   [21,61,233,248], [22,54,232,248], [22,54,232,248], [22,42,230,248],
-  [7,25,247,248], [23,44,232,249], [19,57,236,248], ...bodies.fruitLarge,
+  [7,25,247,248], fruitRepaired['5'], [19,57,236,248], ...bodies.fruitLarge,
 ];
-export const bodyRect=(level:number,skin='fruit'):number[]=>skin==='fruit'?FRUIT_BODY[level]:(bodies as Record<string,number[][]>)[skin][level];
+export const bodyRect=(level:number,skin='fruit'):number[]=>skin==='fruit'?FRUIT_BODY[level]:(collections as Record<string,number[][]>)[skin][level];
 export const bodyUV = (level: number,skin='fruit'): UV[] => {
   const [left,top,right,bottom]=bodyRect(level,skin);
   return REST_POINTS.map(([u,v])=>({x:left+(u+0.5)*(right-left),y:top+(v+0.5)*(bottom-top)}));

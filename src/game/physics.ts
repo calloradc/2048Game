@@ -1,6 +1,6 @@
 import { FRUITS, randomDrop } from './fruits';
 
-export const BOARD = { width: 420, height: 490, left: 48, right: 372, top: 117, floor: 432, dropY: 68, danger: 134 };
+export const BOARD = { width: 420, height: 490, left: 48, right: 372, top: 117, floor: 432, dropY: 68, danger: 156 };
 export type Status = 'playing' | 'gameover' | 'won';
 export interface GameState {
   score: number; best: number; current: number; next: number;
@@ -24,7 +24,7 @@ export const REST_POINTS = [[-0.5,-0.5],[0,-0.5],[0.5,-0.5],[0.5,0],[0.5,0.5],[0
 const ITERATIONS = 6;
 const CELL = 100;
 const MAX_CUBES = 70;
-const OVERFLOW_SECONDS = 2.2;
+const OVERFLOW_SECONDS = 1.2;
 
 /** Nine Verlet particles, compliant distance/area constraints and polygon contacts. */
 export class FruitWorld {

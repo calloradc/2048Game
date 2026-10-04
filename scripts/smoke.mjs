@@ -54,8 +54,8 @@ try {
     }), 'Canvas stays inside its field; Nunito loaded');
     assert.ok(metrics.x >= -1 && metrics.y >= -1 && metrics.bottom <= height + 1 && metrics.right <= width + 1, `Scene fits ${width}×${height}`);
     assert.ok(await page.locator('.ambient-background').evaluate(el=>{
-      const r=el.getBoundingClientRect();return r.left<=0&&r.right>=innerWidth&&r.top<=0&&r.bottom>=innerHeight&&getComputedStyle(el,'::before').filter.includes('blur');
-    }),'Blurred background fills the entire viewport');
+      const r=el.getBoundingClientRect();return r.left<=0&&r.right>=innerWidth&&r.top<=0&&r.bottom>=innerHeight&&getComputedStyle(el,'::before').backgroundSize==='cover'&&getComputedStyle(el,'::before').filter==='none'&&getComputedStyle(document.querySelector('.scene'),'::before').backgroundImage==='none';
+    }),'A single sharp cover background fills the entire viewport without scene edges');
     if (width === 390) {
       const canvas = page.locator('canvas'), bounds = await canvas.boundingBox();
       assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
