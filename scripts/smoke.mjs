@@ -140,7 +140,7 @@ try {
       await cdp.detach();
       await page.mouse.move(strip.x+strip.width/2,swipeY);
       await page.mouse.wheel(0,120);
-      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft>70);
+      await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft>30);
       await page.locator('.fruit-scroller').focus();await page.keyboard.press('Home');
       await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft<1);
       await page.mouse.move(swipeX,swipeY);await page.mouse.down();
