@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import '@fontsource/montserrat/latin-700.css';
-import '@fontsource/montserrat/latin-800.css';
-import '@fontsource/montserrat/latin-900.css';
-import '@fontsource/montserrat/cyrillic-700.css';
-import '@fontsource/montserrat/cyrillic-800.css';
-import '@fontsource/montserrat/cyrillic-900.css';
+import '@fontsource/nunito/latin-700.css';
+import '@fontsource/nunito/latin-800.css';
+import '@fontsource/nunito/latin-900.css';
+import '@fontsource/nunito/cyrillic-700.css';
+import '@fontsource/nunito/cyrillic-800.css';
+import '@fontsource/nunito/cyrillic-900.css';
 import App from './App';
 import './style.css';
 

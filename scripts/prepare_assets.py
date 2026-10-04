@@ -21,12 +21,6 @@ for i,rect in enumerate(rects):
     tile.save(dest/f'fruit-{i}.webp',quality=91,method=6)
     if i==0:tile.resize((192,192),Image.Resampling.LANCZOS).save(dest/'icon.png')
 
-panels=Image.open(source/'exec-5527b9b3-ac14-4e0b-b2b3-e3a366849df1.png')
-rects={'cream':(25,80,551,260),'mint':(550,75,1080,260),'pill':(1090,85,1500,255),
-       'green':(20,315,632,540),'round-cream':(704,276,989,558),'round-mint':(1150,290,1445,565),
-       'ribbon':(20,654,628,855),'dialog':(633,544,1077,961),'counter':(1176,629,1460,910)}
-for name,rect in rects.items():
-    sprite=cut(panels,rect);sprite.save(dest/'ui'/f'{name}.webp',quality=91,method=6)
 icons=Image.open(source/'exec-375baf1d-67dc-4c86-8d5b-f63bf6330735.png')
 names=['sound','mute','pause','restart','help','shake','hand','leaf','trophy','play','close','fullscreen','right','left','sparkle']
 for i,name in enumerate(names):
@@ -35,4 +29,4 @@ for i,name in enumerate(names):
     sprite.thumbnail((88,88),Image.Resampling.LANCZOS)
     tile=Image.new('RGBA',(96,96));tile.alpha_composite(sprite,((96-sprite.width)//2,(96-sprite.height)//2))
     tile.save(dest/'ui'/f'icon-{name}.webp',quality=90,method=6)
-print('Exported 11 frontal fruit sprites, 9 UI surfaces and 15 icons.')
+print('Exported 11 frontal fruit sprites and 15 icons. UI surfaces use HTML/CSS.')

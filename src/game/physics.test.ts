@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOARD, FruitWorld } from './physics';
+import { BOARD, FruitWorld, SHAKE_PRICE } from './physics';
 import { FRUITS, randomDrop } from './fruits';
 const advance = (world: FruitWorld, seconds: number) => { for (let i = 0; i < seconds * 60; i++) world.step(); };
 
@@ -56,6 +56,23 @@ describe('FruitWorld: rules and soft bodies', () => {
     expect(cube.sleeping).toBe(true);expect(world.shake()).toBe(true);expect(cube.sleeping).toBe(false);
     expect(world.shake()).toBe(true);expect(world.shake()).toBe(true);expect(world.shake()).toBe(false);
     world.reset();expect(world.state.best).toBe(1234);expect(world.state.shakes).toBe(3);world.destroy();
+  });
+  it('rewards merges, discovers dropped and merged fruit, and preserves the wallet on restart', () => {
+    const world=new FruitWorld(123,10,1);
+    world.state.current=2;world.drop();
+    expect(world.state.discovered & (1<<2)).toBeTruthy();
+    world.add(0,190,410);world.add(0,218,410);advance(world,0.3);
+    expect(world.state.coins).toBe(11);expect(world.state.discovered & (1<<1)).toBeTruthy();
+    const discoveries=world.state.discovered;
+    world.reset();expect(world.state.coins).toBe(11);expect(world.state.discovered).toBe(discoveries);
+    expect(world.state.score).toBe(0);world.destroy();
+  });
+  it('uses three free shakes before spending coins and refuses an unaffordable shake', () => {
+    const world=new FruitWorld(0,SHAKE_PRICE+1);
+    for(let i=0;i<3;i++)expect(world.shake()).toBe(true);
+    expect(world.state.coins).toBe(SHAKE_PRICE+1);expect(world.state.shakes).toBe(0);
+    expect(world.shake()).toBe(true);expect(world.state.coins).toBe(1);
+    expect(world.shake()).toBe(false);expect(world.state.coins).toBe(1);world.destroy();
   });
   it('gives a new fruit time before sustained overflow ends the game', () => {
     const world=new FruitWorld();const cube=world.add(3,200,157);cube.sleeping=true;

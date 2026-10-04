@@ -1,0 +1,44 @@
+import { REST_POINTS, type Node } from './physics';
+export interface UV { x: number; y: number }
+// Visible flesh bounds, excluding transparent padding and decorative leaves.
+// Each rectangle was measured on the exported 256px sprite, independently.
+export const FRUIT_BODY = [
+  [21,61,233,248], [22,54,232,248], [22,54,232,248], [22,42,230,248],
+  [7,25,247,248], [23,44,232,249], [19,57,236,248], [12,70,242,249],
+  [7,33,247,247], [30,59,223,248], [7,23,248,249],
+] as const;
+export const bodyUV = (level: number): UV[] => {
+  const [left,top,right,bottom]=FRUIT_BODY[level];
+  return REST_POINTS.map(([u,v])=>({x:left+(u+0.5)*(right-left),y:top+(v+0.5)*(bottom-top)}));
+};
+function clipHalfPlane(polygon: UV[], value: (p: UV)=>number): UV[] {
+  const result: UV[]=[];
+  for(let i=0;i<polygon.length;i++) {
+    const a=polygon[i],b=polygon[(i+1)%polygon.length],va=value(a),vb=value(b);
+    if(va>=-0.00001)result.push(a);
+    if((va>=0)!==(vb>=0)) {
+      const t=va/(va-vb);result.push({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+    }
+  }
+  return result;
+}
+// Extend the eight flesh triangles to the image boundary so leaves are painted
+// outside the collider, without scaling or moving the physical body texture.
+export const SPRITE_FANS = FRUIT_BODY.map((_,level)=>{
+  const uv=bodyUV(level),centre=uv[8];
+  return Array.from({length:8},(_,i)=>{
+    const a=uv[i],b=uv[(i+1)%8];
+    let polygon:UV[]=[{x:0,y:0},{x:256,y:0},{x:256,y:256},{x:0,y:256}];
+    polygon=clipHalfPlane(polygon,p=>(a.x-centre.x)*(p.y-centre.y)-(a.y-centre.y)*(p.x-centre.x));
+    return clipHalfPlane(polygon,p=>(p.x-centre.x)*(b.y-centre.y)-(p.y-centre.y)*(b.x-centre.x));
+  });
+});
+export function textureTransform(s: UV[], d: Pick<Node,'x'|'y'>[]) {
+  const den=s[0].x*(s[1].y-s[2].y)+s[1].x*(s[2].y-s[0].y)+s[2].x*(s[0].y-s[1].y);
+  const affine=(v:number[])=>[
+    (v[0]*(s[1].y-s[2].y)+v[1]*(s[2].y-s[0].y)+v[2]*(s[0].y-s[1].y))/den,
+    (v[0]*(s[2].x-s[1].x)+v[1]*(s[0].x-s[2].x)+v[2]*(s[1].x-s[0].x))/den,
+    (v[0]*(s[1].x*s[2].y-s[2].x*s[1].y)+v[1]*(s[2].x*s[0].y-s[0].x*s[2].y)+v[2]*(s[0].x*s[1].y-s[1].x*s[0].y))/den,
+  ];
+  return {x:affine(d.map(p=>p.x)),y:affine(d.map(p=>p.y))};
+}

@@ -1,11 +1,11 @@
 import { FRUITS, randomDrop } from './fruits';
 
-export const BOARD = { width: 420, height: 520, left: 48, right: 372, top: 152, floor: 477, dropY: 87, danger: 169 };
+export const BOARD = { width: 420, height: 490, left: 48, right: 372, top: 117, floor: 432, dropY: 68, danger: 134 };
 export type Status = 'playing' | 'gameover' | 'won';
 export interface GameState {
   score: number; best: number; current: number; next: number;
   highest: number; drops: number; shakes: number; status: Status;
-  danger: number; combo: number; ready: boolean;
+  danger: number; combo: number; ready: boolean; coins: number; discovered: number;
 }
 export interface Node { x: number; y: number; px: number; py: number }
 interface Link { a: number; b: number; rest: number; lambda: number }
@@ -16,7 +16,8 @@ export interface Cube {
   invMass: number; restArea: number; areaLambda: number; deformation: number; gx: Float64Array; gy: Float64Array;
 }
 export interface MergeEvent { x: number; y: number; level: number; combo: number }
-export const initialState = (best = 0): GameState => ({ score: 0, best, current: 0, next: 1, highest: 0, drops: 0, shakes: 3, status: 'playing', danger: 0, combo: 0, ready: true });
+export const SHAKE_PRICE = 25;
+export const initialState = (best = 0, coins = 0, discovered = 1): GameState => ({ score: 0, best, current: 0, next: 1, highest: 0, drops: 0, shakes: 3, status: 'playing', danger: 0, combo: 0, ready: true, coins, discovered });
 // Clockwise perimeter: corners and edge midpoints. Ninth point is the centre.
 export const REST_POINTS = [[-0.5,-0.5],[0,-0.5],[0.5,-0.5],[0.5,0],[0.5,0.5],[0,0.5],[-0.5,0.5],[-0.5,0],[0,0]] as const;
 const ITERATIONS = 6;
@@ -40,14 +41,14 @@ export class FruitWorld {
   private contactA = new Float64Array(8);
   private contactB = new Float64Array(8);
 
-  constructor(best = 0) { this.state = initialState(best); this.reset(); }
+  constructor(best = 0, coins = 0, discovered = 1) { this.state = initialState(best,coins,discovered); this.reset(); }
   emit() { this.onChange({ ...this.state }); }
   reset() {
-    const best = this.state.best;
+    const {best,coins,discovered} = this.state;
     this.cubes.clear(); this.time = 0; this.lastDrop = -2; this.lastMerge = -2;
     this.overflowTime = 0; this.overDanger = false; this.nextId = 1;
     this.aim = BOARD.width / 2;
-    this.state = { ...initialState(best), current: randomDrop(), next: randomDrop() };
+    this.state = { ...initialState(best,coins,discovered), current: randomDrop(), next: randomDrop() };
     this.emit();
   }
 
@@ -74,6 +75,7 @@ export class FruitWorld {
     if (this.state.status !== 'playing' || !this.state.ready || this.cubes.size >= MAX_CUBES) return false;
     this.setAim(this.aim);
     const cube = this.add(this.state.current,this.aim,BOARD.dropY);
+    this.state.discovered |= 1 << cube.level;
     this.setVelocity(cube,0,1.5);
     this.lastDrop = this.time; this.state.current = this.state.next; this.state.next = randomDrop();
     this.state.drops++; this.state.ready = false; this.emit(); return true;
@@ -84,8 +86,10 @@ export class FruitWorld {
     for (const n of cube.nodes) { n.px=n.x-vx; n.py=n.y-vy; }
   }
   shake(): boolean {
-    if (!this.state.shakes || this.state.status !== 'playing') return false;
-    this.state.shakes--;
+    if (this.state.status !== 'playing') return false;
+    if (this.state.shakes > 0) this.state.shakes--;
+    else if (this.state.coins >= SHAKE_PRICE) this.state.coins -= SHAKE_PRICE;
+    else return false;
     for (const cube of this.cubes.values()) {
       this.setVelocity(cube,(Math.random()-0.5)*7,-3-Math.random()*3);
       // Offset individual perimeter nodes to excite a real bending wave.
@@ -236,6 +240,7 @@ export class FruitWorld {
     this.state.combo=this.time-this.lastMerge<1.4?this.state.combo+1:1;this.lastMerge=this.time;
     this.state.score+=FRUITS[level].value;this.state.best=Math.max(this.state.best,this.state.score);
     this.state.highest=Math.max(this.state.highest,level);
+    this.state.discovered |= 1 << level; this.state.coins += level;
     this.onMerge({x,y,level,combo:this.state.combo});
     if(level===10)this.state.status='won';this.emit();
   }

@@ -1,9 +1,10 @@
 import { asset, FRUITS, fruitAsset } from './fruits';
-import { BOARD, type Cube, type FruitWorld, type MergeEvent, REST_POINTS } from './physics';
+import { BOARD, type Cube, type FruitWorld, type MergeEvent } from './physics';
+import { bodyUV, FRUIT_BODY, SPRITE_FANS, textureTransform, type UV } from './spriteShape';
 
-interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; color: string; size: number }
+interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; texture: number; size: number; angle: number; spin: number }
+interface Burst { x: number; y: number; age: number; color: string; radius: number }
 interface Float { x: number; y: number; text: string; age: number; combo: number }
-type Point = { x: number; y: number };
 const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
   const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error(`Не удалось загрузить ${src}`)); image.src = src;
 });
@@ -12,6 +13,8 @@ export class GameRenderer {
   private ctx: CanvasRenderingContext2D;
   private sprites: HTMLImageElement[] = [];
   private glass?: HTMLImageElement;
+  private particleTextures: HTMLImageElement[] = [];
+  private bursts: Burst[] = [];
   private frame = 0;
   private last = 0;
   private accumulator = 0;
@@ -31,11 +34,16 @@ export class GameRenderer {
     this.resize();
   }
 
-  async start() {
-    const images = await Promise.all([...FRUITS.map((_, level) => loadImage(fruitAsset(level))), loadImage(asset('glass.webp'))]);
+  async start(progress: (loaded: number, total: number) => void = () => {}) {
+    const icons=['sound','mute','pause','restart','help','shake','hand','leaf','trophy','play','close','fullscreen','right','left','sparkle'];
+    const files=[...FRUITS.map((_,level)=>fruitAsset(level)),asset('glass.webp'),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),asset('wood-sign.webp'),asset('countryside.webp'),...icons.map(name=>asset(`ui/icon-${name}.webp`))];
+    let completed=0;const total=files.length+1;
+    const images=await Promise.all(files.map(async src=>{const image=await loadImage(src);if(!this.destroyed)progress(++completed,total);return image;}));
+    await document.fonts.ready;
     if (this.destroyed) return;
-    this.sprites = images.slice(0, 11); this.glass = images[11];
-    this.frame = requestAnimationFrame(this.tick);
+    progress(++completed,total);
+    this.sprites=images.slice(0,11);this.glass=images[11];this.particleTextures=images.slice(12,24);
+    this.frame=requestAnimationFrame(this.tick);
   }
 
   private resize() {
@@ -55,8 +63,10 @@ export class GameRenderer {
         this.world.step(1 / 60); this.accumulator -= 1 / 60; steps++;
       }
       if (steps === 3) this.accumulator = 0;
-      for (const p of this.particles) { p.age += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 210 * dt; }
+      for (const p of this.particles) { p.age += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 320 * dt; p.vx *= Math.pow(0.985, dt * 60); p.angle += p.spin * dt; }
       this.particles = this.particles.filter(p => p.age < p.life);
+      for (const b of this.bursts) b.age += dt;
+      this.bursts=this.bursts.filter(b=>b.age<0.35);
       for (const f of this.floats) f.age += dt;
       this.floats = this.floats.filter(f => f.age < 1.1);
     } else this.accumulator = 0;
@@ -67,10 +77,14 @@ export class GameRenderer {
   merge(event: MergeEvent) {
     const { x, y, level, combo } = event;
     this.floats.push({ x, y: y - FRUITS[level].size / 2, text: combo > 1 ? 'КОМБО!' : 'СОЧНО!', age: 0, combo });
-    const count = Math.min(18, 9 + level);
-    for (let i = 0; i < count && this.particles.length < 140; i++) {
-      const a = Math.random() * Math.PI * 2, speed = 45 + Math.random() * 100;
-      this.particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed - 35, age: 0, life: 0.45 + Math.random() * 0.4, color: i % 3 ? FRUITS[level].color : '#fff5a6', size: 2 + Math.random() * 3 });
+    this.floats=this.floats.slice(-3);
+    this.bursts.push({x,y,age:0,color:FRUITS[level].color,radius:FRUITS[level].size*0.55});
+    const juice=[0,0,1,2,3,4,5,5,2,2,0][level];
+    const count=Math.min(30,17+level);
+    for(let i=0;i<count&&this.particles.length<150;i++) {
+      const angle=Math.random()*Math.PI*2,speed=85+Math.random()*150,r=Math.random();
+      const texture=i===0?11:r<0.6?juice:r<0.77?6:r<0.91?7:8+(level===4?2:level===2?1:0);
+      this.particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-60,age:0,life:0.5+Math.random()*0.5,texture,size:texture===11?20:texture===7?18:9+Math.random()*10,angle:Math.random()*6.28,spin:(Math.random()-0.5)*8});
     }
   }
 
@@ -79,7 +93,7 @@ export class GameRenderer {
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     ctx.clearRect(0, 0, BOARD.width, BOARD.height);
     // Use the original glass image once; no drawn tint, duplicate rim or wash.
-    if (this.glass) ctx.drawImage(this.glass, 25, 130, 370, 370);
+    if (this.glass) ctx.drawImage(this.glass, 25, 95, 370, 370);
     for (const id of this.sleepingSprites.keys()) if (!this.world.cubes.has(id)) this.sleepingSprites.delete(id);
 
     const { state, aim } = this.world;
@@ -107,14 +121,21 @@ export class GameRenderer {
     ctx.strokeStyle = state.danger ? '#ff666bdd' : '#fffdf082';
     ctx.beginPath(); ctx.moveTo(57, BOARD.danger); ctx.lineTo(363, BOARD.danger); ctx.stroke(); ctx.restore();
     for (const cube of this.world.cubes.values()) this.cube(cube);
+    for(const b of this.bursts) {
+      const t=b.age/0.35;ctx.save();ctx.globalAlpha=(1-t)*0.5;ctx.strokeStyle=b.color;ctx.lineWidth=3*(1-t);
+      ctx.beginPath();ctx.arc(b.x,b.y,b.radius*(0.4+t),0,Math.PI*2);ctx.stroke();ctx.restore();
+    }
     for (const p of this.particles) {
-      ctx.globalAlpha = Math.max(0, 1 - p.age / p.life); ctx.fillStyle = p.color;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+      const texture=this.particleTextures[p.texture];if(!texture)continue;
+      ctx.save();ctx.globalAlpha=Math.min(1,(p.life-p.age)*4);ctx.translate(p.x,p.y);ctx.rotate(p.angle);
+      const size=p.size*(0.7+0.3*(1-p.age/p.life));
+      if(p.texture===7)ctx.globalCompositeOperation='lighter';
+      ctx.drawImage(texture,-size/2,-size/2,size,size);ctx.restore();
     }
     ctx.globalAlpha = 1;
     for (const f of this.floats) {
       ctx.save(); ctx.globalAlpha = Math.min(1, (1.1 - f.age) * 3); ctx.textAlign = 'center';
-      ctx.font = '900 18px Montserrat, sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#fff8e5'; ctx.fillStyle = '#438952';
+      ctx.font = '900 18px Nunito, sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#fff8e5'; ctx.fillStyle = '#438952';
       const y = f.y - f.age * 45; ctx.strokeText(f.text, f.x, y); ctx.fillText(f.text, f.x, y);
 
       ctx.restore();
@@ -126,12 +147,22 @@ export class GameRenderer {
     if (cube.sleeping) {
       let cached = this.sleepingSprites.get(cube.id);
       if (!cached) {
-        const margin = FRUITS[cube.level].size * 0.23;
-        const x = cube.bounds.min.x - margin, y = cube.bounds.min.y - margin;
-        const w = cube.bounds.max.x - cube.bounds.min.x + margin * 2, h = cube.bounds.max.y - cube.bounds.min.y + margin * 2;
+        // Cache only the mapped image bounds, including leaves beyond the flesh.
+        const uv = bodyUV(cube.level);
+        let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+        for(let i=0;i<8;i++) {
+          const next=(i+1)%8;
+          const {x:a,y:b}=textureTransform([uv[8],uv[i],uv[next]],[cube.nodes[8],cube.nodes[i],cube.nodes[next]]);
+          for(const p of SPRITE_FANS[cube.level][i]) {
+            const px=a[0]*p.x+a[1]*p.y+a[2],py=b[0]*p.x+b[1]*p.y+b[2];
+            minX=Math.min(minX,px);maxX=Math.max(maxX,px);minY=Math.min(minY,py);maxY=Math.max(maxY,py);
+          }
+        }
+        const x=minX-1,y=minY-1;
         const canvas = document.createElement('canvas');
         const resolution = Math.min(this.canvas.width / BOARD.width, 2);
-        canvas.width = Math.ceil(w * resolution); canvas.height = Math.ceil(h * resolution);
+        canvas.width = Math.ceil((maxX-minX+2)*resolution);canvas.height = Math.ceil((maxY-minY+2)*resolution);
+        const w=canvas.width/resolution,h=canvas.height/resolution;
         const offscreen = canvas.getContext('2d')!;
         offscreen.setTransform(resolution,0,0,resolution,-x*resolution,-y*resolution);
         this.mesh(cube,offscreen);
@@ -145,37 +176,29 @@ export class GameRenderer {
   }
 
   private sprite(level: number, x: number, y: number, angle: number, size: number) {
-    const ctx = this.ctx, image = this.sprites[level]; if (!image) return;
-    const display = size * 1.10;
-    ctx.save(); ctx.translate(x,y); ctx.rotate(angle);
-    ctx.drawImage(image,-display/2,-display/2-size*0.035,display,display); ctx.restore();
+    const ctx=this.ctx,image=this.sprites[level];if(!image)return;
+    const [left,top,right,bottom]=FRUIT_BODY[level],sx=size/(right-left),sy=size/(bottom-top);
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);
+    ctx.drawImage(image,-size/2-left*sx,-size/2-top*sy,256*sx,256*sy);ctx.restore();
   }
 
-  /** The texture follows the same eight collision nodes, joined to the centre. */
+  /** Measured flesh UVs map directly to collider nodes; leaves extend outside. */
   private mesh(cube: Cube, ctx: CanvasRenderingContext2D) {
-    const image = this.sprites[cube.level]; if (!image) return;
-    const size = FRUITS[cube.level].size;
-    const points: Point[] = cube.nodes.map(p => ({x:cube.x+(p.x-cube.x)*1.10,y:cube.y+(p.y-cube.y)*1.10-size*0.035}));
-    const source: Point[] = REST_POINTS.map(([u,v]) => ({x:(u+0.5)*image.width,y:(v+0.5)*image.height}));
+    const image=this.sprites[cube.level];if(!image)return;
+    const uv=bodyUV(cube.level);
     for(let i=0;i<8;i++) {
       const next=(i+1)%8;
-      this.triangle(ctx,image,[source[8],source[i],source[next]],[points[8],points[i],points[next]]);
+      this.triangle(ctx,image,[uv[8],uv[i],uv[next]],[cube.nodes[8],cube.nodes[i],cube.nodes[next]],SPRITE_FANS[cube.level][i]);
     }
   }
 
-  private triangle(ctx: CanvasRenderingContext2D, image: HTMLImageElement, s: Point[], d: Point[]) {
-    const den = s[0].x * (s[1].y - s[2].y) + s[1].x * (s[2].y - s[0].y) + s[2].x * (s[0].y - s[1].y);
-    const affine = (values: number[]) => [
-      (values[0] * (s[1].y - s[2].y) + values[1] * (s[2].y - s[0].y) + values[2] * (s[0].y - s[1].y)) / den,
-      (values[0] * (s[2].x - s[1].x) + values[1] * (s[0].x - s[2].x) + values[2] * (s[1].x - s[0].x)) / den,
-      (values[0] * (s[1].x * s[2].y - s[2].x * s[1].y) + values[1] * (s[2].x * s[0].y - s[0].x * s[2].y) + values[2] * (s[0].x * s[1].y - s[1].x * s[0].y)) / den,
-    ];
-    const a = affine(d.map(p => p.x)), b = affine(d.map(p => p.y));
-    // Overlap clips by a fraction of a pixel to avoid anti-alias seams.
-    const cx=(d[0].x+d[1].x+d[2].x)/3,cy=(d[0].y+d[1].y+d[2].y)/3;
-    const clip=d.map(p=>{const dx=p.x-cx,dy=p.y-cy,len=Math.max(1,Math.hypot(dx,dy));return{x:p.x+dx/len*0.3,y:p.y+dy/len*0.3};});
-    ctx.save();ctx.beginPath();ctx.moveTo(clip[0].x,clip[0].y);ctx.lineTo(clip[1].x,clip[1].y);ctx.lineTo(clip[2].x,clip[2].y);ctx.closePath();ctx.clip();
-    ctx.transform(a[0], b[0], a[1], b[1], a[2], b[2]); ctx.drawImage(image, 0, 0); ctx.restore();
+  private triangle(ctx: CanvasRenderingContext2D, image: HTMLImageElement, s: UV[], d: UV[], polygon: UV[]) {
+    const {x:a,y:b}=textureTransform(s,d);
+    const points=polygon.map(p=>({x:a[0]*p.x+a[1]*p.y+a[2],y:b[0]*p.x+b[1]*p.y+b[2]}));
+    const cx=points.reduce((v,p)=>v+p.x,0)/points.length,cy=points.reduce((v,p)=>v+p.y,0)/points.length;
+    const clip=points.map(p=>{const dx=p.x-cx,dy=p.y-cy,len=Math.max(1,Math.hypot(dx,dy));return{x:p.x+dx/len*0.25,y:p.y+dy/len*0.25};});
+    ctx.save();ctx.beginPath();ctx.moveTo(clip[0].x,clip[0].y);for(let i=1;i<clip.length;i++)ctx.lineTo(clip[i].x,clip[i].y);ctx.closePath();ctx.clip();
+    ctx.transform(a[0],b[0],a[1],b[1],a[2],b[2]);ctx.drawImage(image,0,0);ctx.restore();
   }
 
   destroy() { this.destroyed = true; cancelAnimationFrame(this.frame); this.resizeObserver.disconnect(); this.sleepingSprites.clear(); }
