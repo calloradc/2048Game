@@ -23,7 +23,7 @@ export async function checkGameover(browser,base,errors){
   assert.equal(await wallet(),earned*2);assert.equal(await page.getByRole('button',{name:/Монеты за игру ×2/}).count(),0);
   await page.getByRole('button',{name:/Спасти урожай/}).click({force:true});await page.clock.runFor(3500);await page.clock.runFor(400);
   assert.equal(await page.getByRole('dialog').count(),0,'Rewarded rescue resumes the real game');
-  assert.equal(await wallet(),earned*2);
+  assert.ok(await wallet()>=earned*2,'Rescue preserves the doubled wallet; resumed merges may earn more coins');
   await canvas.dispatchEvent('keydown',{key:'Enter'});await page.clock.runFor(700);
   await page.screenshot({path:'test-results/revived.png'});
   await page.close();console.log(`✓ actual overflow after ${throws} drops, one-time coin doubling and rewarded rescue`);
