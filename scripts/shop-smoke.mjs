@@ -40,9 +40,11 @@ export async function checkShop(browser,base,errors){
     const s=getComputedStyle(el),dialog=getComputedStyle(el.querySelector('.shop-dialog'));
     return s.backdropFilter.includes('blur(18px)')&&s.backgroundImage==='none'&&dialog.backgroundImage==='none'&&dialog.backgroundColor==='rgba(0, 0, 0, 0)';
   }),'Shop blurs the actual game without a replacement wallpaper');
-  assert.ok(await section('skins').locator('.shop-card').first().evaluate(el=>{
-    const s=getComputedStyle(el);return s.backgroundImage==='none'&&s.borderTopWidth==='0px'&&(!CSS.supports('corner-shape','squircle')||s.cornerShape==='squircle');
-  }),'Native CSS photo frames have squircles and no border');
+  const photoStyle=await section('skins').locator('.shop-card').first().evaluate(el=>{
+    const s=getComputedStyle(el);
+    return {image:s.backgroundImage,border:s.borderTopWidth,supportsSquircle:CSS.supports('corner-shape','squircle'),corners:['top-left','top-right','bottom-right','bottom-left'].map(corner=>s.getPropertyValue(`corner-${corner}-shape`))};
+  });
+  assert.ok(photoStyle.image==='none'&&photoStyle.border==='0px'&&(!photoStyle.supportsSquircle||photoStyle.corners.every(shape=>shape==='squircle'||shape==='superellipse(2)')),`Native CSS photo frames have squircles and no border: ${JSON.stringify(photoStyle)}`);
   await section('skins').locator('.snap-viewport').focus();await page.keyboard.press('ArrowLeft');await waitItem('skins','Фруктовая семья');
   await page.keyboard.press('End');await waitItem('skins','Кристаллики');
   assert.ok(await section('skins').locator('.shop-arrow.next').isDisabled(),'The last card has a hard end');
