@@ -14,6 +14,12 @@ export async function checkRewardsAndOffers(browser,base,errors){
   const close=async()=>{await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.locator('.overlay').waitFor({state:'detached'});};
   const watch=async(button)=>{await button.click();await page.getByRole('dialog',{name:'Имитация рекламы'}).waitFor();await page.locator('.ad-overlay').waitFor({state:'detached'});};
   await page.getByRole('button',{name:'Подарки',exact:true}).click();
+  assert.equal(await page.locator('.daily-prize').count(),14);
+  await page.locator('[data-day="14"]').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
+  assert.ok(await page.locator('.daily-list').evaluate(el=>{
+    const [first,second,third]=el.children;
+    return first.offsetTop===second.offsetTop&&second.offsetTop===third.offsetTop&&first.offsetLeft<second.offsetLeft&&second.offsetLeft<third.offsetLeft;
+  }),'Daily gifts are arranged in three cells per row');
   await page.getByRole('button',{name:'Забрать ежедневный подарок'}).click();
   assert.ok((await profile()).owned.includes('boxes:lunar'));assert.equal((await profile()).dailyCount,4);
   await page.getByRole('button',{name:'Надеть Лунное стекло'}).click();
@@ -58,5 +64,37 @@ export async function checkRewardsAndOffers(browser,base,errors){
   for(let i=0;i<4;i++)await page.getByRole('button',{name:/Встряхнуть/}).click();
   assert.equal((await profile()).shakeTokens,7,'Free shakes are used before consuming the persistent bank');assert.equal(await coins(),690);
   await page.close();
+  const finalDay=await browser.newPage({viewport:{width:320,height:568},isMobile:true,hasTouch:true});
+  finalDay.on('pageerror',e=>errors.push(e.message));finalDay.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()}: ${r.url()}`);});
+  await finalDay.clock.install({time:new Date('2026-10-05T12:00:00Z')});
+  await finalDay.addInitScript(()=>{
+    if(localStorage.getItem('final-day-seeded'))return;
+    localStorage.setItem('final-day-seeded','true');
+    localStorage.setItem('jelly-profile',JSON.stringify({daily:'2026-10-04',dailyCount:13}));
+  });
+  await finalDay.goto(base,{waitUntil:'networkidle'});await finalDay.locator('.loading').waitFor({state:'detached'});
+  await finalDay.getByRole('button',{name:'Подарки',exact:true}).click();
+  const finalPrize=finalDay.locator('[data-day="14"]');
+  await finalPrize.getByRole('button',{name:'Забрать ежедневный подарок'}).click();
+  assert.equal(await finalDay.locator('.daily-week-progress').textContent(),'14 / 14 подарков');
+  assert.equal(await finalDay.locator('.daily-prize.received').count(),14,'Last claim leaves the whole cycle complete for today');
+  assert.ok(await finalDay.locator('.daily-list').evaluate(el=>{
+    const [first,second,third]=el.children;
+    return first.offsetTop===second.offsetTop&&first.offsetLeft<second.offsetLeft&&third.offsetTop>first.offsetTop;
+  }),'Small screens use two cells per row');
+  await finalPrize.getByRole('button',{name:'Надеть Кристаллики'}).click();
+  await finalDay.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.skins==='crystals');
+  await finalDay.screenshot({path:'test-results/daily-final-320.png',animations:'disabled'});
+  await finalDay.reload({waitUntil:'networkidle'});await finalDay.locator('.loading').waitFor({state:'detached'});
+  await finalDay.getByRole('button',{name:'Подарки',exact:true}).click();
+  assert.equal(await finalDay.getByRole('button',{name:'Забрать ежедневный подарок'}).count(),0);
+  await finalDay.clock.setSystemTime(new Date('2026-10-06T12:00:00Z'));
+  await finalDay.evaluate(()=>window.dispatchEvent(new Event('focus')));
+  const firstPrize=finalDay.locator('[data-day="1"]');
+  await firstPrize.getByRole('button',{name:'Забрать ежедневный подарок'}).click();
+  assert.equal(await finalDay.locator('.daily-week-progress').textContent(),'1 / 14 подарков');
+  assert.equal(await finalDay.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')).dailyCount),15);
+  assert.equal(await finalDay.getByTestId('coins').textContent(),'25');
+  await finalDay.close();
   console.log('✓ real exclusive daily prize, equipped shop entry, fixed top navigation, one-time bundles, persistent shake packs and two-view coin packs');
 }

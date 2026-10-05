@@ -5,6 +5,7 @@ import { asset, fruitAsset } from '../game/fruits';
 import type { Profile } from '../game/profile';
 import { Icon } from './Icon';
 import { SnapRail } from './SnapRail';
+import { PreviewImage } from './PreviewImage';
 
 const sections:[Category,string,string][]=[['skins','Персонажи','КТО СЕГОДНЯ В ИГРЕ?'],['backgrounds','Твой мир','НОВОЕ МЕСТО ДЛЯ СЛИЯНИЙ'],['boxes','Боксы','СОБЕРИ СВОЙ ИДЕАЛЬНЫЙ НАБОР']];
 const links=[['skins','Персонажи'],['backgrounds','Фоны'],['boxes','Боксы'],['bundles','Наборы'],['supplies','Монеты']] as const;
@@ -12,7 +13,7 @@ type ShopProps={profile:Profile;coins:number;busy:boolean;onBuy:(item:ShopItem)=
 
 function Ribbon({children}:{children:string}) {return <span className="sale-ribbon">{children}</span>;}
 function BundleArt({bundle}:{bundle:Bundle}) {
-  return <div className="bundle-art">{bundle.items.map(key=>{const item=itemByKey(key)!;return <img className={`bundle-preview ${item.category}`} src={itemPreview(item)} alt="" key={key}/>;})}<span className="bundle-shakes"><Icon name="shake" size={24}/><b>+{bundle.shakes}</b></span></div>;
+  return <div className="bundle-art">{bundle.items.map(key=>{const item=itemByKey(key)!;return <PreviewImage className={`bundle-preview ${item.category}`} src={itemPreview(item)} key={key}/>;})}<span className="bundle-shakes"><Icon name="shake" size={24}/><b>+{bundle.shakes}</b></span></div>;
 }
 
 function Collection({category,title,caption,profile,coins,busy,onBuy,onSelect,onVideo,onRewards}:ShopProps&{category:Category;title:string;caption:string}) {
@@ -21,8 +22,8 @@ function Collection({category,title,caption,profile,coins,busy,onBuy,onSelect,on
   const item=list[index],owned=profile.owned.includes(item.key),selected=profile.selected[category]===item.id;
   return <section className={`shop-collection ${category}`} data-category={category} data-shop-section={category} aria-label={title}>
     <header className="collection-heading"><span className="eyebrow">{caption}</span><h2>{title}</h2></header>
-    <SnapRail count={list.length} initial={index} current={index} onChange={setIndex}>{list.map(card=><article className={`shop-card ${category} ${card.exclusive?'exclusive-card':''}`} data-theme={card.id} key={card.key} aria-label={card.name}>
-      <div className="card-art">{category==='skins'?<><img className="skin-mini left" src={fruitAsset(0,card.id)} alt="" loading="lazy"/><img className="skin-main" src={fruitAsset(5,card.id)} alt="" loading="lazy"/><img className="skin-mini right" src={fruitAsset(10,card.id)} alt="" loading="lazy"/></>:<img className="item-image" src={itemPreview(card)} alt="" loading="lazy"/>}</div>
+    <SnapRail count={list.length} initial={index} current={index} onChange={setIndex}>{list.map((card,i)=><article className={`shop-card ${category} ${card.exclusive?'exclusive-card':''}`} data-theme={card.id} key={card.key} aria-label={card.name}>
+      <div className="card-art">{category==='skins'?<><PreviewImage className="skin-mini left" src={fruitAsset(0,card.id)} eager={Math.abs(i-index)<=1}/><PreviewImage className="skin-main" src={fruitAsset(5,card.id)} eager={Math.abs(i-index)<=1}/><PreviewImage className="skin-mini right" src={fruitAsset(10,card.id)} eager={Math.abs(i-index)<=1}/></>:<PreviewImage className="item-image" src={itemPreview(card)} eager={Math.abs(i-index)<=1}/>}</div>
       <span className="card-caption">{card.name}</span>
       {card.exclusive&&<Ribbon>НОВОЕ</Ribbon>}
       <span className="card-status"><Icon name={profile.owned.includes(card.key)?profile.selected[category]===card.id?'check':'sparkle':card.exclusive?'gift':'lock'} size={17}/></span>
@@ -46,23 +47,30 @@ export function Shop(props:ShopProps) {
   };
   useEffect(()=>{
     const el=scroll.current!;
+    let frame=0;
+    const sections=Array.from(el.querySelectorAll<HTMLElement>('[data-shop-section]'));
+    let positions:{id:string;top:number}[]=[];
+    const measure=()=>{positions=sections.map(section=>({id:section.dataset.shopSection!,top:section.offsetTop}));};
     const update=()=>{
+      frame=0;
       let id:string='skins';
-      for(const section of el.querySelectorAll<HTMLElement>('[data-shop-section]'))if(section.offsetTop<=el.scrollTop+40)id=section.dataset.shopSection!;
+      for(const section of positions)if(section.top<=el.scrollTop+40)id=section.id;
       if(el.scrollTop>0&&el.scrollTop+el.clientHeight>=el.scrollHeight-8)id='supplies';
       setActive(id);
     };
-    const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){(entry.target as HTMLElement).dataset.revealed='true';observer.unobserve(entry.target);}},{root:el,threshold:.12});
-    el.querySelectorAll('[data-reveal]').forEach(node=>observer.observe(node));
-    el.addEventListener('scroll',update,{passive:true});return()=>{el.removeEventListener('scroll',update);observer.disconnect();};
+    const onScroll=()=>{if(!frame)frame=requestAnimationFrame(update);};
+    const observer=new ResizeObserver(()=>{measure();onScroll();});observer.observe(el);sections.forEach(section=>observer.observe(section));measure();
+    const revealObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){(entry.target as HTMLElement).dataset.revealed='true';revealObserver.unobserve(entry.target);}},{root:el,threshold:.12});
+    el.querySelectorAll('[data-reveal]').forEach(node=>revealObserver.observe(node));
+    el.addEventListener('scroll',onScroll,{passive:true});return()=>{cancelAnimationFrame(frame);observer.disconnect();revealObserver.disconnect();el.removeEventListener('scroll',onScroll);};
   },[]);
   const featured=BUNDLES.find(bundle=>!props.profile.bundles.includes(bundle.id))??BUNDLES[0];
   const offer=bundleOffer(props.profile,featured);
   return <>
-    <header className="shop-heading"><h1><Icon name="shop" size={34}/>Магазин</h1><div className="shop-wallet"><img src={asset('particles/11.webp')} alt="монет"/><strong>{props.coins.toLocaleString('ru-RU')}</strong></div></header>
+    <header className="shop-heading"><h1><Icon name="shop" size={46}/>Магазин</h1><div className="shop-wallet"><img src={asset('particles/11.webp')} alt="монет"/><strong>{props.coins.toLocaleString('ru-RU')}</strong></div></header>
     <div className="shop-toolbar"><div className="shop-toolbar-top"><span>{props.profile.owned.length} образов в коллекции</span><button className="shop-quick-coins" disabled={props.busy} onClick={props.onCoins} aria-label="+75 монет за видео"><Icon name="video" size={22}/><b>+75</b><img src={asset('particles/11.webp')} alt=""/></button></div><nav className="shop-nav" aria-label="Разделы магазина">{links.map(([id,label])=><button key={id} aria-current={active===id?'true':undefined} onClick={()=>jump(id)}>{label}</button>)}</nav></div>
     <div className="shop-scroll" ref={scroll}>
-      <button className="shop-feature" onClick={()=>jump('bundles')} aria-label="Смотреть выгодные наборы"><Ribbon>ВЫГОДНО</Ribbon><div className="feature-copy"><span className="offer-tag">НАБОР ДНЯ</span><h2>{featured.name}</h2><span>3 образа + {featured.shakes} встряски</span><span className="feature-price">{offer.bought?'Собран':<><img src={asset('particles/11.webp')} alt=""/>{offer.price}<Icon name="right" size={15}/></>}</span></div><img className="feature-mascot" src={itemPreview(itemByKey(featured.items[0])!)} alt=""/></button>
+      <button className="shop-feature" onClick={()=>jump('bundles')} aria-label="Смотреть выгодные наборы"><Ribbon>ВЫГОДНО</Ribbon><div className="feature-copy"><span className="offer-tag">НАБОР ДНЯ</span><h2>{featured.name}</h2><span>3 образа + {featured.shakes} встряски</span><span className="feature-price">{offer.bought?'Собран':<><img src={asset('particles/11.webp')} alt=""/>{offer.price}<Icon name="right" size={15}/></>}</span></div><PreviewImage className="feature-mascot" src={itemPreview(itemByKey(featured.items[0])!)} eager/></button>
       {sections.map(([category,title,caption])=><Collection key={category} category={category} title={title} caption={caption} {...props}/>)}
       <section className="shop-bundles" data-shop-section="bundles" aria-label="Наборы"><header className="collection-heading"><span className="eyebrow">БОЛЬШЕ ПРИЯТНОСТЕЙ ЗА МЕНЬШЕ МОНЕТ</span><h2>Всё в одном наборе</h2></header><div className="bundle-list">{BUNDLES.map(bundle=>{
         const deal=bundleOffer(props.profile,bundle);

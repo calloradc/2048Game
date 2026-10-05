@@ -10,6 +10,13 @@ export const DAILY_PRIZES:DailyPrize[]=[
   {type:'coins',amount:120},
   {type:'item',key:'backgrounds:aurora',duplicateCoins:150},
   {type:'item',key:'skins:mochi',duplicateCoins:200},
+  {type:'coins',amount:80},
+  {type:'shakes',amount:3},
+  {type:'coins',amount:150},
+  {type:'shakes',amount:4},
+  {type:'coins',amount:220},
+  {type:'shakes',amount:5},
+  {type:'item',key:'skins:crystals',duplicateCoins:480},
 ];
 
 export const calendarDay=(date=new Date())=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -27,4 +34,10 @@ export function claimDaily(profile:Profile,date:string) {
   if(prize.type==='shakes')next.shakeTokens+=prize.amount;
   return {profile:next,prize,coins:prize.type==='coins'?prize.amount:0};
 }
-export const prizeName=(prize:DailyPrize)=>prize.type==='coins'?`+${prize.amount} монет`:prize.type==='shakes'?`+${prize.amount} встряски`:itemByKey(prize.key)!.name;
+export function prizeName(prize:DailyPrize) {
+  if(prize.type==='item')return itemByKey(prize.key)!.name;
+  if(prize.type==='coins')return `+${prize.amount} монет`;
+  const last=prize.amount%10,teen=prize.amount%100>=11&&prize.amount%100<=14;
+  const word=teen?'встрясок':last===1?'встряска':last>=2&&last<=4?'встряски':'встрясок';
+  return `+${prize.amount} ${word}`;
+}

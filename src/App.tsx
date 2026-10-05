@@ -209,7 +209,7 @@ export default function App() {
         <div className="best-card"><span className="small-label"><Icon name="trophy" size={13}/> РЕКОРД</span><strong key={state.best}>{format(state.best)}</strong></div>
       </section>
       <div className={`playfield ${shaking?'shaking':''} ${state.danger?'danger':''}`}>
-        <button className="shop-launch" aria-label="Магазин" onClick={()=>setModal('shop')}><span className="shop-launch-art"><Icon name="shop" size={64}/></span><span className="shop-launch-label">Магазин</span></button>
+        <button className="shop-launch" aria-label="Магазин" onClick={()=>setModal('shop')}><span className="shop-launch-art"><Icon name="shop" size={64}/></span><span className="shop-launch-label">МАГАЗИН</span></button>
         <div className="next-fruit"><span>ДАЛЬШЕ</span><img key={`${skin}-${state.drops}`} src={fruitAsset(state.next,skin)} alt="Следующий кубик" draggable={false}/></div>
         <canvas ref={canvasRef} aria-label="Игровой контейнер. Веди пальцем и отпусти, чтобы бросить фрукт." tabIndex={0}
           onPointerDown={pointerDown} onPointerMove={e=>{if(dragRef.current===e.pointerId||e.pointerType==='mouse')aim(e);}} onPointerUp={pointerUp} onPointerCancel={()=>{dragRef.current=null;}} onLostPointerCapture={()=>{dragRef.current=null;}}

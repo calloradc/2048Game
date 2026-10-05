@@ -22,9 +22,20 @@ describe('Daily prize collection',()=>{
     expect(restored.selected.skins).toBe('mochi');expect(restored.dailyCount).toBe(7);expect(restored.shakeTokens).toBe(2);
   });
   it('replaces duplicate exclusive cosmetics with coins in the next cycle',()=>{
+    let profile=defaultProfile();for(let day=1;day<=14;day++)profile=claimDaily(profile,date(day)).profile;
+    let coins=0;for(let day=15;day<=28;day++){const result=claimDaily(profile,date(day));profile=result.profile;coins+=result.coins;}
+    expect(coins).toBe(1605);expect(profile.owned).toHaveLength(7);expect(profile.shakeTokens).toBe(28);
+  });
+  it('extends saved seven-day progress through the second week and starts a new cycle on day fifteen',()=>{
     let profile=defaultProfile();for(let day=1;day<=7;day++)profile=claimDaily(profile,date(day)).profile;
-    let coins=0;for(let day=8;day<=14;day++){const result=claimDaily(profile,date(day));profile=result.profile;coins+=result.coins;}
-    expect(coins).toBe(675);expect(profile.owned).toHaveLength(6);expect(profile.shakeTokens).toBe(4);
+    profile=parseProfile(JSON.stringify(profile));
+    const eighth=claimDaily(profile,date(8));expect(eighth.coins).toBe(80);expect(eighth.profile.dailyCount).toBe(8);
+    profile=eighth.profile;let coins=eighth.coins;
+    for(let day=9;day<=14;day++){const result=claimDaily(profile,date(day));profile=result.profile;coins+=result.coins;}
+    expect(coins).toBe(450);expect(profile.shakeTokens).toBe(14);expect(profile.owned).toContain('skins:crystals');
+    expect(claimDaily(profile,date(14)).prize).toBeNull();
+    const fifteenth=claimDaily(parseProfile(JSON.stringify(profile)),date(15));
+    expect(fifteenth.coins).toBe(25);expect(fifteenth.profile.dailyCount).toBe(15);
   });
   it('keeps daily exclusives out of coin and video purchases',()=>{
     const fresh=defaultProfile();

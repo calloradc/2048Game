@@ -29,6 +29,8 @@ export class GameRenderer {
   private preview: AimPreview;
   private skin='fruit';
   private appearanceVersion=0;
+  private needsDraw=true;
+  private suspended=false;
   private reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   paused = false;
 
@@ -58,7 +60,7 @@ export class GameRenderer {
     const version=++this.appearanceVersion;
     const images=await Promise.all([...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),backgroundAsset(background)].map(loadImage));
     if(this.destroyed||version!==this.appearanceVersion)return false;
-    this.skin=skin;this.sprites=images.slice(0,11);this.glass=images[11];this.sleepingSprites.clear();return true;
+    this.skin=skin;this.sprites=images.slice(0,11);this.glass=images[11];this.sleepingSprites.clear();this.needsDraw=true;return true;
   }
 
   private resize() {
@@ -66,12 +68,14 @@ export class GameRenderer {
     const width = Math.max(1, Math.round(this.canvas.getBoundingClientRect().width * dpr));
     this.sleepingSprites.clear();
     this.canvas.width = width; this.canvas.height = Math.round(width * BOARD.height / BOARD.width);
+    this.needsDraw=true;
   }
 
   private tick = (now: number) => {
     const dt = this.last ? Math.min((now - this.last) / 1000, 0.05) : 1 / 60;
     this.last = now;
-    if (!this.paused && !document.hidden) {
+    const suspended=this.paused||document.hidden;
+    if (!suspended) {
       this.accumulator += dt;
       let steps = 0;
       while (this.accumulator >= 1 / 60 && steps < 3) {
@@ -86,7 +90,10 @@ export class GameRenderer {
       for (const f of this.floats) f.age += dt;
       this.floats = this.floats.filter(f => f.age < 1.1);
     } else this.accumulator = 0;
-    this.draw();
+    // Keep the blurred game backdrop cached while a dialog is open.
+    // Appearance changes and resizes still refresh it once during the pause.
+    if(!suspended||this.needsDraw||suspended!==this.suspended)this.draw();
+    this.needsDraw=false;this.suspended=suspended;
     this.frame = requestAnimationFrame(this.tick);
   };
 

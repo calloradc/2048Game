@@ -1,51 +1,86 @@
-.rewards-fullscreen.overlay { padding: 0; background: #f9f3ecd1; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); z-index: 40; }
-.rewards-dialog.dialog { width: 100%; height: 100%; max-width: none; border-radius: 0; box-shadow: none; background: transparent; animation: overlay-in .25s ease-out; }
+.rewards-fullscreen.overlay { padding: 0; background: #f9f3ecd1; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); z-index: 40; animation: overlay-in .32s cubic-bezier(.22, 1, .36, 1) both; }
+.rewards-dialog.dialog { width: 100%; height: 100%; max-width: none; border-radius: 0; box-shadow: none; background: transparent; animation: none; }
+.rewards-fullscreen.is-leaving .rewards-dialog { animation: none; }
 .rewards-dialog > .dialog-content { position: relative; width: min(100%, 560px); height: 100%; margin: auto; display: grid; grid-template-rows: calc(84px + var(--safe-top)) minmax(0, 1fr) calc(76px + var(--safe-bottom)); padding: 0; overflow: hidden; }
 .rewards-dialog .dialog-close { top: calc(24px + var(--safe-top)); right: 16px; background: #eee5df; }
-.rewards-heading { display: flex; align-items: center; gap: 10px; padding: calc(16px + var(--safe-top)) 58px 12px 20px; background: #fffdf4c4; text-align: left; }
+.rewards-heading { display: flex; align-items: center; gap: 10px; padding: calc(16px + var(--safe-top)) 58px 12px 20px; background: #fffdf4c4; text-align: left; animation: overlay-in .4s cubic-bezier(.22, 1, .36, 1) both; }
+.rewards-heading > .ui-icon { flex-shrink: 0; }
 .rewards-heading .eyebrow { font-size: 6px; letter-spacing: 1px; color: #af9abe; }
 .rewards-heading h1 { font-size: 21px; margin: 4px 0 0; letter-spacing: -.4px; }
 .rewards-scroll { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; padding: 18px 16px 24px; }
 .rewards-scroll::-webkit-scrollbar { display: none; }
-.daily-hero { position: relative; display: flex; align-items: center; height: 139px; padding: 19px; margin-bottom: 18px; border-radius: 25px; corner-shape: squircle; background: linear-gradient(110deg, #e9d6fb, #fff1dc); text-align: left; overflow: hidden; }
-.daily-hero > div { position: relative; z-index: 1; max-width: 65%; }
-.daily-hero h2 { font-size: 20px; line-height: 1.1; font-weight: 900; margin: 8px 0 5px; color: #795397; }
+.daily-hero { position: relative; display: flex; align-items: center; min-height: 155px; padding: 19px; margin-bottom: 16px; border-radius: 25px; corner-shape: squircle; background: linear-gradient(110deg, #e9d6fb, #fff1dc); text-align: left; overflow: hidden; animation: reward-arrive .5s .04s cubic-bezier(.22, 1, .36, 1) both; }
+.daily-hero > div { position: relative; z-index: 1; width: 66%; }
+.daily-hero h2 { font-size: 23px; line-height: 1.1; font-weight: 900; margin: 8px 0 6px; color: #795397; }
 .daily-hero p { font-size: 10px; line-height: 1.4; color: #a086b0; margin: 0 0 8px; }
-.daily-hero > img { position: absolute; right: -4px; bottom: -3px; width: 129px; height: 129px; object-fit: contain; transform: rotate(8deg); }
-.exclusive-tag { font-size: 7px; font-weight: 900; letter-spacing: 1.1px; color: #ab79c1; }
+.daily-hero > img { position: absolute; right: -4px; bottom: -3px; width: 135px; height: 135px; object-fit: contain; transform: rotate(8deg); }
+.exclusive-tag { font-size: 7px; font-weight: 900; letter-spacing: 1px; color: #ab79c1; }
 .daily-week-progress { display: inline-block; padding: 4px 9px; border-radius: 8px; corner-shape: squircle; background: #fffdf4a6; font-size: 9px; font-weight: 900; color: #a182b8; }
-.daily-list { display: grid; gap: 10px; }
-.daily-prize { display: grid; grid-template-columns: 55px minmax(0, 1fr) 66px; align-items: center; gap: 10px; width: 100%; min-height: 88px; padding: 12px; border-radius: 23px; corner-shape: squircle; background: #fffdf5; text-align: left; box-shadow: var(--soft-shadow); }
-.daily-prize.available { background: #eff8dd; }
+.daily-progress-track { width: 100%; max-width: 170px; height: 5px; margin-top: 9px; border-radius: 3px; background: #fffdf48c; overflow: hidden; }
+.daily-progress-track > span { display: block; width: 100%; height: 100%; border-radius: inherit; background: #ab79c1; transform-origin: left; transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+
+/* Six small cells and a special seventh-day gift in each week. */
+.daily-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.daily-prize { position: relative; display: grid; grid-template-rows: 14px 55px minmax(38px, 1fr) 32px; justify-items: center; align-items: center; gap: 7px; min-width: 0; min-height: 184px; padding: 12px 9px; border-radius: 21px; corner-shape: squircle; background: #fffdf5; text-align: center; box-shadow: 0 4px 12px #35594e0a; animation: reward-arrive .48s cubic-bezier(.22, 1, .36, 1) both; animation-delay: var(--prize-delay); transition: background-color .3s; }
+.daily-prize.available { background: #edf7dc; box-shadow: 0 6px 18px #83ad5422; }
 .daily-prize.exclusive { background: #f3e8fc; }
 .daily-prize.exclusive.available { background: #ead8fa; }
-.daily-prize-art { width: 55px; height: 58px; display: grid; place-items: center; border-radius: 16px; corner-shape: squircle; background: #fff2c8; }
+.daily-day { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; font-size: 8px; line-height: 14px; letter-spacing: .5px; font-weight: 900; color: #9aa38b; white-space: nowrap; }
+.daily-day > b { font-size: 6px; letter-spacing: .1px; color: #6ba645; }
+.daily-prize-art { width: 55px; height: 55px; display: grid; place-items: center; border-radius: 16px; corner-shape: squircle; background: #fff2c8; }
 .daily-prize-art.shakes { background: #e5f0d5; }
 .daily-prize-art.item { background: #fff9fa9e; }
 .daily-prize-art > img { width: 43px; height: 47px; object-fit: contain; }
 .daily-prize-art.item > img { width: 48px; height: 50px; border-radius: 9px; corner-shape: squircle; }
-.daily-prize-copy { min-width: 0; }
-.daily-day { display: flex; align-items: center; gap: 5px; font-size: 8px; line-height: 1.2; letter-spacing: .7px; font-weight: 900; color: #a5aa98; }
-.daily-day > b { font-size: 6px; letter-spacing: .3px; color: #76b14d; }
-.daily-prize-copy h3 { font-size: 14px; font-weight: 900; line-height: 1.2; margin: 5px 0 3px; color: #5a7256; }
+.daily-prize.available .daily-prize-art { animation: reward-float 3s ease-in-out infinite; }
+.daily-prize.received .daily-prize-art { animation: reward-collected .5s cubic-bezier(.22, 1, .36, 1) both; }
+.daily-prize-copy { align-self: start; min-width: 0; width: 100%; }
+.daily-prize-copy h3 { font-size: 12px; font-weight: 900; line-height: 1.25; margin: 2px 0 3px; color: #5a7256; overflow-wrap: anywhere; }
 .daily-prize.exclusive h3 { color: #9364b0; }
-.daily-prize-note { display: block; font-size: 9px; line-height: 1.3; font-weight: 800; color: #a6ad99; }
-.daily-claim { width: 66px; height: 34px; border-radius: 12px; background: var(--green); color: white; font-size: 10px; font-weight: 900; padding: 0 5px; }
-.daily-equip { width: 38px; height: 38px; justify-self: center; display: grid; place-items: center; border-radius: 13px; background: #e5d5f5; }
+.daily-prize-note { display: block; font-size: 8px; line-height: 1.3; font-weight: 800; color: #a0a68f; }
+.daily-claim { width: 100%; max-width: 90px; height: 32px; border-radius: 11px; background: var(--green); color: white; font-size: 11px; font-weight: 900; padding: 0 5px; }
+.daily-equip { display: flex; align-items: center; justify-content: center; gap: 3px; width: 100%; max-width: 90px; height: 32px; border-radius: 11px; background: #e5d5f5; font-size: 9px; font-weight: 900; color: #895fa3; }
 .daily-equip:disabled { opacity: 1; }
-.daily-state { display: flex; flex-direction: column; align-items: center; justify-content: center; justify-self: center; gap: 4px; width: 50px; }
-.daily-state.locked { opacity: .6; }
-.daily-state small { font-size: 8px; font-weight: 900; color: #a5a48e; }
+.daily-state { display: flex; align-items: center; justify-content: center; gap: 3px; width: 100%; height: 32px; color: #79a76a; }
+.daily-state.locked { opacity: .65; }
+.daily-state small { font-size: 8px; font-weight: 900; }
+.daily-state.locked small { color: #9b9e8a; }
+.daily-prize.received .daily-state > .ui-icon { animation: reward-stamp .4s cubic-bezier(.22, 1, .36, 1) both; }
+.daily-prize.milestone { grid-column: 1 / -1; grid-template-columns: 72px minmax(0, 1fr) 80px; grid-template-rows: 18px minmax(38px, 1fr); justify-items: start; gap: 5px 12px; min-height: 106px; padding: 16px; text-align: left; background: linear-gradient(110deg, #e9dbfb, #fff0dc); }
+.daily-prize.milestone .daily-day { grid-column: 2; grid-row: 1; justify-content: flex-start; }
+.daily-prize.milestone .daily-prize-art { grid-column: 1; grid-row: 1 / -1; width: 72px; height: 72px; border-radius: 19px; }
+.daily-prize.milestone .daily-prize-art > img { width: 66px; height: 66px; }
+.daily-prize.milestone .daily-prize-copy { grid-column: 2; grid-row: 2; align-self: center; }
+.daily-prize.milestone h3 { font-size: 17px; }
+.daily-prize.milestone .daily-prize-note { font-size: 9px; }
+.daily-prize.milestone > :last-child { grid-column: 3; grid-row: 1 / -1; }
+.daily-prize.milestone.available { background: linear-gradient(110deg, #dfc8f6, #ffedc6); }
 .daily-note { text-align: center; color: #a9a38e; font-size: 10px; line-height: 1.5; margin: 20px 12px 0; }
-.rewards-footer { display: flex; align-items: center; justify-content: center; padding: 12px 20px calc(14px + var(--safe-bottom)); background: #fffdf4cf; }
+.rewards-footer { display: flex; align-items: center; justify-content: center; padding: 12px 20px calc(14px + var(--safe-bottom)); background: #fffdf4cf; animation: overlay-in .4s .08s cubic-bezier(.22, 1, .36, 1) both; }
 .rewards-footer .primary-button { width: 200px; height: 50px; }
-.rewards-heading, .daily-hero { animation: content-arrive .4s both; }
-.daily-prize { animation: content-arrive .35s both; }
-.daily-prize:nth-child(2) { animation-delay: .03s; }
-.daily-prize:nth-child(3) { animation-delay: .06s; }
-.daily-prize:nth-child(4) { animation-delay: .09s; }
-.daily-prize:nth-child(5) { animation-delay: .12s; }
-.daily-prize:nth-child(6) { animation-delay: .15s; }
-.daily-prize:nth-child(7) { animation-delay: .18s; }
-@media (max-width: 350px) { .rewards-heading { padding-left: 14px; gap: 7px; } .rewards-heading h1 { font-size: 18px; } .rewards-heading .eyebrow { font-size: 5px; } .daily-prize { grid-template-columns: 46px minmax(0, 1fr) 58px; gap: 8px; padding: 10px; } .daily-prize-art { width: 46px; height: 52px; } .daily-prize-copy h3 { font-size: 12px; } .daily-prize-note { font-size: 8px; } .daily-claim { width: 58px; font-size: 9px; } .daily-hero h2 { font-size: 18px; } .daily-hero > img { width: 111px; height: 111px; } }
-@media (max-height: 480px) { .rewards-dialog > .dialog-content { grid-template-rows: calc(66px + var(--safe-top)) minmax(0, 1fr) calc(64px + var(--safe-bottom)); } .rewards-heading { padding-top: calc(10px + var(--safe-top)); } .rewards-dialog .dialog-close { top: calc(15px + var(--safe-top)); } .rewards-footer { padding-block: 7px; } }
+
+@keyframes reward-arrive { from { opacity: 0; transform: translate3d(0, 12px, 0) scale(.98); } to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
+@keyframes reward-float { 0%, 100% { transform: translate3d(0, 1px, 0) rotate(-2deg); } 50% { transform: translate3d(0, -2px, 0) rotate(2deg); } }
+@keyframes reward-collected { 0% { transform: scale(1); } 35% { transform: scale(1.14) rotate(-4deg); } 100% { transform: scale(1); } }
+@keyframes reward-stamp { from { opacity: 0; transform: scale(.5) rotate(-15deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@media (max-width: 350px) {
+  .rewards-heading { padding-left: 14px; gap: 7px; }
+  .rewards-heading h1 { font-size: 18px; }
+  .rewards-heading .eyebrow { font-size: 5px; }
+  .daily-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .daily-prize { min-height: 175px; }
+  .daily-prize.milestone { grid-template-columns: 58px minmax(0, 1fr) 60px; gap: 5px 8px; padding: 12px; }
+  .daily-prize.milestone .daily-prize-art { width: 58px; height: 62px; }
+  .daily-prize.milestone .daily-prize-art > img { width: 54px; height: 58px; }
+  .daily-prize.milestone h3 { font-size: 14px; }
+  .daily-equip { font-size: 8px; }
+  .daily-hero h2 { font-size: 21px; }
+  .daily-hero > img { width: 111px; height: 111px; }
+}
+@media (max-height: 480px) {
+  .rewards-dialog > .dialog-content { grid-template-rows: calc(66px + var(--safe-top)) minmax(0, 1fr) calc(64px + var(--safe-bottom)); }
+  .rewards-heading { padding-top: calc(10px + var(--safe-top)); }
+  .rewards-dialog .dialog-close { top: calc(15px + var(--safe-top)); }
+  .rewards-footer { padding-block: 7px; }
+}
+@media (prefers-reduced-motion: reduce) { .daily-prize.available .daily-prize-art, .daily-prize.received .daily-prize-art { animation: none; } }

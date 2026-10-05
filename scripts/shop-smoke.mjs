@@ -4,7 +4,12 @@ export async function checkShop(browser,base,errors){
   const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()}: ${r.url()}`);});
-  await page.addInitScript(()=>{if(!localStorage.getItem('shop-test-seeded')){localStorage.setItem('jelly-coins','400');localStorage.setItem('shop-test-seeded','true');}});
+  await page.addInitScript(()=>{
+    if(!localStorage.getItem('shop-test-seeded')){localStorage.setItem('jelly-coins','400');localStorage.setItem('shop-test-seeded','true');}
+    window.__shopCanvasDraws=0;
+    const clear=CanvasRenderingContext2D.prototype.clearRect;
+    CanvasRenderingContext2D.prototype.clearRect=function(...args){if(this.canvas===document.querySelector('canvas'))window.__shopCanvasDraws++;return clear.apply(this,args);};
+  });
   await page.goto(base,{waitUntil:'networkidle'});await page.locator('.loading').waitFor({state:'detached'});
   const coins=async()=>Number((await page.getByTestId('coins').textContent()).replace(/\D/g,''));
   const openShop=()=>page.getByRole('button',{name:'Магазин',exact:true}).click();
@@ -27,6 +32,9 @@ export async function checkShop(browser,base,errors){
   assert.ok(await page.locator('.dialog-close img').evaluate(el=>el.src.includes('icon-close-coral.webp')&&el.naturalWidth>0),'Close uses generated raster artwork');
   assert.ok(await page.locator('.shop-quick-coins .ui-icon').evaluate(el=>getComputedStyle(el).filter==='none'),'Ad icon preserves its generated colors');
   assert.equal(await page.locator('.collection-end,.shake-bank').count(),0,'Shop has no trailing promotional filler');
+  const pausedDraws=await page.evaluate(()=>window.__shopCanvasDraws);
+  await page.waitForTimeout(160);
+  assert.equal(await page.evaluate(()=>window.__shopCanvasDraws),pausedDraws,'Paused game does not repaint behind the animated shop');
   assert.deepEqual(await page.locator('.shop-collection').evaluateAll(els=>els.map(el=>el.dataset.category)),['skins','backgrounds','boxes'],'All three collections are stacked on one page');
   assert.equal(await page.locator('svg').count(),0,'Every visible icon is raster artwork');
   assert.deepEqual(await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox(),{x:0,y:0,width:390,height:844});
@@ -71,7 +79,9 @@ export async function checkShop(browser,base,errors){
   assert.equal(await section('boxes').locator('.shop-current').textContent(),'Розовый кварц');
   await watch(page.getByRole('button',{name:'+75 монет за видео',exact:true}));assert.equal(await coins(),175);await page.waitForTimeout(400);assert.equal(await coins(),175);
   await section('boxes').getByRole('button',{name:'Купить за 150'}).click();assert.equal(await coins(),25);
+  const beforeAppearance=await page.evaluate(()=>window.__shopCanvasDraws);
   await section('boxes').getByRole('button',{name:'Выбрать',exact:true}).click();await section('boxes').getByRole('button',{name:'Уже в игре'}).waitFor();
+  await page.waitForFunction(previous=>window.__shopCanvasDraws>previous,beforeAppearance);
   await page.screenshot({path:'test-results/shop-boxes.png'});
   assert.equal(await section('skins').locator('.shop-current').textContent(),'Шушистики','Rails keep independent selections');
   await next('skins','Суши-пати');
@@ -82,7 +92,7 @@ export async function checkShop(browser,base,errors){
   }
   assert.equal(await coins(),25);
   await section('skins').getByRole('button',{name:'Выбрать',exact:true}).click();await section('skins').getByRole('button',{name:'Уже в игре'}).waitFor();await close();
-  await page.getByRole('button',{name:'Подарки',exact:true}).click();assert.equal(await page.locator('.daily-prize').count(),7);assert.equal(await page.getByRole('dialog',{name:'Подарки'}).getByRole('button',{name:/видео/i}).count(),0,'Rewards only contains daily prizes');await page.getByRole('button',{name:'Забрать ежедневный подарок'}).click();assert.equal(await coins(),50);
+  await page.getByRole('button',{name:'Подарки',exact:true}).click();assert.equal(await page.locator('.daily-prize').count(),14);assert.equal(await page.getByRole('dialog',{name:'Подарки'}).getByRole('button',{name:/видео/i}).count(),0,'Rewards only contains daily prizes');await page.getByRole('button',{name:'Забрать ежедневный подарок'}).click();assert.equal(await coins(),50);
   assert.equal(await page.getByRole('button',{name:'Забрать ежедневный подарок'}).count(),0,'A prize can only be claimed once today');await page.screenshot({path:'test-results/daily-rewards.png',animations:'disabled'});
   await page.locator('.rewards-scroll').evaluate(el=>el.scrollTop=el.scrollHeight);await page.screenshot({path:'test-results/daily-rewards-bottom.png',animations:'disabled'});await close();await openShop();await waitItem('skins','Суши-пати');await waitItem('backgrounds','Сакура на закате');await waitItem('boxes','Розовый кварц');await page.getByRole('navigation',{name:'Разделы магазина'}).getByRole('button',{name:'Монеты',exact:true}).click();
   await page.waitForFunction(()=>{const el=document.querySelector('.shop-scroll'),target=el.querySelector('[data-shop-section=supplies]');return Math.abs(el.scrollTop-Math.min(el.scrollHeight-el.clientHeight,target.offsetTop-8))<2;});
