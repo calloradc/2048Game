@@ -4,7 +4,6 @@ import { BUNDLES, bundleOffer } from '../game/commerce';
 import type { Profile } from '../game/profile';
 import { asset } from '../game/fruits';
 import { ElasticScroll } from './ElasticScroll';
-import { Icon } from './Icon';
 import { PreviewImage } from './PreviewImage';
 
 export function OfferCarousel({profile,onOpen}:{profile:Profile;onOpen:()=>void}) {
@@ -34,6 +33,6 @@ export function OfferCarousel({profile,onOpen}:{profile:Profile;onOpen:()=>void}
       const deal=bundleOffer(profile,bundle);
       return <button className="shop-feature" key={bundle.id} onClick={onOpen} aria-label={`Смотреть ${bundle.name}`}><span className="sale-ribbon">{deal.bought?'СОБРАН':'ВЫГОДНО'}</span><div className="feature-copy"><span className="offer-tag">ПРЕДЛОЖЕНИЕ {BUNDLES.indexOf(bundle)+1} / {BUNDLES.length}</span><h2>{bundle.name}</h2><span>3 образа + {bundle.shakes} встряски</span><span className="feature-price">{deal.bought?'В коллекции':<><img src={asset('particles/11.webp')} alt=""/>{deal.price}</>}</span></div><PreviewImage className="feature-mascot" src={itemPreview(itemByKey(bundle.items[0])!)} eager/></button>;
     })}</div></div>
-    <div className="offer-controls"><button aria-label="Предыдущее предложение" onClick={()=>manual(active.current-1)}><Icon name="right" size={18}/></button><div>{BUNDLES.map((bundle,i)=><button key={bundle.id} aria-label={`Предложение ${i+1}`} aria-pressed={i===index} onClick={()=>manual(i)}><span/></button>)}</div><button aria-label="Следующее предложение" onClick={()=>manual(active.current+1)}><Icon name="right" size={18}/></button></div>
+    <div className="offer-controls"><div>{BUNDLES.map((bundle,i)=><button key={bundle.id} aria-label={`Предложение ${i+1}`} aria-pressed={i===index} onClick={()=>manual(i)}><span/></button>)}</div></div>
   </section>;
 }

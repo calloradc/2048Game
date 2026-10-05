@@ -12,6 +12,7 @@ import { OfferCarousel } from './OfferCarousel';
 import { ShopContents, type Contents } from './ShopContents';
 import { ElasticScroll } from './ElasticScroll';
 import { AD_COINS, AD_COIN_PACK } from '../game/economy';
+import { compactBalance } from './compactBalance';
 
 const sections:[Category,string,string][]=[['skins','Персонажи','КТО СЕГОДНЯ В ИГРЕ?'],['backgrounds','Твой мир','НОВОЕ МЕСТО ДЛЯ СЛИЯНИЙ'],['boxes','Боксы','СОБЕРИ СВОЙ ИДЕАЛЬНЫЙ НАБОР']];
 type ShopProps={profile:Profile;coins:number;busy:boolean;onBuy:(item:ShopItem)=>void;onFocus:(item:ShopItem)=>void;onVideo:(item:ShopItem)=>void;onCoins:()=>void;onCoinPack:()=>void;onShakeVideo:()=>void;onShakes:(pack:typeof SHAKE_PACKS[number])=>void;onBundle:(bundle:Bundle)=>void;onRewards:()=>void;onClose:()=>void};
@@ -23,7 +24,7 @@ function BundleArt({bundle,onItem}:{bundle:Bundle;onItem:(item:ShopItem)=>void})
 
 function Collection({category,title,caption,index,onIndex,profile,coins,busy,onBuy,onVideo,onRewards,onContents}:ShopProps&{category:Category;title:string;caption:string;index:number;onIndex:(index:number)=>void;onContents:(contents:Contents)=>void}) {
   const list=CATALOG[category];
-  const item=list[index],owned=profile.owned.includes(item.key),selected=profile.selected[category]===item.id;
+  const item=list[index],owned=profile.owned.includes(item.key);
   return <section className={`shop-collection ${category}`} data-category={category} data-shop-section={category} aria-label={title}>
     <header className="collection-heading" data-reveal><span className="eyebrow">{caption}</span><h2>{title}</h2></header>
     <SnapRail count={list.length} initial={index} current={index} onChange={onIndex}>{list.map((card,i)=><article className={`shop-card ${category} ${card.exclusive?'exclusive-card':''}`} data-theme={card.id} key={card.key} aria-label={card.name}>
@@ -35,7 +36,7 @@ function Collection({category,title,caption,index,onIndex,profile,coins,busy,onB
     <div className="collection-info" aria-live="polite" data-reveal><div className="item-copy" key={item.key}><h3 className="shop-current">{item.name}</h3><p>{item.exclusive&&<span className="item-exclusive-label">ЭКСКЛЮЗИВ</span>}{item.description}</p></div></div>
     <div data-reveal className="shop-pagination" aria-label={`Выбор: ${title}`}>{list.map((card,i)=><button key={card.key} className={i===index?'active':''} aria-label={`Показать ${card.name}`} aria-pressed={i===index} onClick={()=>onIndex(i)}><span/></button>)}</div>
     <div className="shop-actions" data-reveal>
-      {owned?<div className="auto-equipped" role="status"><Icon name={busy?'sparkle':selected?'check':'play'} size={22}/>{busy?'Примеряем…':'В игре автоматически'}</div>:item.exclusive?<button className="reward-button exclusive-unlock" onClick={onRewards}><Icon name="gift" size={28}/><span>В ежедневных наградах<small>Собери лунную коллекцию</small></span><Icon name="right" size={18}/></button>:<>
+      {owned?null:item.exclusive?<button className="reward-button exclusive-unlock" onClick={onRewards}><Icon name="gift" size={28}/><span>В ежедневных наградах<small>Собери лунную коллекцию</small></span><Icon name="right" size={18}/></button>:<>
         <button className="primary-button" disabled={coins<item.price||busy} onClick={()=>onBuy(item)}><img className="button-coin" src={asset('particles/11.webp')} alt=""/>{coins<item.price?`Нужно ещё ${item.price-coins}`:`Купить за ${item.price}`}</button>
         <button className="reward-button" disabled={busy} onClick={()=>onVideo(item)}><Icon name="video" size={28}/><span>Открыть за видео<small>{profile.videos[item.key]??0} / {item.videos} просмотрено</small></span><span className="ad-progress">{Array.from({length:item.videos},(_,i)=><i key={i} className={i<(profile.videos[item.key]??0)?'filled':''}/>)}</span></button>
       </>}
@@ -98,7 +99,7 @@ export function Shop(props:ShopProps) {
     return()=>{cancelAnimationFrame(frame);observer.disconnect();soft.destroy();motion.current=null;el.removeEventListener('scroll',onScroll);};
   },[]);
   return <>
-    <header className="shop-heading"><h1><Icon name="shop" size={46}/>Магазин</h1><div className="shop-wallet"><img src={asset('particles/11.webp')} alt="монет"/><strong>{props.coins.toLocaleString('ru-RU')}</strong></div></header>
+    <header className="shop-heading"><h1><Icon name="shop" size={46}/>Магазин</h1><div className="shop-wallet"><img src={asset('particles/11.webp')} alt="монет"/><strong>{compactBalance(props.coins)}</strong></div></header>
     <div className="shop-toolbar"><div className="shop-toolbar-top"><span>{props.profile.owned.length} образов в коллекции</span><button className="shop-quick-coins" disabled={props.busy} onClick={props.onCoins} aria-label={`+${AD_COINS} монет за видео`}><Icon name="video" size={22}/><b>+{AD_COINS}</b><img src={asset('particles/11.webp')} alt=""/></button></div><ShopNav active={active} onJump={jump}/></div>
     <div className="shop-scroll" ref={scroll}><div className="shop-scroll-content" ref={track}>
       <OfferCarousel profile={props.profile} onOpen={()=>jump('bundles')}/>

@@ -17,6 +17,7 @@ import { RewardedAd, type AdReward } from './ui/RewardedAd';
 import { Toast } from './ui/Toast';
 import { SoftScroll } from './ui/SoftScroll';
 import { AD_COINS, AD_COIN_PACK } from './game/economy';
+import { compactBalance } from './ui/compactBalance';
 
 const read = (key: string, fallback: string) => { try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; } };
 const save = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch { /* Storage is optional in embedded web games. */ } };
@@ -212,7 +213,7 @@ export default function App() {
               {(dialogKind==='won'||restartReady)&&<button className="primary-button restart-delayed" onClick={dialogKind==='won'?()=>worldRef.current?.continue():restart}><Icon name={dialogKind==='won'?'play':'restart'} size={19}/>{dialogKind==='won'?'Продолжить играть':'Ещё разок'}</button>}
               {dialogKind==='won'&&<button className="text-button" onClick={restart}>Начать заново</button>}
             </>:dialogKind==='wallet'?<>
-              <img className="dialog-mascot coin-mascot" src={asset('particles/11.webp')} alt=""/><span className="eyebrow">ТВОЯ КОПИЛКА</span><h1>{format(state.coins)} монет</h1><p>Получай монеты за слияния и выбирай новые образы в магазине.</p><p className="help-note">Три встряски на игру бесплатно. Потом — по {SHAKE_PRICE} монет. Покупки и монеты сохраняются.</p>
+              <img className="dialog-mascot coin-mascot" src={asset('particles/11.webp')} alt=""/><span className="eyebrow">ТВОЯ КОПИЛКА</span><h1>{compactBalance(state.coins)} монет</h1><p>Получай монеты за слияния и выбирай новые образы в магазине.</p><p className="help-note">Три встряски на игру бесплатно. Потом — по {SHAKE_PRICE} монет. Покупки и монеты сохраняются.</p>
               <button className="reward-button" onClick={()=>watch({type:'coins'})}><Icon name="video" size={27}/><span>+{AD_COINS} монет<small>За короткое видео</small></span><img className="button-coin" src={asset('particles/11.webp')} alt=""/></button><button className="primary-button" onClick={()=>setModal('shop')}><Icon name="shop" size={21}/> В магазин</button><button className="text-button" onClick={()=>setModal(null)}>За сочным урожаем!</button>
             </>:dialogKind==='help'?<>
               <img className="dialog-mascot" src={fruitAsset(1,skin)} alt=""/><span className="eyebrow">ПРОЩЕ ПРОСТОГО</span><h1>Устрой переполох</h1><div className="help-steps"><p><b>1</b><span><strong>Прицелься и отпусти</strong>Веди пальцем над контейнером.</span></p><p><b>2</b><span><strong>Соединяй одинаковые</strong>Два одинаковых кубика — один побольше.</span></p><p><b>3</b><span><strong>Собери всю семью</strong>Переполнение выше линии ведёт к проигрышу.</span></p></div><p className="help-note">Три встряски бесплатно. Если кубики остаются выше линии, красная полоска заполняется — освободи место!</p><button className="primary-button" onClick={()=>setModal(null)}>Понятно, играем!</button>
@@ -229,7 +230,7 @@ export default function App() {
     <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={!loaded||overlay} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
       <header className="header">
         <div className="brand"><span className="brand-leaf"><Icon name="leaf" size={25} /></span><div className="brand-text">jelly<span>fruit<span className="brand-dot">.</span></span></div></div>
-        <button className="wallet" aria-label="Баланс монет" onClick={()=>setModal('wallet')}><img src={asset('particles/11.webp')} alt="" /><strong key={state.coins} data-testid="coins">{format(state.coins)}</strong></button>
+        <button className="wallet" aria-label="Баланс монет" onClick={()=>setModal('wallet')}><img src={asset('particles/11.webp')} alt="" /><strong key={state.coins} data-testid="coins" data-coins={state.coins}>{compactBalance(state.coins)}</strong></button>
         <div className="header-buttons"><button className="round-button sound-button" aria-label={muted?'Включить звук':'Выключить звук'} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={26}/></button><button className="round-button" aria-label="Настройки" onClick={()=>setModal('settings')}><Icon name="settings" size={23}/></button></div>
       </header>
       <section className="scoreboard" aria-label="Результат">

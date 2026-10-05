@@ -9,15 +9,17 @@ export class ElasticScroll {
   private frame=0;
   private lastFrame=0;
   private written=0;
+  private viewportSize=1;
+  private extent=0;
   private edges={left:false,right:false};
-  private drag:{id:number;x:number;y:number;startX:number;startY:number;time:number;moved:boolean}|null=null;
+  private drag:{id:number;x:number;y:number;startX:number;startY:number;time:number;moved:boolean;scale:number}|null=null;
   private observer:ResizeObserver;
   private reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   private suppressClick=false;
   private get vertical(){return this.options.axis==='y';}
-  private get size(){return this.vertical?this.viewport.clientHeight:this.viewport.clientWidth;}
+  private get size(){return this.viewportSize;}
   private get offset(){return this.vertical?this.viewport.scrollTop:this.viewport.scrollLeft;}
-  private get max(){return Math.max(0,(this.vertical?this.viewport.scrollHeight:this.viewport.scrollWidth)-this.size);}
+  private get max(){return this.extent;}
 
   constructor(private viewport:HTMLDivElement,private track:HTMLDivElement,private onEdges:(edges:{left:boolean;right:boolean})=>void,private options:Options={}) {
     this.position=this.offset;
@@ -30,16 +32,24 @@ export class ElasticScroll {
     viewport.addEventListener('scroll',this.scrolled,{passive:true});
     viewport.addEventListener('wheel',this.wheel,{passive:false});
     viewport.addEventListener('keydown',this.key);
-    this.observer=new ResizeObserver(()=>{if(!this.drag&&!this.frame)this.position=clamp(this.offset,0,this.max);this.paint();});
-    this.observer.observe(viewport);this.observer.observe(track);this.paint();
+    const resize=()=>{
+      this.viewportSize=this.vertical?viewport.clientHeight:viewport.clientWidth;
+      this.extent=Math.max(0,(this.vertical?track.scrollHeight:track.scrollWidth)-this.size);
+      if(!this.drag&&!this.frame)this.position=clamp(this.offset,0,this.max);
+      this.paint();
+    };
+    this.observer=new ResizeObserver(resize);
+    this.observer.observe(viewport);this.observer.observe(track);resize();
   }
   private stop(){cancelAnimationFrame(this.frame);this.frame=0;this.lastFrame=0;this.target=null;}
   private paint(){
     const bounded=clamp(this.position,0,this.max),excess=this.position-bounded;
-    const stretch=this.reduced?0:excess*.55/(1+Math.abs(excess)*.55/Math.max(1,this.size));
+    const limit=this.vertical?28:Math.max(1,this.size);
+    const stretch=this.reduced?0:excess*.55/(1+Math.abs(excess)*.55/limit);
     if(this.vertical)this.viewport.scrollTop=bounded;else this.viewport.scrollLeft=bounded;
     this.written=this.offset;
-    this.track.style.transform=this.vertical?`translate3d(0,${-stretch}px,0)`:`translate3d(${-stretch}px,0,0)`;
+    const transform=Math.abs(stretch)<.01?'none':this.vertical?`translate3d(0,${-stretch}px,0)`:`translate3d(${-stretch}px,0,0)`;
+    if(this.track.style.transform!==transform)this.track.style.transform=transform;
     const edges={left:bounded>1,right:bounded<this.max-1};
     if(edges.left!==this.edges.left||edges.right!==this.edges.right){this.edges=edges;this.onEdges(edges);}
   }
@@ -52,7 +62,8 @@ export class ElasticScroll {
   private down=(event:PointerEvent)=>{
     if(!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
     this.stop();this.velocity=0;this.position=this.offset;this.suppressClick=false;this.options.onInterrupt?.();
-    this.drag={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,time:event.timeStamp,moved:false};
+    const rect=this.viewport.getBoundingClientRect();
+    this.drag={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,time:event.timeStamp,moved:false,scale:this.size/(this.vertical?rect.height:rect.width)};
   };
   private move=(event:PointerEvent)=>{
     const drag=this.drag;if(!drag||drag.id!==event.pointerId)return;
@@ -63,15 +74,15 @@ export class ElasticScroll {
       drag.moved=true;this.viewport.dataset.dragging='true';this.viewport.setPointerCapture(event.pointerId);
     }
     event.preventDefault();
-    const rect=this.viewport.getBoundingClientRect(),scale=this.size/(this.vertical?rect.height:rect.width);
-    const delta=(this.vertical?drag.y-event.clientY:drag.x-event.clientX)*scale,dt=Math.max(.008,(event.timeStamp-drag.time)/1000);
-    this.position=clamp(this.position+delta,-this.size*2,this.max+this.size*2);
-    this.velocity=this.velocity*.35+clamp(delta/dt,-1800,1800)*.65;
+    const delta=(this.vertical?drag.y-event.clientY:drag.x-event.clientX)*drag.scale,dt=Math.max(.008,(event.timeStamp-drag.time)/1000);
+    const overscroll=this.vertical?80:this.size*2;
+    this.position=clamp(this.position+delta,-overscroll,this.max+overscroll);
+    this.velocity=this.velocity*.35+clamp(delta/dt,this.vertical?-4200:-1800,this.vertical?4200:1800)*.65;
     drag.x=event.clientX;drag.y=event.clientY;drag.time=event.timeStamp;this.paint();
   };
   private release(event:PointerEvent,cancelled:boolean){
     const drag=this.drag;if(!drag||drag.id!==event.pointerId)return;
-    this.velocity=cancelled?0:this.velocity*Math.exp(-Math.max(0,event.timeStamp-drag.time-40)/70);
+    this.velocity=cancelled?0:this.velocity*(this.vertical?1.4:1)*Math.exp(-Math.max(0,event.timeStamp-drag.time-40)/70);
     this.suppressClick=drag.moved;this.drag=null;delete this.viewport.dataset.dragging;
     if(this.viewport.hasPointerCapture(event.pointerId))this.viewport.releasePointerCapture(event.pointerId);
     if(drag.moved)this.animate();
@@ -110,8 +121,8 @@ export class ElasticScroll {
     const edge=clamp(this.position,0,this.max);
     if(this.target===null&&this.position!==edge)this.target=edge;
     const goal=this.target??edge;
-    if(this.target!==null||this.position!==edge){this.velocity+=(goal-this.position)*170*dt;this.velocity*=Math.exp(-21*dt);}
-    else this.velocity*=Math.exp(-4.8*dt);
+    if(this.target!==null||this.position!==edge){this.velocity+=(goal-this.position)*(this.vertical?620:170)*dt;this.velocity*=Math.exp(-(this.vertical?36:21)*dt);}
+    else this.velocity*=Math.exp(-(this.vertical?5.8:4.8)*dt);
     this.position+=this.velocity*dt;
     if(Math.abs(this.velocity)<2&&Math.abs(this.position-goal)<.5){this.position=goal;this.velocity=0;this.lastFrame=0;this.target=null;this.paint();this.options.onSettled?.();return;}
     this.paint();this.animate();

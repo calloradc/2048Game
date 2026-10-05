@@ -210,7 +210,6 @@
 @media (prefers-reduced-motion: reduce) { .rail-card-wave { animation: none; } }
 
 .shop-scroll-content { position: relative; padding: 16px 0 28px; }
-.auto-equipped { height: 50px; display: flex; align-items: center; justify-content: center; gap: 7px; color: #69a177; font-size: 12px; font-weight: 900; }
 .collection-contents { display: grid; place-items: center; }
 .contents-button { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 30px; padding: 0 6px; background: transparent; color: #946daf; font-size: 10px; font-weight: 900; }
 .bundle-copy .contents-button { margin-top: 3px; padding: 0; }
@@ -219,8 +218,6 @@
 .offer-viewport::-webkit-scrollbar { display: none; }
 .offer-track { display: flex; width: max-content; --offer-width: 358px; }
 .offer-controls { display: flex; align-items: center; justify-content: center; gap: 6px; height: 27px; }
-.offer-controls > button { width: 26px; height: 25px; display: grid; place-items: center; background: transparent; padding: 3px; }
-.offer-controls > button:first-child .ui-icon { transform: scaleX(-1); }
 .offer-controls > div { display: flex; }
 .offer-controls > div > button { width: 22px; height: 25px; display: grid; place-items: center; padding: 0; background: transparent; }
 .offer-controls span { width: 5px; height: 5px; border-radius: 5px; background: #bdc5b2; transition: width .2s, background .2s; }
