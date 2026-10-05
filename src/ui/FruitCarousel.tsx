@@ -1,4 +1,4 @@
-import { t } from '../i18n';
+import { t, localeTag } from '../i18n';
 import { useEffect, useRef, useState } from 'react';
 import { FRUITS, fruitAsset } from '../game/fruits';
 import { ElasticScroll } from './ElasticScroll';
@@ -22,7 +22,7 @@ export function FruitCarousel({discovered,skin='fruit'}:{discovered:number;skin?
     if(newly)motion.current?.scrollTo(Math.max(0,Math.floor(Math.log2(newly))*90-90));
   },[discovered]);
   return <section className="evolution" aria-label={t("Фруктовая семья")}>
-    <div className="evolution-title"><span>{CATALOG.skins.find(item=>item.id===skin)?.name.toUpperCase()}</span><span>{count<11?`${count} / 11`:t("ВСЕ СОБРАНЫ")} · {t("ЦЕЛЬ")} <b>2048</b></span></div>
+    <div className="evolution-title"><span>{CATALOG.skins.find(item=>item.id===skin)?.name.toLocaleUpperCase(localeTag())}</span><span>{count<11?`${count} / 11`:t("ВСЕ СОБРАНЫ")} · {t("ЦЕЛЬ")} <b>2048</b></span></div>
     <button className="carousel-arrow prev" aria-label={t("Предыдущие фрукты")} onClick={()=>motion.current?.scrollBy(-180)} disabled={!edges.left}><Arrow /></button>
     <div className="fruit-scroller" ref={viewport} tabIndex={0} aria-label={t("Лента фруктов. Листай пальцем или стрелками.")}>
       <div className="fruit-chain" ref={track}>{FRUITS.map((fruit,level)=>{

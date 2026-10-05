@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import ts from 'typescript';
 import messages from './locales/messages.json';
-import { LANGUAGES, setLanguage, t } from './i18n';
+import { LANGUAGES, setLanguage, t, localeTag } from './i18n';
 import { ALL_ITEMS, SKIN_NAMES } from './game/catalog';
 import { BUNDLES } from './game/commerce';
 import { prizeName } from './game/rewards';
@@ -40,6 +40,7 @@ describe('Complete localization',()=>{
       if(code!=='ru')expect([...ALL_ITEMS.flatMap(item=>[item.name,item.description]),...Object.keys(SKIN_NAMES).flatMap(skin=>SKIN_NAMES[skin])].join(' ')).not.toMatch(/[А-Яа-яЁё]/);
     }
     setLanguage('en');expect(prizeName({type:'shakes',amount:21})).toBe('+21 shakes');
+    setLanguage('tr');expect(t('Фруктовая семья').toLocaleUpperCase(localeTag())).toBe('MEYVE AİLESİ');
     setLanguage('ru');expect(prizeName({type:'shakes',amount:21})).toBe('+21 встряска');
   });
 });
