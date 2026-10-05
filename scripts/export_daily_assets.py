@@ -48,19 +48,19 @@ def body(image):
     bottom=min(bbox[3],broad[-1]+2);return [left,bottom-(right-left),right,bottom]
 
 assets=ROOT/'public/assets'
-fit(Image.open(SOURCE/FILES['basket']).convert('RGBA'),128,5).save(assets/'ui/generated/icon-shop-basket-red.webp',quality=94,method=6)
+fit(Image.open(SOURCE/FILES['basket']).convert('RGBA'),128,5).save(assets/'ui/generated/icon-shop-basket-red.webp',quality=85,method=6)
 atlas=Image.open(SOURCE/FILES['mochi']).convert('RGBA');w,h=atlas.size
 folder=assets/'skins/mochi';folder.mkdir(parents=True,exist_ok=True);rects=[]
 preview=Image.new('RGB',(11*128,152),'#ebe8fa');draw=ImageDraw.Draw(preview)
 for i in range(11):
     x,y=i%4,i//4
     tile=atlas.crop((round(x*w/4),round(y*h/3),round((x+1)*w/4),round((y+1)*h/3)))
-    tile=fit(clean_cell(tile),256,6);tile.save(folder/f'{i}.webp',quality=93,method=6)
+    tile=fit(clean_cell(tile),256,6);tile.save(folder/f'{i}.webp',quality=85,method=6)
     rect=body(tile);rects.append(rect);thumb=tile.resize((128,128));preview.paste(thumb,(i*128,20),thumb)
     draw.rectangle([i*128+rect[0]/2,20+rect[1]/2,i*128+rect[2]/2,20+rect[3]/2],outline='#ed607a')
 metadata_path=ROOT/'src/game/generatedBodies.json';metadata=json.loads(metadata_path.read_text());metadata['mochi']=rects;metadata_path.write_text(json.dumps(metadata,indent=2)+'\n')
 preview.save('/workspace/scratch/mochi-bodies.jpg')
 background=Image.open(SOURCE/FILES['aurora']).convert('RGB');background.thumbnail((1200,1800),Image.Resampling.LANCZOS)
-background.save(assets/'backgrounds/aurora.webp',quality=91,method=6)
-fit(Image.open(SOURCE/FILES['lunar']).convert('RGBA'),720,12).save(assets/'boxes/lunar.webp',quality=93,method=6)
+background.save(assets/'backgrounds/aurora.webp',quality=85,method=6)
+fit(Image.open(SOURCE/FILES['lunar']).convert('RGBA'),720,12).save(assets/'boxes/lunar.webp',quality=85,method=6)
 print('Exported basket, 11 moon mochi sprites with body bounds, aurora scene and lunar box.')

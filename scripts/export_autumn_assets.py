@@ -34,7 +34,7 @@ def export():
                 tile=sprite(cell)
                 destination=ROOT/f'public/assets/skins/{skin}/{level}.webp'
                 destination.parent.mkdir(parents=True,exist_ok=True)
-                tile.save(destination,quality=92,method=6)
+                tile.save(destination,quality=85,method=6)
                 bodies[skin].append(face_bounds(tile))
             continue
         destination=ROOT/'public/assets'/('glass.webp' if key=='boxes/glass.webp' else key)
@@ -42,14 +42,14 @@ def export():
         if key.startswith('backgrounds/') or key.startswith('cover'):
             image=image.convert('RGB')
             image.thumbnail((1680,945) if '-wide.' in key else (1000,1500),Image.Resampling.LANCZOS)
-            image.save(destination,quality=88,method=6)
+            image.save(destination,quality=85,method=6)
         elif key.startswith('boxes/'):
             image=image.convert('RGBA');image=image.crop(character_bounds(image))
             image.thumbnail((712,712),Image.Resampling.LANCZOS)
             tile=Image.new('RGBA',(720,720));tile.alpha_composite(image,((720-image.width)//2,(720-image.height)//2))
-            tile.save(destination,quality=92,method=6)
+            tile.save(destination,quality=85,method=6)
         else:
-            tile=sprite(image);tile.save(destination,quality=92,method=6)
+            tile=sprite(image);tile.save(destination,quality=85,method=6)
             _,skin,level=key.split('/')
             bodies[skin][int(Path(level).stem)]=face_bounds(tile)
     metadata.write_text(json.dumps(bodies,indent=2)+'\n')

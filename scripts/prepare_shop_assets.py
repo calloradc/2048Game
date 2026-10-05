@@ -52,7 +52,7 @@ for row, (theme, file) in enumerate(sources.items()):
     metadata[theme] = []
     for i in range(11):
         tile = sprite(cell(atlas, i, 4, 3))
-        tile.save(directory / f'{i}.webp', quality=91, method=6)
+        tile.save(directory / f'{i}.webp', quality=85, method=6)
         rect = body(tile)
         metadata[theme].append(rect)
         preview = tile.resize((128,128))
@@ -64,7 +64,7 @@ atlas = Image.open(source / 'exec-7461084d-ed55-45ff-8bfd-e3c75b087aa5.png').con
 metadata['fruitLarge'] = []
 for i in range(4):
     tile = sprite(cell(atlas,i,2,2))
-    tile.save(dest / f'fruit-{i+7}.webp', quality=92, method=6)
+    tile.save(dest / f'fruit-{i+7}.webp', quality=85, method=6)
     rect = body(tile)
     metadata['fruitLarge'].append(rect)
     preview=tile.resize((128,128));sheet.paste(preview,(i*128,770),preview)
@@ -79,11 +79,11 @@ sheet.save('/workspace/scratch/shop-body-check.jpg')
 (dest/'boxes').mkdir(exist_ok=True)
 atlas=Image.open(source/'exec-dd411683-606e-4d39-b485-37e708e59f18.png').convert('RGBA')
 for i,name in enumerate(['rose','amber','ice']):
-    sprite(cell(atlas,i,3,1),720,12).save(dest/'boxes'/f'{name}.webp',quality=92,method=6)
+    sprite(cell(atlas,i,3,1),720,12).save(dest/'boxes'/f'{name}.webp',quality=85,method=6)
 
 atlas=Image.open(source/'exec-5208a442-df88-4fa0-8b36-85dc0848f73a.png').convert('RGBA')
 for i,name in enumerate(['settings','shop','video','gift','skin','background','box','check','lock','double','rescue','vibrate']):
-    sprite(cell(atlas,i,4,3),96,6).save(dest/'ui'/f'icon-{name}.webp',quality=92,method=6)
+    sprite(cell(atlas,i,4,3),96,6).save(dest/'ui'/f'icon-{name}.webp',quality=85,method=6)
 print('Exported 55 characters, 4 large fruits, 3 boxes and legacy icon sources.')
 from refresh_visual_assets import refresh
 refresh()

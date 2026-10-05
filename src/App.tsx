@@ -86,7 +86,7 @@ export default function App() {
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     let alive = true;
-    const world = new FruitWorld(lastBest.current,savedCoins.current), audio = new GameAudio(), renderer = new GameRenderer(canvas, world);
+    const world = new FruitWorld(lastBest.current,savedCoins.current), audio = new GameAudio(muted), renderer = new GameRenderer(canvas, world);
     worldRef.current = world; audioRef.current = audio; rendererRef.current = renderer;
     world.onChange = snapshot => {
       if (!alive) return;
@@ -94,11 +94,18 @@ export default function App() {
       if (snapshot.best > lastBest.current) { lastBest.current = snapshot.best; save('jelly-best', String(snapshot.best)); }
       if(snapshot.coins!==savedCoins.current){savedCoins.current=snapshot.coins;save('jelly-coins',String(snapshot.coins));}
     };
-    world.onMerge = event => { renderer.merge(event); audio.play('merge', event.level); };
+    world.onMerge = event => { renderer.merge(event); audio.play('merge'); };
+    const unlockAudio = () => audio.unlock();
+    const buttonAudio = (event: MouseEvent) => {
+      const button = event.target instanceof Element ? event.target.closest('button') : null;
+      if (button && !button.disabled && !button.closest('[inert]')) audio.play('button');
+    };
+    document.addEventListener('pointerdown', unlockAudio, true);
+    document.addEventListener('click', buttonAudio, true);
     world.emit();
     const appearance=profileRef.current.selected;
     void renderer.start((done,total)=>{if(alive)setProgress(Math.round(done/total*100));},appearance.skins,appearance.boxes,appearance.backgrounds).then(() => { if (alive) setLoaded(true); }).catch(() => { if (alive) setError(true); });
-    return () => { alive = false; renderer.destroy(); world.destroy(); audio.destroy(); clearTimeout(shakeTimer.current);clearTimeout(toastTimer.current); };
+    return () => { alive = false; document.removeEventListener('pointerdown', unlockAudio, true); document.removeEventListener('click', buttonAudio, true); renderer.destroy(); world.destroy(); audio.destroy(); clearTimeout(shakeTimer.current);clearTimeout(toastTimer.current); };
   }, []);
   useEffect(() => { if (audioRef.current) audioRef.current.muted = muted; save('jelly-muted', String(muted)); }, [muted]);
   useEffect(() => { if (rendererRef.current) rendererRef.current.paused = overlay || !loaded; dragRef.current = null; }, [overlay,loaded]);
@@ -143,20 +150,24 @@ export default function App() {
   const shake = () => {
     const world=worldRef.current;if(!world||world.state.status!=='playing')return;
     if(world.state.shakes===0&&profileRef.current.shakeTokens>0){world.grantShake();commitProfile({...profileRef.current,shakeTokens:profileRef.current.shakeTokens-1});}
+    const coinsBefore = world.state.coins;
     audioRef.current?.unlock();if (!world.shake()) return;
-    audioRef.current?.play('shake'); setShaking(true);clearTimeout(shakeTimer.current); shakeTimer.current = setTimeout(() => setShaking(false), 500);
+    if (world.state.coins < coinsBefore) audioRef.current?.play('purchase');
+    setShaking(true);clearTimeout(shakeTimer.current); shakeTimer.current = setTimeout(() => setShaking(false), 500);
   };
   const fullscreen = () => { if (!document.fullscreenElement) void shellRef.current?.requestFullscreen?.().catch(() => {}); else void document.exitFullscreen().catch(() => {}); };
   const buy=(item:ShopItem)=>{
     const world=worldRef.current;if(!world)return;
     const result=purchase(profileRef.current,item,world.state.coins);
     if(!result.purchased||!world.spendCoins(item.price))return;
+    audioRef.current?.play('purchase');
     commitProfile(result.profile);void showAppearance({...appearanceRef.current,[item.category]:item.id});notify(t("{item} теперь в коллекции!",{item:item.name}));
   };
   const buyBundle=(bundle:Bundle)=>{
     const world=worldRef.current;if(!world)return;
     const cost=bundleOffer(profileRef.current,bundle).price,result=purchaseBundle(profileRef.current,bundle,world.state.coins);
     if(!result.purchased||!world.spendCoins(cost))return;
+    audioRef.current?.play('purchase');
     commitProfile(result.profile);
     bundle.items.forEach(key=>{const item=itemByKey(key)!;shopFocus.current[item.category]=item;});
     void showAppearance(result.profile.selected);notify(t("{item} в коллекции! +{n} встряски",{item:bundle.name,n:bundle.shakes}));
@@ -165,6 +176,7 @@ export default function App() {
     const world=worldRef.current;if(!world)return;
     const result=purchaseShakes(profileRef.current,pack,world.state.coins);
     if(!result.purchased||!world.spendCoins(pack.price))return;
+    audioRef.current?.play('purchase');
     commitProfile(result.profile);notify(t("+{n} встрясок в запасе!",{n:pack.amount}));
   };
   const showAppearance=async(selected:Profile['selected'])=>{

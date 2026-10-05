@@ -34,6 +34,17 @@ jobs:
             sleep 1
           done
           npm run test:browser
+          node scripts/audio-stream-smoke.mjs
+      - name: Check audio effects and focus behavior
+        env:
+          GAME_URL: http://localhost:5174/
+        run: |
+          npm run dev -- --port 5174 > /tmp/jelly-audio-dev.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail "$GAME_URL" > /dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/audio-smoke.mjs
       - name: Save UI screenshots
         if: always()
         uses: actions/upload-artifact@v4

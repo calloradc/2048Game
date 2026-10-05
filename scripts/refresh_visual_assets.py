@@ -68,14 +68,14 @@ def refresh():
         destination.parent.mkdir(parents=True, exist_ok=True)
         image = Image.open(source)
         if name.startswith('backgrounds/'):
-            image.convert('RGB').resize((900,1350),Image.Resampling.LANCZOS).save(destination,quality=89,method=6)
+            image.convert('RGB').resize((900,1350),Image.Resampling.LANCZOS).save(destination,quality=85,method=6)
             continue
         image = image.convert('RGBA')
         image = image.crop(character_bounds(image))
         image.thumbnail((244,244),Image.Resampling.LANCZOS)
         tile = Image.new('RGBA',(256,256))
         tile.alpha_composite(image,((256-image.width)//2,(256-image.height)//2))
-        tile.save(destination,quality=92,method=6)
+        tile.save(destination,quality=85,method=6)
         if name.startswith('skins/'):
             _, skin, level = name.split('/')
             bodies[skin][int(Path(level).stem)] = face_bounds(tile)

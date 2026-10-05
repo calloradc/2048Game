@@ -29,7 +29,7 @@ def export():
             image.thumbnail((120, 120), Image.Resampling.LANCZOS)
             tile = Image.new('RGBA', (128, 128))
             tile.alpha_composite(image, ((128 - image.width) // 2, (128 - image.height) // 2))
-        tile.save(destination, quality=92, method=6)
+        tile.save(destination, quality=85, method=6)
         print(f'Exported {key}: {tile.width}x{tile.height}')
 
 if __name__ == '__main__':

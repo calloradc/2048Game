@@ -21,5 +21,5 @@ for entry in manifest:
     fitted = ImageOps.contain(source, size, Image.Resampling.LANCZOS)
     canvas = Image.new('RGBA', size)
     canvas.alpha_composite(fitted, ((size[0]-fitted.width)//2, (size[1]-fitted.height)//2))
-    canvas.save(destination, quality=94, method=6, exact=True)
+    canvas.save(destination, quality=85, method=6, exact=True)
 print(f'Exported {len(manifest)} separate UI textures.')

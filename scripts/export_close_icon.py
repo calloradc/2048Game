@@ -9,4 +9,4 @@ image = image.crop(image.getchannel('A').point(lambda a: 255 if a > 32 else 0).g
 image.thumbnail((118, 118), Image.Resampling.LANCZOS)
 canvas = Image.new('RGBA', (128, 128))
 canvas.alpha_composite(image, ((128-image.width)//2, (128-image.height)//2))
-canvas.save(ROOT/'public/assets/ui/generated/icon-close-coral.webp', quality=94, method=6)
+canvas.save(ROOT/'public/assets/ui/generated/icon-close-coral.webp', quality=85, method=6)

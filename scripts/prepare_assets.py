@@ -18,8 +18,8 @@ rects=[(0,0,362,350),(362,0,724,350),(724,0,1086,350),(1086,0,1448,350),
 for i,rect in enumerate(rects):
     sprite=cut(fruits,rect);sprite.thumbnail((244,244),Image.Resampling.LANCZOS)
     tile=Image.new('RGBA',(256,256));tile.alpha_composite(sprite,((256-sprite.width)//2,(256-sprite.height)//2))
-    tile.save(dest/f'fruit-{i}.webp',quality=91,method=6)
-    if i==0:tile.resize((192,192),Image.Resampling.LANCZOS).save(dest/'icon.png')
+    tile.save(dest/f'fruit-{i}.webp',quality=85,method=6)
+    if i==0:tile.resize((192,192),Image.Resampling.LANCZOS).save(dest/'icon.webp',quality=85,method=6)
 
 icons=Image.open(source/'exec-375baf1d-67dc-4c86-8d5b-f63bf6330735.png')
 names=['sound','mute','pause','restart','help','shake','hand','leaf','trophy','play','close','fullscreen','right','left','sparkle']
@@ -28,5 +28,5 @@ for i,name in enumerate(names):
     sprite=cut(icons,(round(col*w/4),round(row*h/4),round((col+1)*w/4),round((row+1)*h/4)))
     sprite.thumbnail((88,88),Image.Resampling.LANCZOS)
     tile=Image.new('RGBA',(96,96));tile.alpha_composite(sprite,((96-sprite.width)//2,(96-sprite.height)//2))
-    tile.save(dest/'ui'/f'icon-{name}.webp',quality=90,method=6)
+    tile.save(dest/'ui'/f'icon-{name}.webp',quality=85,method=6)
 print('Exported 11 frontal fruit sprites and 15 icons. UI surfaces use HTML/CSS.')
