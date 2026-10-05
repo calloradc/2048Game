@@ -10,7 +10,7 @@ export async function checkGameover(browser,base,errors){
   const canvas=page.locator('canvas');
   for(let i=0;i<15;i++)await canvas.dispatchEvent('keydown',{key:'ArrowLeft'});
   let throws=0;
-  for(;throws<150;throws++){
+  for(;throws<250;throws++){
     if(await page.getByRole('dialog',{name:'Игра окончена'}).count())break;
     if(await page.getByRole('dialog',{name:'Победа'}).count())await page.getByRole('button',{name:'Продолжить играть'}).click({force:true});
     await canvas.dispatchEvent('keydown',{key:'Enter'});await page.clock.runFor(650);
@@ -31,5 +31,28 @@ export async function checkGameover(browser,base,errors){
   assert.ok(await wallet()>=earned*2,'Rescue preserves the doubled wallet; resumed merges may earn more coins');
   await canvas.dispatchEvent('keydown',{key:'Enter'});await page.clock.runFor(700);
   await page.screenshot({path:'test-results/revived.png'});
-  await page.close();console.log(`✓ actual overflow after ${throws} drops, one-time coin doubling and rewarded rescue`);
+  let extra=0;
+  for(;extra<200;extra++){
+    if(await page.getByRole('dialog',{name:'Игра окончена'}).count())break;
+    if(await page.getByRole('dialog',{name:'Победа'}).count())await page.getByRole('button',{name:'Продолжить играть'}).click({force:true});
+    await canvas.dispatchEvent('keydown',{key:'Enter'});await page.clock.runFor(650);
+  }
+  assert.equal(await page.getByRole('dialog',{name:'Игра окончена'}).count(),1,'The revived round can finish normally');
+  await page.clock.runFor(6500);
+  assert.equal(await page.getByRole('dialog',{name:'Лидерборд'}).count(),0,'A record popup waits until a new round starts');
+  await page.getByRole('button',{name:'Ещё разок',exact:true}).click({force:true});await page.clock.runFor(300);
+  assert.equal(await page.getByTestId('score').textContent(),'0','A fresh round resets the score before showing rank progress');
+  assert.equal(await page.getByRole('dialog',{name:'Лидерборд'}).count(),1,'A lost round beating its starting best shows the demo ranking');
+  const firstRank=Number((await page.getByTestId('animated-rank').textContent()).replace(/\D/g,''));
+  await page.clock.runFor(900);
+  const middleRank=Number((await page.getByTestId('animated-rank').textContent()).replace(/\D/g,''));
+  await page.clock.runFor(1500);
+  const finalRank=Number((await page.getByTestId('animated-rank').textContent()).replace(/\D/g,''));
+  assert.ok(firstRank>middleRank&&middleRank>=finalRank,'The displayed global rank animates upward');
+  assert.ok(await page.locator('.leaderboard-summary').textContent().then(text=>text.includes('из 201')));
+  await page.screenshot({path:'test-results/leaderboard.png'});
+  await page.getByRole('button',{name:'Продолжить играть'}).click({force:true});await page.clock.runFor(400);
+  await canvas.dispatchEvent('keydown',{key:'Enter'});await page.clock.runFor(700);
+  assert.equal(await page.getByRole('dialog').count(),0,'Closing the leaderboard resumes the new round');
+  await page.close();console.log(`✓ actual overflow after ${throws} drops, one-time rewards, rescue without a popup and animated record ranking after restarting`);
 }

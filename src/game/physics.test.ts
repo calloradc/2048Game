@@ -80,7 +80,7 @@ describe('FruitWorld: rules and soft bodies', () => {
     advance(world,1.05);expect(world.state.status).toBe('playing');
     advance(world,.15);expect(world.state.status).toBe('gameover');expect(world.drop()).toBe(false);world.destroy();
   });
-  it('does not count fruit resting just beneath the lower danger line', () => {
+  it('does not count fruit resting just beneath the danger line', () => {
     const world=new FruitWorld();const cube=world.add(3,200,BOARD.danger+FRUITS[3].size/2+1);cube.sleeping=true;
     advance(world,5);expect(world.state.danger).toBe(0);expect(world.state.status).toBe('playing');world.destroy();
   });

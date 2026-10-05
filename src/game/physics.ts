@@ -1,7 +1,7 @@
 import { PRICE_MULTIPLIER } from './economy';
 import { FRUITS, randomDrop } from './fruits';
 
-export const BOARD = { width: 420, height: 490, left: 50, right: 370, top: 117, floor: 432, dropY: 68, danger: 166 };
+export const BOARD = { width: 420, height: 490, left: 50, right: 370, top: 117, floor: 432, dropY: 68, danger: 128 };
 export type Status = 'playing' | 'gameover' | 'won';
 export interface GameState {
   score: number; best: number; current: number; next: number;

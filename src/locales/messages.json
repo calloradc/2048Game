@@ -2356,5 +2356,65 @@
     "Galaksi Kralı",
     "Re della Galassia",
     "Rei da Galáxia"
+  ],
+  "Лидерборд": [
+    "Leaderboard",
+    "Liderlik tablosu",
+    "Classifica",
+    "Ranking"
+  ],
+  "НОВЫЙ РЕКОРД!": [
+    "NEW PERSONAL BEST!",
+    "YENİ REKOR!",
+    "NUOVO RECORD!",
+    "NOVO RECORDE!"
+  ],
+  "Ты поднимаешься!": [
+    "You're moving up!",
+    "Yükseliyorsun!",
+    "Stai salendo!",
+    "Você está subindo!"
+  ],
+  "очков": [
+    "points",
+    "puan",
+    "punti",
+    "pontos"
+  ],
+  "Ты": [
+    "You",
+    "Sen",
+    "Tu",
+    "Você"
+  ],
+  "Твоё место: {rank} из {total} · вверх на {n}": [
+    "Your rank: {rank} of {total} · up {n}",
+    "Sıran: {rank} / {total} · {n} sıra yükseldin",
+    "Posizione: {rank} su {total} · sali di {n}",
+    "Sua posição: {rank} de {total} · subiu {n}"
+  ],
+  "Поднимаемся в рейтинге…": [
+    "Moving up the rankings…",
+    "Sıralamada yükseliyorsun…",
+    "Stai scalando la classifica…",
+    "Subindo no ranking…"
+  ],
+  "Демо-лидерборд · игроки пока вымышленные": [
+    "Demo leaderboard · fictional players for now",
+    "Demo sıralama · şimdilik hayalî oyuncular",
+    "Classifica demo · per ora i giocatori sono fittizi",
+    "Ranking de demonstração · jogadores fictícios por enquanto"
+  ],
+  "Доступен ежедневный подарок": [
+    "Daily gift available",
+    "Günlük hediye hazır",
+    "Regalo giornaliero disponibile",
+    "Presente diário disponível"
+  ],
+  "Рекорд стал выше!": [
+    "A new personal best!",
+    "Rekorun yükseldi!",
+    "Hai migliorato il record!",
+    "Você superou seu recorde!"
   ]
 }

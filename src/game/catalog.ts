@@ -50,7 +50,7 @@ export const STARTERS:Record<Category,string>={skins:'fruit',backgrounds:'meadow
 export const itemByKey=(key:string)=>ALL_ITEMS.find(item=>item.key===key);
 export const backgroundAsset=(id:string)=>asset(id==='meadow'?'countryside.webp':`backgrounds/${id}.webp`);
 export const wideBackgroundAsset=(id:string)=>asset(`backgrounds/${id}-wide.webp`);
-export const boxAsset=(id:string)=>asset(id==='glass'?'glass.webp':`boxes/${id}.webp`);
+export const boxAsset=(id:string)=>asset(`boxes/tall-${id}.webp`);
 const skinNames:Record<string,string[]>={
   fruit:FRUIT_NAMES,
   fuzzies:['Пушик','Мятушка','Солнышко','Лилу','Облачко','Лисёнок','Зайчик','Совушка','Мишутка','Радужик','Лёвушка'],

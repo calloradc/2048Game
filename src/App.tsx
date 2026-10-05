@@ -1,4 +1,4 @@
-import { t, useLanguage, setLanguage, LANGUAGES, localeTag } from './i18n';
+import { t, useLanguage, localeTag } from './i18n';
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { asset, fruitAsset } from './game/fruits';
@@ -21,13 +21,17 @@ import { SoftScroll } from './ui/SoftScroll';
 import { AD_COINS, AD_COIN_PACK } from './game/economy';
 import { compactBalance } from './ui/compactBalance';
 import { useGameViewport } from './ui/useGameViewport';
+import { LanguagePicker } from './ui/LanguagePicker';
+import { Leaderboard } from './ui/Leaderboard';
+import { roundRankProgress, type RankProgress } from './game/leaderboard';
+import { uiAsset } from './ui/assets';
 
 const read = (key: string, fallback: string) => { try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; } };
 const save = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch { /* Storage is optional in embedded web games. */ } };
-type Modal = 'help' | 'settings' | 'wallet' | 'restart' | 'shop' | 'rewards' | null;
+type Modal = 'help' | 'settings' | 'wallet' | 'restart' | 'shop' | 'rewards' | 'leaderboard' | null;
 const readNumber = (key: string, fallback = 0) => Math.max(0, Math.floor(Number(read(key, String(fallback))) || 0));
 const format = (n: number) => n.toLocaleString(localeTag());
-const dialogLabels={gameover:'Игра окончена',won:'Победа',help:'Как играть',wallet:'Монеты',restart:'Новая игра',settings:'Настройки',shop:'Магазин',rewards:'Подарки'};
+const dialogLabels={gameover:'Игра окончена',won:'Победа',help:'Как играть',wallet:'Монеты',restart:'Новая игра',settings:'Настройки',shop:'Магазин',rewards:'Подарки',leaderboard:'Лидерборд'};
 
 export default function App() {
   const language=useLanguage();
@@ -56,6 +60,8 @@ export default function App() {
   const shellRef = useRef<HTMLDivElement>(null),dialogRef = useRef<HTMLDivElement>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const lastBest = useRef(state.best),savedCoins = useRef(state.coins);
+  const roundStartingBest=useRef(state.best);
+  const [rankProgress,setRankProgress]=useState<RankProgress|null>(null);
   const notify=(text:string)=>{setToast(text);clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(null),2600);};
   const commitProfile=(next:Profile)=>{profileRef.current=next;setProfile(next);save('jelly-profile',JSON.stringify(next));};
   useEffect(()=>{
@@ -126,7 +132,14 @@ export default function App() {
     aim(event); dragRef.current = null;
     if (!overlay && worldRef.current?.drop()) audioRef.current?.play('drop');
   };
-  const restart = () => { worldRef.current?.reset(); setModal(null); };
+  const restart = () => {
+    const world=worldRef.current;if(!world)return;
+    const progress=roundRankProgress(world.state.status,world.state.score,roundStartingBest.current);
+    roundStartingBest.current=world.state.best;
+    world.reset();
+    if(progress)setRankProgress(progress);
+    setModal(progress?'leaderboard':null);
+  };
   const shake = () => {
     const world=worldRef.current;if(!world||world.state.status!=='playing')return;
     if(world.state.shakes===0&&profileRef.current.shakeTokens>0){world.grantShake();commitProfile({...profileRef.current,shakeTokens:profileRef.current.shakeTokens-1});}
@@ -199,7 +212,7 @@ export default function App() {
   const daily=()=>{const world=worldRef.current;if(!world)return;const result=claimDaily(profileRef.current,calendarDay());if(!result.prize)return;commitProfile(result.profile);if(result.coins)world.grantCoins(result.coins);setDay(calendarDay());notify(t("Твой подарок: {item}!",{item:prizeName(result.prize)}));};
   const skin=appearance.skins;
   const dialog=overlay&&<div key={dialogKind} className={`overlay ${dialogKind==='shop'?'shop-fullscreen':dialogKind==='rewards'?'rewards-fullscreen':''} ${dialogLeaving?'is-leaving':''}`} onPointerDown={e=>e.stopPropagation()}>
-        <div className={`dialog ${dialogKind==='shop'?'shop-dialog':dialogKind==='rewards'?'rewards-dialog':''}`} role="dialog" aria-modal="true" aria-label={dialogKind?t(dialogLabels[dialogKind]):''} tabIndex={-1} ref={dialogRef}>
+        <div className={`dialog ${dialogKind==='shop'?'shop-dialog':dialogKind==='rewards'?'rewards-dialog':dialogKind==='leaderboard'?'leaderboard-dialog':''}`} role="dialog" aria-modal="true" aria-label={dialogKind?t(dialogLabels[dialogKind]):''} tabIndex={-1} ref={dialogRef}>
           <div className="dialog-content" inert={!!renderedAd||interstitial||dialogLeaving}>
             {dialogKind!=='gameover'&&dialogKind!=='won'&&<button className="dialog-close" aria-label={t("Закрыть")} onClick={()=>setModal(null)}><Icon name="close" size={21}/></button>}
             <SoftScroll enabled={dialogKind!=='shop'&&dialogKind!=='rewards'}>{dialogKind==='shop'?<Shop profile={profile} coins={state.coins} busy={appearanceBusy} onBuy={buy} onFocus={focusItem} onVideo={item=>watch({type:'unlock',key:item.key})} onCoins={()=>watch({type:'coins'})} onCoinPack={()=>watch({type:'coin-pack'})} onShakeVideo={()=>watch({type:'shake'})} onShakes={buyShakes} onBundle={buyBundle} onRewards={()=>setModal('rewards')} onClose={()=>setModal(null)}/>:dialogKind==='settings'?<>
@@ -208,9 +221,9 @@ export default function App() {
                 <button className="setting-row" role="switch" aria-checked={!muted} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={27}/><span>{t("Звук")}</span><i className={!muted?'on':''}/></button>
                 <button className="setting-row" onClick={fullscreen}><Icon name="fullscreen" size={27}/><span>{t("На весь экран")}</span><Icon name="right" size={17}/></button>
                 <button className="setting-row" onClick={()=>setModal('restart')}><Icon name="restart" size={27}/><span>{t("Начать заново")}</span><Icon name="right" size={17}/></button>
-                <label className="language-setting"><span>{t('Язык')}</span><select aria-label={t('Язык')} value={language} onChange={e=>setLanguage(e.target.value as typeof language)}>{LANGUAGES.map(([code,name])=><option key={code} value={code}>{name}</option>)}</select></label>
+                <LanguagePicker language={language}/>
               </div><button className="primary-button" onClick={()=>setModal(null)}><Icon name="play" size={19}/> {t("Вернуться в игру")}</button>
-            </>:dialogKind==='rewards'?<Rewards profile={profile} day={day} busy={appearanceBusy} onClaim={daily} onSelect={item=>void apply(item)} onClose={()=>setModal(null)}/>:dialogKind==='gameover'||dialogKind==='won'?<>
+            </>:dialogKind==='rewards'?<Rewards profile={profile} day={day} busy={appearanceBusy} onClaim={daily} onSelect={item=>void apply(item)} onClose={()=>setModal(null)}/>:dialogKind==='leaderboard'&&rankProgress?<Leaderboard progress={rankProgress} onContinue={()=>setModal(null)}/>:dialogKind==='gameover'||dialogKind==='won'?<>
               <img className="dialog-mascot" src={fruitAsset(dialogKind==='won'?10:6,skin)} alt=""/><span className="eyebrow">{dialogKind==='won'?t("2048! ВСЯ СЕМЬЯ В СБОРЕ!"):t("КОНТЕЙНЕР ПОЛОН")}</span><h1>{dialogKind==='won'?t("Сочный финал!"):t("Хороший урожай!")}</h1>
               <div className="result-score">{format(state.score)}<span>{t("очков за эту игру")}</span></div><div className="round-earnings"><img src={asset("particles/11.webp")} alt=""/>{t("+{n} монет",{n:state.earned+state.bonusCoins})}{state.doubled&&<Icon name="check" size={18}/>}</div>
               {dialogKind==='gameover'&&state.revives===0&&<button className="reward-button" onClick={()=>watch({type:'revive'})}><Icon name="video" size={27}/><span>{t("Спасти урожай")}<small>{t("Убрать верхние кубики · 1 раз за игру")}</small></span><Icon name="rescue" size={27}/></button>}
@@ -256,7 +269,7 @@ export default function App() {
       <footer className="controls">
         <button className="utility-button" onClick={()=>setModal('help')} aria-label={t("Как играть")}><Icon name="help" size={34}/></button>
         <button className="shake-button" onClick={shake} disabled={(!state.shakes&&!profile.shakeTokens&&state.coins<SHAKE_PRICE)||!loaded||state.status!=='playing'}><Icon name="shake" size={28}/><span>{t("Встряхнуть")}</span><b>{state.shakes+profile.shakeTokens>0?state.shakes+profile.shakeTokens:<><img src={asset("particles/11.webp")} alt={t("монет")}/>{SHAKE_PRICE}</>}</b></button>
-        <button className="utility-button" onClick={()=>setModal('rewards')} aria-label={t("Подарки")}><Icon name="gift" size={34}/></button>
+        <button className="utility-button gift-button" onClick={()=>setModal('rewards')} aria-label={t("Подарки")} aria-description={profile.daily<day?t('Доступен ежедневный подарок'):undefined}><Icon name="gift" size={34}/>{profile.daily<day&&<img className="gift-alert" src={uiAsset('icon-gift-alert')} alt="" aria-hidden="true"/>}</button>
       </footer>
     </div>
     {shellRef.current&&createPortal(dialog,shellRef.current)}
