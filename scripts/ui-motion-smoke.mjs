@@ -70,14 +70,14 @@ export async function checkUiMotion(browser,base,errors){
   assert.equal(await bundle.evaluate(el=>el.dataset.entered),'true');
   await jump('Персонажи','skins');await jump('Наборы','bundles');
   assert.equal(await bundle.evaluate(el=>getComputedStyle(el).opacity),'1','Previously revealed cards never fade back out');
-  await bundle.getByRole('button',{name:'Купить Уютный набор за 1800'}).click();
+  await bundle.getByRole('button',{name:'Купить Уютный набор за 2340'}).click();
   const toast=page.locator('.toast');await toast.waitFor({state:'visible'});
   const toastBounds=await toast.boundingBox();assert.ok(toastBounds.y<64,'Notifications appear at the top');
   await page.mouse.move(toastBounds.x+toastBounds.width*.4,toastBounds.y+toastBounds.height*.7);
   await page.mouse.down();await page.mouse.move(toastBounds.x+toastBounds.width*.4,toastBounds.y-55,{steps:6});await page.mouse.up();
   await toast.waitFor({state:'detached'});
   await jump('Монеты','supplies');
-  await page.getByRole('button',{name:'Купить 1 встрясок за 125'}).click();
+  await page.getByRole('button',{name:'Купить 1 встрясок за 163'}).click();
   await toast.waitFor({state:'visible'});const nextToast=await toast.boundingBox();
   await page.mouse.move(nextToast.x+nextToast.width*.35,nextToast.y+nextToast.height*.5);await page.mouse.down();
   await page.mouse.move(nextToast.x+nextToast.width*.35+110,nextToast.y+nextToast.height*.5,{steps:6});await page.mouse.up();await toast.waitFor({state:'detached'});

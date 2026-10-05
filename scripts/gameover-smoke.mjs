@@ -50,6 +50,18 @@ export async function checkGameover(browser,base,errors){
   assert.ok(await page.locator('.leaderboard-summary').textContent().then(text=>text.includes('Твоё место:')));
   assert.ok(await page.locator('.leaderboard-name').allTextContents().then(names=>names.includes('Real SDK rival')));
   await page.screenshot({path:'test-results/leaderboard.png'});
+  for(const [width,height] of [[320,568],[390,640],[844,390]]) {
+    await page.setViewportSize({width,height});await page.clock.runFor(400);
+    const layout=await page.locator('.leaderboard-dialog').evaluate(dialog=>{
+      const rows=[...dialog.querySelectorAll('.leaderboard-row')].map(row=>row.getBoundingClientRect());
+      const panel=dialog.getBoundingClientRect(),button=dialog.querySelector('.primary-button').getBoundingClientRect();
+      return {rowsFit:rows.every((row,i)=>!i||row.top>=rows[i-1].bottom),buttonFits:button.top>=panel.top&&button.bottom<=panel.bottom+1,overflows:dialog.scrollWidth>dialog.clientWidth};
+    });
+    assert.ok(layout.rowsFit,'Leaderboard rows occupy separate slots');
+    assert.ok(layout.buttonFits,`Continue stays visible at ${width}×${height}`);assert.equal(layout.overflows,false);
+    await page.screenshot({path:`test-results/leaderboard-${width}x${height}.png`});
+  }
+  await page.setViewportSize({width:390,height:844});await page.clock.runFor(400);
   await page.getByRole('button',{name:'Продолжить играть'}).click({force:true});await page.clock.runFor(400);
   await canvas.dispatchEvent('keydown',{key:'Enter'});await page.clock.runFor(700);
   assert.equal(await page.getByRole('dialog').count(),0,'Closing the leaderboard resumes the new round');

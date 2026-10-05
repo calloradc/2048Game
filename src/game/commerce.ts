@@ -2,16 +2,16 @@ import { localizedProperty } from '../i18n';
 import { itemByKey } from './catalog';
 import type { Profile } from './profile';
 import { SHAKE_PRICE } from './physics';
-import { AD_COIN_PACK, PRICE_MULTIPLIER } from './economy';
+import { AD_COIN_PACK, shopPrice } from './economy';
 
 export interface Bundle {id:string;name:string;caption:string;items:string[];shakes:number;price:number}
 export const BUNDLES:Bundle[]=[
-  {id:'cozy',name:'Уютный набор',caption:'Шушистики, сакура и розовый бокс',items:['skins:fuzzies','backgrounds:sunset','boxes:rose'],shakes:3,price:360*PRICE_MULTIPLIER},
-  {id:'crystal',name:'Звёздный набор',caption:'Кристаллики, лунный сад и ледяной бокс',items:['skins:crystals','backgrounds:moonlight','boxes:ice'],shakes:5,price:720*PRICE_MULTIPLIER},
-  {id:'cosmic',name:'Космический набор',caption:'Три эксклюзивных оформления и 7 встрясок',items:['skins:cosmos','backgrounds:cosmos','boxes:cosmos'],shakes:7,price:4400},
+  {id:'cozy',name:'Уютный набор',caption:'Шушистики, сакура и розовый бокс',items:['skins:fuzzies','backgrounds:sunset','boxes:rose'],shakes:3,price:shopPrice(360)},
+  {id:'crystal',name:'Звёздный набор',caption:'Кристаллики, лунный сад и ледяной бокс',items:['skins:crystals','backgrounds:moonlight','boxes:ice'],shakes:5,price:shopPrice(720)},
+  {id:'cosmic',name:'Космический набор',caption:'Три эксклюзивных оформления и 7 встрясок',items:['skins:cosmos','backgrounds:cosmos','boxes:cosmos'],shakes:7,price:5720},
 ];
 BUNDLES.forEach(bundle=>{localizedProperty(bundle,'name');localizedProperty(bundle,'caption');});
-export const SHAKE_PACKS=[{id:'one',amount:1,price:25*PRICE_MULTIPLIER},{id:'five',amount:5,price:100*PRICE_MULTIPLIER}] as const;
+export const SHAKE_PACKS=[{id:'one',amount:1,price:shopPrice(25)},{id:'five',amount:5,price:shopPrice(100)}] as const;
 
 export function bundleOffer(profile:Profile,bundle:Bundle) {
   const retail=bundle.items.reduce((sum,key)=>sum+itemByKey(key)!.price,0)+bundle.shakes*SHAKE_PRICE;

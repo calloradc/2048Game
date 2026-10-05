@@ -62,8 +62,8 @@ describe('FruitWorld: rules and soft bodies', () => {
     world.state.current=2;world.drop();
     expect(world.state.discovered & (1<<2)).toBeTruthy();
     world.add(0,190,410);world.add(0,218,410);advance(world,0.3);
-    expect(world.state.coins).toBe(11);expect(world.state.discovered & (1<<1)).toBeTruthy();
-    world.reset();expect(world.state.coins).toBe(11);expect(world.state.discovered).toBe(1);
+    expect(world.state.coins).toBe(10);expect(world.state.discovered & (1<<1)).toBeTruthy();
+    world.reset();expect(world.state.coins).toBe(10);expect(world.state.discovered).toBe(1);
     expect(world.state.score).toBe(0);world.destroy();
   });
   it('uses three free shakes before spending coins and refuses an unaffordable shake', () => {
@@ -72,6 +72,16 @@ describe('FruitWorld: rules and soft bodies', () => {
     expect(world.state.coins).toBe(SHAKE_PRICE+1);expect(world.state.shakes).toBe(0);
     expect(world.shake()).toBe(true);expect(world.state.coins).toBe(1);
     expect(world.shake()).toBe(false);expect(world.state.coins).toBe(1);world.destroy();
+  });
+  it('accumulates small merge rewards in whole coins and doubles only the earned amount', () => {
+    const world=new FruitWorld(0,100);
+    for(let i=0;i<5;i++) {
+      world.cubes.clear();world.add(0,190,410);world.add(0,218,410);advance(world,.3);
+    }
+    expect(world.state.score).toBe(20);expect(world.state.earned).toBe(3);expect(world.state.coins).toBe(103);
+    world.state.status='gameover';expect(world.doubleEarnings()).toBe(true);expect(world.state.coins).toBe(106);
+    expect(world.doubleEarnings()).toBe(false);
+    world.reset();expect(world.state.earned).toBe(0);expect(world.state.coins).toBe(106);world.destroy();
   });
   it('gives a new fruit time before sustained overflow ends the game', () => {
     const world=new FruitWorld();const cube=world.add(3,200,BOARD.danger+FRUITS[3].size/2-5);cube.sleeping=true;
@@ -114,11 +124,11 @@ describe('FruitWorld: rules and soft bodies', () => {
   it('awards extra coins once, preserves the bonus on continuing, and resets round perks',()=>{
     const world=new FruitWorld(0,50);
     world.add(9,145,390);world.add(9,265,390);advance(world,.3);
-    expect(world.state.earned).toBe(10);expect(world.state.coins).toBe(60);
-    expect(world.doubleEarnings()).toBe(true);expect(world.state.coins).toBe(70);
-    expect(world.doubleEarnings()).toBe(false);expect(world.state.coins).toBe(70);
+    expect(world.state.earned).toBe(6);expect(world.state.coins).toBe(56);
+    expect(world.doubleEarnings()).toBe(true);expect(world.state.coins).toBe(62);
+    expect(world.doubleEarnings()).toBe(false);expect(world.state.coins).toBe(62);
     world.continue();world.add(0,70,410);world.add(0,98,410);advance(world,.3);
-    expect(world.state.earned).toBe(11);expect(world.state.bonusCoins).toBe(10);
+    expect(world.state.earned).toBe(6);expect(world.state.bonusCoins).toBe(6);
     world.grantShake();expect(world.state.shakes).toBe(4);
     expect(world.spendCoins(500)).toBe(false);expect(world.spendCoins(20)).toBe(true);
     const coins=world.state.coins;world.reset();expect(world.state.coins).toBe(coins);

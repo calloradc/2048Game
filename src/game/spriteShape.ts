@@ -6,7 +6,8 @@ export interface UV { x: number; y: number }
 // Each rectangle was measured on the exported 256px sprite, independently.
 export const FRUIT_BODY = [
   [21,61,233,248], [22,54,232,248], [22,54,232,248], [22,42,230,248],
-  [7,25,247,248], fruitRepaired['5'], [19,57,236,248], ...bodies.fruitLarge,
+  // Square UV bounds preserve the kiwi/peach art's natural squat proportions.
+  [7,8,247,248], fruitRepaired['5'], [19,31,236,248], ...bodies.fruitLarge,
 ];
 export const bodyRect=(level:number,skin='fruit'):number[]=>skin==='fruit'?FRUIT_BODY[level]:(collections as Record<string,number[][]>)[skin][level];
 export const bodyUV = (level: number,skin='fruit'): UV[] => {

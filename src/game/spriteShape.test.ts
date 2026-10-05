@@ -37,7 +37,7 @@ describe('Fruit texture follows the physical flesh',()=>{
   });
   it('maps every new square face uniformly and covers all decorations',()=>{
     for(const skin of CATALOG.skins)for(let level=0;level<11;level++){
-      if(skin.id==='fruit'&&level<7)continue;
+      if(skin.id==='fruit'&&level<7&&level!==4&&level!==6)continue;
       const [left,top,right,bottom]=bodyRect(level,skin.id);
       expect(right-left).toBe(bottom-top);
       expect(spriteFans(skin.id)[level].reduce((sum,polygon)=>sum+area(polygon),0)).toBeCloseTo(256*256,6);

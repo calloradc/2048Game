@@ -3,11 +3,12 @@ const AUDIO_FILES = {
   splash14: 'splash-14.ogg', splash03: 'splash-03.ogg', sell: 'sell.ogg',
 } as const;
 type Sample = keyof typeof AUDIO_FILES;
-type Sound = 'button' | 'merge' | 'purchase';
+type Sound = 'button' | 'merge' | 'purchase' | 'drop';
 const LAYERS: Record<Sound, Sample[]> = {
   button: ['button', 'highlight'],
   merge: ['button', 'currency', 'splash14', 'splash03'],
   purchase: ['sell'],
+  drop: ['splash03'],
 };
 
 export class GameAudio {

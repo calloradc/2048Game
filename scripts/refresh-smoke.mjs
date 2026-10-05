@@ -45,7 +45,7 @@ export async function checkRefresh(browser,base,errors){
   assert.equal(await skin.getByRole('button',{name:/Купить за|Открыть за видео/}).count(),0,'Bundle exclusives have no direct purchase');
   await skin.getByRole('button',{name:/Только в космическом наборе/}).click();await page.getByRole('dialog',{name:'Содержимое: Космический набор'}).waitFor();
   assert.equal(await page.locator('.contents-item').count(),3);await closeContents();
-  await page.getByRole('button',{name:'Купить Космический набор за 4400'}).click();await close();
+  await page.getByRole('button',{name:'Купить Космический набор за 5720'}).click();await close();
   await page.getByRole('button',{name:'Подарки',exact:true}).click();await page.getByRole('button',{name:'Забрать ежедневный подарок'}).click();
   assert.ok(await page.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')).owned.includes('boxes:cloud')));
   await edge('.rewards-scroll',false);await edge('.rewards-scroll',true);await close();await touch.detach();

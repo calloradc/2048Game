@@ -11,31 +11,31 @@ describe('Bundles and persistent supplies',()=>{
       expect(purchase(fresh,item,10000).purchased).toBe(false);
       expect(rewardUnlock(fresh,item).unlocked).toBe(false);
     }
-    expect(bundleOffer(fresh,bundle)).toMatchObject({price:4400,saving:2975});
-    const bought=purchaseBundle(fresh,bundle,5000);
+    expect(bundleOffer(fresh,bundle)).toMatchObject({price:5720,saving:3871});
+    const bought=purchaseBundle(fresh,bundle,6500);
     const restored=parseProfile(JSON.stringify(bought.profile));
-    expect(bought.coins).toBe(600);expect(restored.bundles).toContain('cosmic');
+    expect(bought.coins).toBe(780);expect(restored.bundles).toContain('cosmic');
     expect(restored.selected).toEqual({skins:'cosmos',backgrounds:'cosmos',boxes:'cosmos'});
     expect(restored.shakeTokens).toBe(7);
-    expect(purchaseBundle(restored,bundle,5000).purchased).toBe(false);
+    expect(purchaseBundle(restored,bundle,6500).purchased).toBe(false);
   });
   it('charges once, grants every missing cosmetic and banks the advertised shakes',()=>{
     const fresh=defaultProfile(),bundle=BUNDLES[0];
-    expect(bundleOffer(fresh,bundle)).toMatchObject({price:1800,saving:825});
-    expect(purchaseBundle(fresh,bundle,1799).purchased).toBe(false);
-    const result=purchaseBundle(fresh,bundle,2500);expect(result.coins).toBe(700);expect(result.profile.shakeTokens).toBe(3);
+    expect(bundleOffer(fresh,bundle)).toMatchObject({price:2340,saving:1074});
+    expect(purchaseBundle(fresh,bundle,2339).purchased).toBe(false);
+    const result=purchaseBundle(fresh,bundle,2500);expect(result.coins).toBe(160);expect(result.profile.shakeTokens).toBe(3);
     for(const key of bundle.items)expect(result.profile.owned.filter(owned=>owned===key)).toHaveLength(1);
     expect(purchaseBundle(result.profile,bundle,2500).purchased).toBe(false);expect(fresh.shakeTokens).toBe(0);expect(result.profile.selected).toEqual({skins:'fuzzies',backgrounds:'sunset',boxes:'rose'});
   });
   it('reduces the bundle price for an already owned item and never duplicates ownership',()=>{
     const profile=purchase(defaultProfile(),CATALOG.skins[1],2500).profile;
-    expect(bundleOffer(profile,BUNDLES[0])).toMatchObject({price:1183,saving:542});
-    const result=purchaseBundle(profile,BUNDLES[0],1183);
+    expect(bundleOffer(profile,BUNDLES[0])).toMatchObject({price:1539,saving:705});
+    const result=purchaseBundle(profile,BUNDLES[0],1539);
     expect(result.coins).toBe(0);expect(result.profile.owned).toHaveLength(6);expect(result.profile.shakeTokens).toBe(3);
   });
   it('banks shake packs and persists supplies across profile reloads',()=>{
-    const fresh=defaultProfile();expect(purchaseShakes(fresh,SHAKE_PACKS[1],499).purchased).toBe(false);
-    const result=purchaseShakes(fresh,SHAKE_PACKS[1],625);expect(result.coins).toBe(125);expect(result.profile.shakeTokens).toBe(5);
+    const fresh=defaultProfile();expect(purchaseShakes(fresh,SHAKE_PACKS[1],649).purchased).toBe(false);
+    const result=purchaseShakes(fresh,SHAKE_PACKS[1],775);expect(result.coins).toBe(125);expect(result.profile.shakeTokens).toBe(5);
     const restored=parseProfile(JSON.stringify(result.profile));expect(restored.shakeTokens).toBe(5);expect(fresh.shakeTokens).toBe(0);
   });
   it('awards a 300 coin pack only after two completed views',()=>{

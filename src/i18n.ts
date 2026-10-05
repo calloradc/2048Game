@@ -32,7 +32,7 @@ export function setLanguage(next:Language) {
 export function syncDocument() {
   if(typeof document==='undefined')return;
   document.documentElement.lang=language;
-  document.title=t('Jelly Fruit — фруктовый переполох');
+  document.title=t('Фруктовые желейки: сочное слияние');
   document.querySelector('meta[name="description"]')?.setAttribute('content',t('Сливай упругие фруктовые кубики и собери арбуз 2048. Уютная игра для телефона.'));
 }
 export function useLanguage() {

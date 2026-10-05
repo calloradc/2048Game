@@ -92,7 +92,7 @@ try {
       assert.equal(await page.getByTestId('score').textContent(), '0', 'One fruit cannot merge');
       await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.22);
       await page.waitForFunction(() => Number(document.querySelector('[data-testid="score"]').textContent.replace(/\D/g, '')) >= 4);
-      assert.equal(await page.getByTestId('coins').textContent(),'1','A merge rewards coins');
+      assert.equal(await page.getByTestId('coins').textContent(),'0','A first small merge accumulates a fractional coin reward');
       assert.equal(await page.locator('.chain-fruit[data-level="1"]').getAttribute('data-discovered'),'true');
       const shakeButton=page.getByRole('button',{name:/Встряхнуть/});
       await shakeButton.click();
@@ -165,7 +165,7 @@ try {
       await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft<1);
       await page.screenshot({path:'test-results/collection.png'});
       await page.getByRole('button',{name:'Баланс монет'}).click();
-      assert.match(await page.getByRole('dialog').textContent(),/125 монет/);
+      assert.match(await page.getByRole('dialog').textContent(),/163 монет/);
       await page.getByRole('button',{name:'За сочным урожаем!'}).click();
       await page.locator('.overlay').waitFor({state:'detached'});
       assert.ok(await page.locator('.scene').evaluate((el,original)=>{
@@ -192,14 +192,14 @@ try {
     console.log(`✓ ${width}×${height}: no scroll, all controls fit`);
   }
   const paid=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-  await paid.addInitScript(()=>localStorage.setItem('jelly-coins','125'));
+  await paid.addInitScript(()=>localStorage.setItem('jelly-coins','163'));
   await paid.goto(base,{waitUntil:'networkidle'});
   await paid.waitForFunction(()=>!document.querySelector('.loading'));
   const shake=paid.getByRole('button',{name:/Встряхнуть/});
   for(let i=0;i<3;i++)await shake.click();
-  assert.equal(await paid.getByTestId('coins').textContent(),'125','Free shakes keep coins');
+  assert.equal(await paid.getByTestId('coins').textContent(),'163','Free shakes keep coins');
   await shake.click();
-  assert.equal(await paid.getByTestId('coins').textContent(),'0','Extra shake costs 125 coins');
+  assert.equal(await paid.getByTestId('coins').textContent(),'0','Extra shake costs 163 coins');
   assert.ok(await shake.isDisabled(),'An unaffordable shake is disabled');
   await paid.close();
   await checkShop(browser,base,errors);

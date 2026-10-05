@@ -37,9 +37,9 @@ export async function checkShopBehavior(browser,base,errors){
   assert.equal(await page.locator('.contents-grid figure').count(),11);
   await page.screenshot({path:'test-results/skin-contents.png',animations:'disabled'});
   await page.getByRole('button',{name:'Закрыть содержимое'}).click();await page.locator('.contents-overlay').waitFor({state:'detached'});
-  await page.locator('[data-category=skins]').getByRole('button',{name:'Купить за 1200',exact:true}).click();
+  await page.locator('[data-category=skins]').getByRole('button',{name:'Купить за 1560',exact:true}).click();
   assert.equal((await profile()).selected.skins,'sushi','Buying equips immediately');
-  await jump('Наборы');await page.getByRole('button',{name:'Купить Уютный набор за 1183'}).click();
+  await jump('Наборы');await page.getByRole('button',{name:'Купить Уютный набор за 1539'}).click();
   assert.deepEqual((await profile()).selected,{skins:'fuzzies',backgrounds:'sunset',boxes:'rose'},'Bundle equips all three contents');
   await page.locator('.bundle-card.cozy .bundle-copy').click();
   await page.getByRole('dialog',{name:'Содержимое: Уютный набор'}).waitFor();
@@ -70,7 +70,7 @@ export async function checkShopBehavior(browser,base,errors){
   await page.getByRole('button',{name:'Баланс монет'}).click();
   await page.getByRole('button',{name:/150 монет.*За короткое видео/}).click();
   await page.locator('.ad-overlay').waitFor({state:'detached'});
-  assert.equal(Number(await page.getByTestId('coins').getAttribute('data-coins')),7767,'Wallet offers the doubled coin reward');
+  assert.equal(Number(await page.getByTestId('coins').getAttribute('data-coins')),7051,'Wallet offers the doubled coin reward');
   await close();await page.close();
   console.log('✓ independent game toolbar, owned focus, locked preview rollback, purchase and bundle auto-equipping, contents windows, automatic offers, soft vertical scroll and wallet ad reward');
 }

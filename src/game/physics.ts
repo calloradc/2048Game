@@ -1,4 +1,4 @@
-import { PRICE_MULTIPLIER } from './economy';
+import { mergeCoins, shopPrice } from './economy';
 import { FRUITS, randomDrop } from './fruits';
 
 export const BOARD = { width: 420, height: 490, left: 50, right: 370, top: 117, floor: 432, dropY: 68, danger: 128 };
@@ -18,7 +18,7 @@ export interface Cube {
   invMass: number; restArea: number; areaLambda: number; deformation: number; gx: Float64Array; gy: Float64Array;
 }
 export interface MergeEvent { x: number; y: number; level: number; combo: number }
-export const SHAKE_PRICE = 25*PRICE_MULTIPLIER;
+export const SHAKE_PRICE = shopPrice(25);
 export const initialState = (best = 0, coins = 0, discovered = 1): GameState => ({ score: 0, best, current: 0, next: 1, highest: 0, drops: 0, shakes: 3, status: 'playing', danger: 0, combo: 0, ready: true, coins, discovered, earned:0, doubled:false, bonusCoins:0, revives:0 });
 // Clockwise perimeter: corners and edge midpoints. Ninth point is the centre.
 export const REST_POINTS = [[-0.5,-0.5],[0,-0.5],[0.5,-0.5],[0.5,0],[0.5,0.5],[0,0.5],[-0.5,0.5],[-0.5,0],[0,0]] as const;
@@ -38,6 +38,7 @@ export class FruitWorld {
   private nextId = 1;
   private lastDrop = -2;
   private lastMerge = -2;
+  private mergedLevels = 0;
   private overflowTime = 0;
   private overDanger = false;
   lastPairCount = 0;
@@ -65,6 +66,7 @@ export class FruitWorld {
   reset() {
     const {best,coins} = this.state;
     this.cubes.clear(); this.time = 0; this.lastDrop = -2; this.lastMerge = -2;
+    this.mergedLevels = 0;
     this.overflowTime = 0; this.overDanger = false; this.nextId = 1;
     this.aim = BOARD.width / 2;
     this.state = { ...initialState(best,coins), current: randomDrop(), next: randomDrop() };
@@ -259,7 +261,9 @@ export class FruitWorld {
     this.state.combo=this.time-this.lastMerge<1.4?this.state.combo+1:1;this.lastMerge=this.time;
     this.state.score+=FRUITS[level].value;this.state.best=Math.max(this.state.best,this.state.score);
     this.state.highest=Math.max(this.state.highest,level);
-    this.state.discovered |= 1 << level; this.state.coins += level;this.state.earned+=level;
+    const coins = mergeCoins(this.mergedLevels + level) - mergeCoins(this.mergedLevels);
+    this.mergedLevels += level;
+    this.state.discovered |= 1 << level; this.state.coins += coins;this.state.earned+=coins;
     this.onMerge({x,y,level,combo:this.state.combo});
     if(level===10)this.state.status='won';this.emit();
   }

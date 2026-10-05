@@ -165,7 +165,7 @@ export default function App() {
   const pointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
     if (dragRef.current !== event.pointerId) return;
     aim(event); dragRef.current = null;
-    if (!blocked) worldRef.current?.drop();
+    if (!blocked && worldRef.current?.drop()) audioRef.current?.play('drop');
   };
   const restart = () => {
     const world=worldRef.current;if(!world)return;
@@ -273,7 +273,7 @@ export default function App() {
         <div className={`dialog ${dialogKind==='shop'?'shop-dialog':dialogKind==='rewards'?'rewards-dialog':dialogKind==='leaderboard'?'leaderboard-dialog':''}`} role="dialog" aria-modal="true" aria-label={dialogKind?t(dialogLabels[dialogKind]):''} tabIndex={-1} ref={dialogRef}>
           <div className="dialog-content" inert={!!renderedAd||interstitial||dialogLeaving||platform.platformPaused||platform.adOpen}>
             {dialogKind!=='gameover'&&dialogKind!=='won'&&<button className="dialog-close" aria-label={t("Закрыть")} onClick={()=>setModal(null)}><Icon name="close" size={21}/></button>}
-            <SoftScroll enabled={dialogKind!=='shop'&&dialogKind!=='rewards'}>{dialogKind==='shop'?<Shop profile={profile} coins={state.coins} busy={appearanceBusy} onBuy={buy} onFocus={focusItem} onVideo={item=>watch({type:'unlock',key:item.key})} onCoins={()=>watch({type:'coins'})} onCoinPack={()=>watch({type:'coin-pack'})} onShakeVideo={()=>watch({type:'shake'})} onShakes={buyShakes} onBundle={buyBundle} onRewards={()=>setModal('rewards')} onClose={()=>setModal(null)}/>:dialogKind==='settings'?<>
+            <SoftScroll enabled={dialogKind!=='shop'&&dialogKind!=='rewards'&&dialogKind!=='leaderboard'}>{dialogKind==='shop'?<Shop profile={profile} coins={state.coins} busy={appearanceBusy} onBuy={buy} onFocus={focusItem} onVideo={item=>watch({type:'unlock',key:item.key})} onCoins={()=>watch({type:'coins'})} onCoinPack={()=>watch({type:'coin-pack'})} onShakeVideo={()=>watch({type:'shake'})} onShakes={buyShakes} onBundle={buyBundle} onRewards={()=>setModal('rewards')} onClose={()=>setModal(null)}/>:dialogKind==='settings'?<>
               <Icon name="settings" size={65}/><span className="eyebrow settings-caption">{t("УСТРОИМ ВСЁ ПО-ТВОЕМУ")}</span><h1>{t("Настройки")}</h1>
               <div className="settings-list">
                 <button className="setting-row" role="switch" aria-checked={!muted} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={27}/><span>{t("Звук")}</span><i className={!muted?'on':''}/></button>
@@ -305,7 +305,7 @@ export default function App() {
     <div className="ambient-background" aria-hidden="true" />
     <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={blocked} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
       <header className="header">
-        <div className="brand"><span className="brand-leaf"><Icon name="leaf" size={25} /></span><div className="brand-text">jelly<span>fruit<span className="brand-dot">.</span></span></div></div>
+        <div className="brand" aria-label={t("Фруктовые желейки: сочное слияние")}><img className="brand-icon" src={asset("icon.webp")} alt=""/><div className="brand-text">{t("Фруктовые")}<span>{t("желейки")}</span></div></div>
         <button className="wallet" aria-label={t("Баланс монет")} onClick={()=>setModal('wallet')}><img src={asset("particles/11.webp")} alt="" /><strong key={state.coins} data-testid="coins" data-coins={state.coins}>{compactBalance(state.coins)}</strong></button>
         <div className="header-buttons"><button className="round-button sound-button" aria-label={muted?t("Включить звук"):t("Выключить звук")} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={26}/></button><button className="round-button" aria-label={t("Настройки")} onClick={()=>setModal('settings')}><Icon name="settings" size={23}/></button></div>
       </header>
@@ -320,7 +320,7 @@ export default function App() {
       <div className={`playfield ${shaking?'shaking':''} ${state.danger?'danger':''}`}>
         <canvas ref={canvasRef} aria-label={t("Игровой контейнер. Веди пальцем и отпусти, чтобы бросить фрукт.")} tabIndex={0}
           onPointerDown={pointerDown} onPointerMove={e=>{if(dragRef.current===e.pointerId||e.pointerType==='mouse')aim(e);}} onPointerUp={pointerUp} onPointerCancel={()=>{dragRef.current=null;}} onLostPointerCapture={()=>{dragRef.current=null;}}
-          onKeyDown={e=>{if(blocked||getPlatformState().platformPaused||getPlatformState().adOpen||state.status!=='playing')return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();world.drop();}}}/>
+          onKeyDown={e=>{if(blocked||getPlatformState().platformPaused||getPlatformState().adOpen||state.status!=='playing')return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();if(world.drop())audioRef.current?.play('drop');}}}/>
         {state.danger>0&&<div className="danger-message">{t("Контейнер почти полон!")} {state.status==='playing'?t("Освободи место"):''}</div>}
       </div>
       <FruitCarousel discovered={state.discovered} skin={skin}/>
@@ -333,7 +333,7 @@ export default function App() {
     {shellRef.current&&createPortal(dialog,shellRef.current)}
     {interstitial&&<InterstitialAd/>}
     <Toast text={toast} onDismiss={()=>{clearTimeout(toastTimer.current);setToast(null);}}/>
-    {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label={t("Загрузка игры")}><div className="loading-content"><div className="loading-logo">jelly <span>fruit.</span></div><div className="loading-status"><h1>{error?t("Фрукты задержались"):t("Скоро будет сочно!")}</h1><p>{error?t("Не удалось загрузить ассеты. Попробуй ещё раз."):t("Собираем маленькую фруктовую семью")}</p>{!error?<><div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{width:`${progress}%`}}/></div><span className="loading-percent">{progress}%</span></>:<button className="primary-button" onClick={()=>window.location.reload()}>{t("Попробовать ещё")}</button>}</div></div><span className="loading-caption">{t("НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА")}</span></section>}
+    {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label={t("Загрузка игры")}><div className="loading-content"><div className="loading-logo">{t("Фруктовые")}<span>{t("желейки")}</span><small>{t("Сочное слияние")}</small></div><div className="loading-status"><h1>{error?t("Фрукты задержались"):t("Скоро будет сочно!")}</h1><p>{error?t("Не удалось загрузить ассеты. Попробуй ещё раз."):t("Собираем маленькую фруктовую семью")}</p>{!error?<><div className="loading-progress" role="progressbar" aria-label={t("Загрузка игры")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span className="loading-percent">{progress}%</span><div className="loading-dots" aria-hidden="true">{[0,1,2,3,4].map(dot=><i key={dot} style={{animationDelay:`${dot*.12}s`}}/>)}</div></div></>:<button className="primary-button" onClick={()=>window.location.reload()}>{t("Попробовать ещё")}</button>}</div></div><span className="loading-caption">{t("НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА")}</span></section>}
     <div className="desktop-note"><Icon name="left" size={14}/><span>{t("Наведи мышку и нажми, чтобы бросить")}</span><Icon name="right" size={14}/></div>
   </main>;
 }

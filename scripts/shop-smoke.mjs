@@ -5,7 +5,7 @@ export async function checkShop(browser,base,errors){
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()}: ${r.url()}`);});
   await page.addInitScript(()=>{
-    if(!localStorage.getItem('shop-test-seeded')){localStorage.setItem('jelly-coins','2100');localStorage.setItem('shop-test-seeded','true');}
+    if(!localStorage.getItem('shop-test-seeded')){localStorage.setItem('jelly-coins','2775');localStorage.setItem('shop-test-seeded','true');}
     window.__shopCanvasDraws=0;
     const clear=CanvasRenderingContext2D.prototype.clearRect;
     CanvasRenderingContext2D.prototype.clearRect=function(...args){if(this.canvas===document.querySelector('canvas'))window.__shopCanvasDraws++;return clear.apply(this,args);};
@@ -32,8 +32,8 @@ export async function checkShop(browser,base,errors){
   assert.ok(await page.locator('.dialog-close img').evaluate(el=>el.src.includes('icon-close-coral.webp')&&el.naturalWidth>0),'Close uses generated raster artwork');
   assert.ok(await page.locator('.shop-quick-coins .ui-icon').evaluate(el=>getComputedStyle(el).filter==='none'),'Ad icon preserves its generated colors');
   assert.equal(await page.locator('.collection-end,.shake-bank').count(),0,'Shop has no trailing promotional filler');
-  assert.equal(await page.getByTestId('coins').textContent(),'2.1K','Balance uses the compact label');
-  assert.equal(await page.locator('.shop-wallet strong').textContent(),'2.1K');
+  assert.equal(await page.getByTestId('coins').textContent(),'2.8K','Balance uses the compact label');
+  assert.equal(await page.locator('.shop-wallet strong').textContent(),'2.8K');
   const pausedDraws=await page.evaluate(()=>window.__shopCanvasDraws);
   await page.waitForTimeout(160);
   assert.equal(await page.evaluate(()=>window.__shopCanvasDraws),pausedDraws,'Paused game does not repaint behind the animated shop');
@@ -66,29 +66,29 @@ export async function checkShop(browser,base,errors){
   await next('skins','Шушистики');
   assert.deepEqual(await layout(),fixedLayout,'Locked item actions do not move any collection or slot');
   await page.screenshot({path:'test-results/shop-skins.png'});
-  await section('skins').getByRole('button',{name:'Купить за 900'}).click();assert.equal(await coins(),1200);
+  await section('skins').getByRole('button',{name:'Купить за 1170'}).click();assert.equal(await coins(),1605);
   assert.deepEqual(await layout(),fixedLayout,'Buying an item does not collapse reserved action space');
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.skins==='fuzzies');
   assert.deepEqual(await layout(),fixedLayout,'Applying an item leaves all sections in place');
   await page.waitForFunction(()=>document.querySelector('.chain-fruit img').src.includes('/skins/fuzzies/'));
   await next('backgrounds','Сакура на закате');
-  await section('backgrounds').getByRole('button',{name:'Купить за 600'}).click();assert.equal(await coins(),600);
+  await section('backgrounds').getByRole('button',{name:'Купить за 780'}).click();assert.equal(await coins(),825);
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.backgrounds==='sunset');
   assert.ok(await page.locator('.ambient-background').evaluate(el=>getComputedStyle(el,'::before').backgroundImage.includes('backgrounds/sunset.webp')));
   await page.screenshot({path:'test-results/shop-backgrounds.png'});
   await next('boxes','Розовый кварц');assert.ok(await section('boxes').getByRole('button',{name:'Нужно ещё 150'}).isDisabled());
-  await page.getByRole('button',{name:'+150 монет за видео',exact:true}).click();await page.locator('[data-test-ad-close]').click();assert.equal(await coins(),600);
+  await page.getByRole('button',{name:'+150 монет за видео',exact:true}).click();await page.locator('[data-test-ad-close]').click();assert.equal(await coins(),825);
   assert.equal(await section('boxes').locator('.shop-current').textContent(),'Розовый кварц');
-  await watch(page.getByRole('button',{name:'+150 монет за видео',exact:true}));assert.equal(await coins(),750);await page.waitForTimeout(400);assert.equal(await coins(),750);
-  await section('boxes').getByRole('button',{name:'Купить за 750'}).click();assert.equal(await coins(),0);
+  await watch(page.getByRole('button',{name:'+150 монет за видео',exact:true}));assert.equal(await coins(),975);await page.waitForTimeout(400);assert.equal(await coins(),975);
+  await section('boxes').getByRole('button',{name:'Купить за 975'}).click();assert.equal(await coins(),0);
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.boxes==='rose');
   await page.screenshot({path:'test-results/shop-boxes.png'});
   assert.equal(await section('skins').locator('.shop-current').textContent(),'Шушистики','Rails keep independent selections');
   await next('skins','Суши-пати');
-  for(let i=1;i<=3;i++){
+  for(let i=1;i<=4;i++){
     await watch(section('skins').getByRole('button',{name:/Открыть за видео/}));
     const profile=await page.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')));
-    assert.equal(profile.videos['skins:sushi'],i);assert.equal(profile.owned.includes('skins:sushi'),i===3);
+    assert.equal(profile.videos['skins:sushi'],i);assert.equal(profile.owned.includes('skins:sushi'),i===4);
   }
   assert.equal(await coins(),0);
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.skins==='sushi');await close();

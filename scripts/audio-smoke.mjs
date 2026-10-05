@@ -75,7 +75,18 @@ await page.goto(process.env.GAME_URL || 'http://localhost:5173/', { waitUntil: '
     OscillatorNode.prototype.start = function(...args) { window.oscillatorStarts++; return start.apply(this, args); };
   });
   await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+  await page.waitForFunction(()=>window.audioStarts.length===1);
+  const splash=await page.evaluate(()=>window.audioStarts[0]);
+  assert.ok(Math.abs(splash.duration - .772) < .02, 'A pointer drop plays the splash sample');
+  // The keyboard event during cooldown must not play an extra splash.
   await page.locator('canvas').press('Enter');
+  await page.waitForTimeout(60);
+  assert.equal(await page.evaluate(()=>window.audioStarts.length),1,'Rejected cooldown drops stay silent');
+  await page.waitForTimeout(450);
+  await page.evaluate(()=>{window.audioStarts=[];});
+  await page.locator('canvas').press('Enter');
+  await page.waitForFunction(()=>window.audioStarts.length>0);
+  assert.ok(await page.evaluate(()=>Math.abs(window.audioStarts[0].duration - .772)<.02),'A keyboard drop plays splash too');
   assert.equal(await page.evaluate(() => window.oscillatorStarts), 0, 'Pointer and keyboard drops have no synthesized sound');
 
   const result = await page.evaluate(async () => {
