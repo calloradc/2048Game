@@ -44,7 +44,7 @@ export class ElasticScroll {
   private stop(){cancelAnimationFrame(this.frame);this.frame=0;this.lastFrame=0;this.target=null;}
   private paint(){
     const bounded=clamp(this.position,0,this.max),excess=this.position-bounded;
-    const limit=this.vertical?28:Math.max(1,this.size);
+    const limit=this.vertical?20:Math.max(1,this.size);
     const stretch=this.reduced?0:excess*.55/(1+Math.abs(excess)*.55/limit);
     if(this.vertical)this.viewport.scrollTop=bounded;else this.viewport.scrollLeft=bounded;
     this.written=this.offset;
@@ -61,7 +61,7 @@ export class ElasticScroll {
   scrollBy(value:number){this.scrollTo((this.target??this.position)+value);}
   private down=(event:PointerEvent)=>{
     if(!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
-    this.stop();this.velocity=0;this.position=this.offset;this.suppressClick=false;this.options.onInterrupt?.();
+    this.stop();this.velocity=0;this.suppressClick=false;this.options.onInterrupt?.();
     const rect=this.viewport.getBoundingClientRect();
     this.drag={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,time:event.timeStamp,moved:false,scale:this.size/(this.vertical?rect.height:rect.width)};
   };
@@ -75,14 +75,15 @@ export class ElasticScroll {
     }
     event.preventDefault();
     const delta=(this.vertical?drag.y-event.clientY:drag.x-event.clientX)*drag.scale,dt=Math.max(.008,(event.timeStamp-drag.time)/1000);
-    const overscroll=this.vertical?80:this.size*2;
-    this.position=clamp(this.position+delta,-overscroll,this.max+overscroll);
-    this.velocity=this.velocity*.35+clamp(delta/dt,this.vertical?-4200:-1800,this.vertical?4200:1800)*.65;
-    drag.x=event.clientX;drag.y=event.clientY;drag.time=event.timeStamp;this.paint();
+    const overscroll=this.vertical?32:this.size*.6;
+    const outward=this.position<=0&&delta<0||this.position>=this.max&&delta>0;
+    this.position=clamp(this.position+delta*(outward?.35:1),-overscroll,this.max+overscroll);
+    this.velocity=this.velocity*.35+clamp(delta/dt,this.vertical?-2800:-1800,this.vertical?2800:1800)*.65;
+    drag.x=event.clientX;drag.y=event.clientY;drag.time=event.timeStamp;this.animate();
   };
   private release(event:PointerEvent,cancelled:boolean){
     const drag=this.drag;if(!drag||drag.id!==event.pointerId)return;
-    this.velocity=cancelled?0:this.velocity*(this.vertical?1.4:1)*Math.exp(-Math.max(0,event.timeStamp-drag.time-40)/70);
+    this.velocity=cancelled||this.position<0||this.position>this.max?0:this.velocity*Math.exp(-Math.max(0,event.timeStamp-drag.time-40)/70);
     this.suppressClick=drag.moved;this.drag=null;delete this.viewport.dataset.dragging;
     if(this.viewport.hasPointerCapture(event.pointerId))this.viewport.releasePointerCapture(event.pointerId);
     if(drag.moved)this.animate();
@@ -104,7 +105,7 @@ export class ElasticScroll {
     const delta=(this.vertical?event.deltaY:event.deltaX||event.deltaY)*(event.deltaMode===1?18:event.deltaMode===2?this.size:1);
     const destination=(this.target??this.position)+delta;
     if(this.reduced){this.scrollTo(destination,true);return;}
-    if(destination<0||destination>this.max){this.stop();this.velocity=0;this.position=clamp(destination,-80,this.max+80);this.paint();}
+    if(destination<0||destination>this.max){this.stop();this.velocity=0;this.position=clamp(destination,-32,this.max+32);this.paint();}
     else this.target=destination;
     this.animate();
   };
@@ -117,13 +118,21 @@ export class ElasticScroll {
   private animate(){if(!this.frame)this.frame=requestAnimationFrame(this.tick);}
   private tick=(now:number)=>{
     this.frame=0;
+    if(this.drag){this.paint();return;}
     const dt=this.lastFrame?Math.min((now-this.lastFrame)/1000,1/30):1/60;this.lastFrame=now;
     const edge=clamp(this.position,0,this.max);
     if(this.target===null&&this.position!==edge)this.target=edge;
     const goal=this.target??edge;
-    if(this.target!==null||this.position!==edge){this.velocity+=(goal-this.position)*(this.vertical?620:170)*dt;this.velocity*=Math.exp(-(this.vertical?36:21)*dt);}
-    else this.velocity*=Math.exp(-(this.vertical?5.8:4.8)*dt);
-    this.position+=this.velocity*dt;
+    if(this.target!==null){
+      // Exact critically damped spring: stable on slow frames and no edge bounce.
+      const omega=this.vertical?22:15,displacement=this.position-goal;
+      const impulse=this.velocity+omega*displacement,decay=Math.exp(-omega*dt);
+      this.position=goal+(displacement+impulse*dt)*decay;
+      this.velocity=(this.velocity-omega*impulse*dt)*decay;
+    } else {
+      const friction=this.vertical?7:5,decay=Math.exp(-friction*dt);
+      this.position+=this.velocity*(1-decay)/friction;this.velocity*=decay;
+    }
     if(Math.abs(this.velocity)<2&&Math.abs(this.position-goal)<.5){this.position=goal;this.velocity=0;this.lastFrame=0;this.target=null;this.paint();this.options.onSettled?.();return;}
     this.paint();this.animate();
   };

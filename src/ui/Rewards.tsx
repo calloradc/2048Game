@@ -22,8 +22,8 @@ export function Rewards({profile,day,busy,onClaim,onSelect,onClose}:Props) {
   return <>
     <header className="rewards-heading"><Icon name="gift" size={32}/><div><span className="eyebrow">КАЖДЫЙ ДЕНЬ ЧТО-ТО ПРИЯТНОЕ</span><h1>Ежедневные награды</h1></div></header>
     <SoftScroll className="rewards-scroll" viewportRef={scroll}>
-      <section className="daily-hero" data-reveal><div><span className="exclusive-tag">14 ДНЕЙ МАЛЕНЬКИХ ЧУДЕС</span><h2>Две недели подарков</h2><p>Лунная коллекция и кристальный финал</p><span className="daily-week-progress">{completed} / {cycle} подарков</span><div className="daily-progress-track" role="progressbar" aria-label="Получено подарков" aria-valuemin={0} aria-valuemax={cycle} aria-valuenow={completed}><span style={{transform:`scaleX(${completed/cycle})`}}/></div></div><PreviewImage src={fruitAsset(10,'mochi')} alt="Лунный король" eager/></section>
-      <div className="daily-list" role="list" aria-label="Подарки на 14 дней">{DAILY_PRIZES.map((original,index)=>{
+      <section className="daily-hero" data-reveal><div><span className="exclusive-tag">21 ДЕНЬ МАЛЕНЬКИХ ЧУДЕС</span><h2>Три недели подарков</h2><p>Лунная коллекция, облачный бокс и сонные подушки</p><span className="daily-week-progress">{completed} / {cycle} подарков</span><div className="daily-progress-track" role="progressbar" aria-label="Получено подарков" aria-valuemin={0} aria-valuemax={cycle} aria-valuenow={completed}><span style={{transform:`scaleX(${completed/cycle})`}}/></div></div><PreviewImage src={fruitAsset(10,'pillows')} alt="Звёздная подушка" eager/></section>
+      <div className="daily-list" role="list" aria-label="Подарки на 21 день">{DAILY_PRIZES.map((original,index)=>{
         const received=index<completed,available=index===completed&&!claimedToday;
         const prize=received?original:effectivePrize(original,profile);
         const item=original.type==='item'?itemByKey(original.key):undefined;

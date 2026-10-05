@@ -4,7 +4,7 @@ import { asset, fruitAsset } from './game/fruits';
 import { BOARD, FruitWorld, initialState, SHAKE_PRICE } from './game/physics';
 import { GameRenderer } from './game/renderer';
 import { GameAudio } from './game/audio';
-import { backgroundAsset, itemByKey, type ShopItem, type Category } from './game/catalog';
+import { backgroundAsset, wideBackgroundAsset, itemByKey, type ShopItem, type Category } from './game/catalog';
 import { parseProfile, purchase, rewardUnlock, selectItem, type Profile } from './game/profile';
 import { calendarDay, claimDaily, prizeName } from './game/rewards';
 import { bundleOffer, purchaseBundle, purchaseShakes, rewardCoinPack, type Bundle, type SHAKE_PACKS } from './game/commerce';
@@ -14,6 +14,7 @@ import { Icon } from './ui/Icon';
 import { Shop } from './ui/Shop';
 import { Rewards } from './ui/Rewards';
 import { RewardedAd, type AdReward } from './ui/RewardedAd';
+import { InterstitialAd } from './ui/InterstitialAd';
 import { Toast } from './ui/Toast';
 import { SoftScroll } from './ui/SoftScroll';
 import { AD_COINS, AD_COIN_PACK } from './game/economy';
@@ -35,14 +36,15 @@ export default function App() {
   const shopOriginal=useRef<Profile['selected']|null>(null),shopFocus=useRef<Partial<Record<Category,ShopItem>>>({});
   const appearanceVersion=useRef(0);
   const [scale, setScale] = useState(1),[loaded, setLoaded] = useState(false),[error, setError] = useState(false),[progress, setProgress] = useState(0),[splashDone, setSplashDone] = useState(false);
+  const [landscape,setLandscape]=useState(false),[interstitial,setInterstitial]=useState(false);
+  useEffect(()=>{if(state.status==='gameover')setInterstitial(true);},[state.status]);
   const [modal, setModal] = useState<Modal>(null);
   const {rendered:dialogKind,leaving:dialogLeaving}=usePresence(modal??(state.status==='playing'?null:state.status));
   const overlay=dialogKind!==null;
   const [muted, setMuted] = useState(read('jelly-muted', 'false') === 'true');
-  const [vibration,setVibration]=useState(read('jelly-vibration','true')==='true');
   const [shaking, setShaking] = useState(false),[appearanceBusy,setAppearanceBusy]=useState(false);
   const [restartReady,setRestartReady]=useState(false);
-  useEffect(()=>{setRestartReady(false);if(dialogKind!=='gameover'&&dialogKind!=='won')return;const timer=setTimeout(()=>setRestartReady(true),1000);return()=>clearTimeout(timer);},[dialogKind]);
+  useEffect(()=>{setRestartReady(false);if(interstitial||dialogKind!=='gameover'&&dialogKind!=='won')return;const timer=setTimeout(()=>setRestartReady(true),1000);return()=>clearTimeout(timer);},[dialogKind,interstitial]);
   const [ad,setAd]=useState<{id:number;reward:AdReward}|null>(null),adRef=useRef<typeof ad>(null),adId=useRef(0);
   const {rendered:renderedAd,leaving:adLeaving}=usePresence(ad,180);
   const [toast,setToast]=useState<string|null>(null),toastTimer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
@@ -64,7 +66,8 @@ export default function App() {
       const viewport = window.visualViewport,h=viewport?.height??window.innerHeight,w=viewport?.width??window.innerWidth;
       const safe = window.getComputedStyle(shellRef.current ?? document.documentElement);
       const insets = (parseFloat(safe.paddingTop) || 0) + (parseFloat(safe.paddingBottom) || 0);
-      setScale(Math.min(w / 420, (h - insets - 12) / 864, 1.12));
+      const wide=w>h&&w>=600;setLandscape(wide);
+      setScale(Math.min(w / (wide?860:420), (h - insets - 12) / (wide?550:864), 1.12));
     };
     resize(); window.addEventListener('resize', resize); window.visualViewport?.addEventListener('resize', resize);
     const context = (e: Event) => e.preventDefault(); document.addEventListener('contextmenu', context);
@@ -88,7 +91,6 @@ export default function App() {
     return () => { alive = false; renderer.destroy(); world.destroy(); audio.destroy(); clearTimeout(shakeTimer.current);clearTimeout(toastTimer.current); };
   }, []);
   useEffect(() => { if (audioRef.current) audioRef.current.muted = muted; save('jelly-muted', String(muted)); }, [muted]);
-  useEffect(()=>save('jelly-vibration',String(vibration)),[vibration]);
   useEffect(() => { if (rendererRef.current) rendererRef.current.paused = overlay || !loaded; dragRef.current = null; }, [overlay,loaded]);
   useEffect(() => {
     const cancel = () => { dragRef.current = null; };
@@ -96,7 +98,7 @@ export default function App() {
     return () => { document.removeEventListener('visibilitychange', cancel); window.removeEventListener('blur', cancel); };
   }, []);
   useEffect(() => {
-    if (!overlay||renderedAd||dialogLeaving) return;
+    if (!overlay||renderedAd||interstitial||dialogLeaving) return;
     dialogRef.current?.focus({preventScroll:true});
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setModal(null);
@@ -108,7 +110,7 @@ export default function App() {
       }
     };
     document.addEventListener('keydown', key); return () => document.removeEventListener('keydown', key);
-  }, [dialogKind, overlay, renderedAd, dialogLeaving]);
+  }, [dialogKind, overlay, renderedAd, interstitial, dialogLeaving]);
 
   const aim = (event: PointerEvent<HTMLCanvasElement>) => { const bounds = event.currentTarget.getBoundingClientRect();worldRef.current?.setAim((event.clientX - bounds.left) / bounds.width * BOARD.width); };
   const pointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
@@ -118,7 +120,7 @@ export default function App() {
   const pointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
     if (dragRef.current !== event.pointerId) return;
     aim(event); dragRef.current = null;
-    if (!overlay && worldRef.current?.drop()) { audioRef.current?.play('drop'); if (vibration&&'vibrate' in navigator) navigator.vibrate(8); }
+    if (!overlay && worldRef.current?.drop()) audioRef.current?.play('drop');
   };
   const restart = () => { worldRef.current?.reset(); setModal(null); };
   const shake = () => {
@@ -126,7 +128,6 @@ export default function App() {
     if(world.state.shakes===0&&profileRef.current.shakeTokens>0){world.grantShake();commitProfile({...profileRef.current,shakeTokens:profileRef.current.shakeTokens-1});}
     audioRef.current?.unlock();if (!world.shake()) return;
     audioRef.current?.play('shake'); setShaking(true);clearTimeout(shakeTimer.current); shakeTimer.current = setTimeout(() => setShaking(false), 500);
-    if (vibration&&'vibrate' in navigator) navigator.vibrate([12, 20, 12]);
   };
   const fullscreen = () => { if (!document.fullscreenElement) void shellRef.current?.requestFullscreen?.().catch(() => {}); else void document.exitFullscreen().catch(() => {}); };
   const buy=(item:ShopItem)=>{
@@ -195,13 +196,12 @@ export default function App() {
   const skin=appearance.skins;
   const dialog=overlay&&<div key={dialogKind} className={`overlay ${dialogKind==='shop'?'shop-fullscreen':dialogKind==='rewards'?'rewards-fullscreen':''} ${dialogLeaving?'is-leaving':''}`} onPointerDown={e=>e.stopPropagation()}>
         <div className={`dialog ${dialogKind==='shop'?'shop-dialog':dialogKind==='rewards'?'rewards-dialog':''}`} role="dialog" aria-modal="true" aria-label={dialogKind?dialogLabels[dialogKind]:''} tabIndex={-1} ref={dialogRef}>
-          <div className="dialog-content" inert={!!renderedAd||dialogLeaving}>
+          <div className="dialog-content" inert={!!renderedAd||interstitial||dialogLeaving}>
             {dialogKind!=='gameover'&&dialogKind!=='won'&&<button className="dialog-close" aria-label="Закрыть" onClick={()=>setModal(null)}><Icon name="close" size={21}/></button>}
             <SoftScroll enabled={dialogKind!=='shop'&&dialogKind!=='rewards'}>{dialogKind==='shop'?<Shop profile={profile} coins={state.coins} busy={appearanceBusy} onBuy={buy} onFocus={focusItem} onVideo={item=>watch({type:'unlock',key:item.key})} onCoins={()=>watch({type:'coins'})} onCoinPack={()=>watch({type:'coin-pack'})} onShakeVideo={()=>watch({type:'shake'})} onShakes={buyShakes} onBundle={buyBundle} onRewards={()=>setModal('rewards')} onClose={()=>setModal(null)}/>:dialogKind==='settings'?<>
-              <Icon name="settings" size={65}/><span className="eyebrow">УСТРОИМ ВСЁ ПО-ТВОЕМУ</span><h1>Настройки</h1>
+              <Icon name="settings" size={65}/><span className="eyebrow settings-caption">УСТРОИМ ВСЁ ПО-ТВОЕМУ</span><h1>Настройки</h1>
               <div className="settings-list">
                 <button className="setting-row" role="switch" aria-checked={!muted} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={27}/><span>Звук</span><i className={!muted?'on':''}/></button>
-                <button className="setting-row" role="switch" aria-checked={vibration} onClick={()=>setVibration(!vibration)}><Icon name="vibrate" size={27}/><span>Вибрация</span><i className={vibration?'on':''}/></button>
                 <button className="setting-row" onClick={fullscreen}><Icon name="fullscreen" size={27}/><span>На весь экран</span><Icon name="right" size={17}/></button>
                 <button className="setting-row" onClick={()=>setModal('restart')}><Icon name="restart" size={27}/><span>Начать заново</span><Icon name="right" size={17}/></button>
               </div><button className="primary-button" onClick={()=>setModal(null)}><Icon name="play" size={19}/> Вернуться в игру</button>
@@ -225,7 +225,7 @@ export default function App() {
         </div>
       </div>;
 
-  return <main className="game-screen" ref={shellRef} aria-busy={!loaded} style={{'--scenery':`url("${new URL(backgroundAsset(appearance.backgrounds),document.baseURI).href}")`} as CSSProperties}>
+  return <main className={`game-screen ${landscape?'landscape':''}`} ref={shellRef} aria-busy={!loaded} style={{'--scenery':`url("${new URL(backgroundAsset(appearance.backgrounds),document.baseURI).href}")`,'--scenery-wide':`url("${new URL(wideBackgroundAsset(appearance.backgrounds),document.baseURI).href}")`,'--cover':`url("${new URL(asset('cover.webp'),document.baseURI).href}")`,'--cover-wide':`url("${new URL(asset('cover-wide.webp'),document.baseURI).href}")`} as CSSProperties}>
     <div className="ambient-background" aria-hidden="true" />
     <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={!loaded||overlay} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
       <header className="header">
@@ -255,8 +255,9 @@ export default function App() {
       </footer>
     </div>
     {shellRef.current&&createPortal(dialog,shellRef.current)}
+    {interstitial&&<InterstitialAd onComplete={()=>setInterstitial(false)}/>}
     <Toast text={toast} onDismiss={()=>{clearTimeout(toastTimer.current);setToast(null);}}/>
-    {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label="Загрузка игры"><div className="loading-content"><div className="loading-logo">jelly <span>fruit.</span></div><div className="loading-mascots"><img className="loading-side left" src={fruitAsset(1)} alt=""/><img className="loading-hero" src={fruitAsset(0)} alt=""/><img className="loading-side right" src={fruitAsset(2)} alt=""/><span className="loading-spark s1">✦</span><span className="loading-spark s2">✦</span></div><h1>{error?'Фрукты задержались':'Скоро будет сочно!'}</h1><p>{error?'Не удалось загрузить ассеты. Попробуй ещё раз.':'Собираем маленькую фруктовую семью'}</p>{!error?<><div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{width:`${progress}%`}}/></div><span className="loading-percent">{progress}%</span></>:<button className="primary-button" onClick={()=>window.location.reload()}>Попробовать ещё</button>}</div><span className="loading-caption">НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА</span></section>}
+    {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label="Загрузка игры"><div className="loading-content"><div className="loading-logo">jelly <span>fruit.</span></div><div className="loading-status"><h1>{error?'Фрукты задержались':'Скоро будет сочно!'}</h1><p>{error?'Не удалось загрузить ассеты. Попробуй ещё раз.':'Собираем маленькую фруктовую семью'}</p>{!error?<><div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{width:`${progress}%`}}/></div><span className="loading-percent">{progress}%</span></>:<button className="primary-button" onClick={()=>window.location.reload()}>Попробовать ещё</button>}</div></div><span className="loading-caption">НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА</span></section>}
     <div className="desktop-note"><Icon name="left" size={14}/><span>Наведи мышку и нажми, чтобы бросить</span><Icon name="right" size={14}/></div>
   </main>;
 }

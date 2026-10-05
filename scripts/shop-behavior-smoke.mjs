@@ -32,7 +32,7 @@ export async function checkShopBehavior(browser,base,errors){
   await page.waitForFunction(()=>document.querySelector('.chain-fruit img').src.includes('/skins/fuzzies/'));
   await open();await choose('Фруктовая семья');await close();assert.equal((await profile()).selected.skins,'fruit','Closing on an owned item keeps the focused selection');
   await open();await choose('Суши-пати');
-  await page.locator('[data-category=skins] .contents-button').click();
+  await page.locator('[data-category=skins] .rail-card[data-centred=true]').click();
   await page.getByRole('dialog',{name:'Содержимое: Суши-пати'}).waitFor();
   assert.equal(await page.locator('.contents-grid figure').count(),11);
   await page.screenshot({path:'test-results/skin-contents.png',animations:'disabled'});
@@ -41,7 +41,7 @@ export async function checkShopBehavior(browser,base,errors){
   assert.equal((await profile()).selected.skins,'sushi','Buying equips immediately');
   await jump('Наборы');await page.getByRole('button',{name:'Купить Уютный набор за 1183'}).click();
   assert.deepEqual((await profile()).selected,{skins:'fuzzies',backgrounds:'sunset',boxes:'rose'},'Bundle equips all three contents');
-  await page.locator('.bundle-card.cozy .contents-button').click();
+  await page.locator('.bundle-card.cozy .bundle-copy').click();
   await page.getByRole('dialog',{name:'Содержимое: Уютный набор'}).waitFor();
   assert.equal(await page.locator('.contents-item').count(),3);assert.match(await page.locator('.contents-shakes').textContent(),/3/);
   await page.screenshot({path:'test-results/bundle-contents.png',animations:'disabled'});

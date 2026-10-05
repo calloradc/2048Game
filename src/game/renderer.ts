@@ -2,7 +2,7 @@ import { asset, FRUITS, fruitAsset } from './fruits';
 import { BOARD, type Cube, type FruitWorld, type MergeEvent } from './physics';
 import { bodyUV, bodyRect, spriteFans, textureTransform, type UV } from './spriteShape';
 import { AimPreview } from './aimPreview';
-import { backgroundAsset, boxAsset } from './catalog';
+import { backgroundAsset, wideBackgroundAsset, boxAsset } from './catalog';
 import { UI_ARTWORK } from '../ui/assets';
 
 interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; texture: number; size: number; angle: number; spin: number }
@@ -46,7 +46,7 @@ export class GameRenderer {
 
   async start(progress: (loaded: number, total: number) => void = () => {},skin='fruit',box='glass',background='meadow') {
     this.skin=skin;
-    const files=[...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),backgroundAsset(background),...UI_ARTWORK];
+    const files=[...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),backgroundAsset(background),wideBackgroundAsset(background),asset('cover.webp'),asset('cover-wide.webp'),...UI_ARTWORK];
     let completed=0;const total=files.length+1;
     const images=await Promise.all(files.map(async src=>{const image=await loadImage(src);if(!this.destroyed)progress(++completed,total);return image;}));
     await document.fonts.ready;
@@ -58,7 +58,7 @@ export class GameRenderer {
 
   async setAppearance(skin:string,box:string,background:string) {
     const version=++this.appearanceVersion;
-    const images=await Promise.all([...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),backgroundAsset(background)].map(loadImage));
+    const images=await Promise.all([...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),backgroundAsset(background),wideBackgroundAsset(background)].map(loadImage));
     if(this.destroyed||version!==this.appearanceVersion)return false;
     this.skin=skin;this.sprites=images.slice(0,11);this.glass=images[11];this.sleepingSprites.clear();this.needsDraw=true;return true;
   }

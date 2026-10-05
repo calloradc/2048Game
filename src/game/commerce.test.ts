@@ -1,9 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { CATALOG } from './catalog';
-import { defaultProfile, parseProfile, purchase } from './profile';
+import { CATALOG, itemByKey } from './catalog';
+import { defaultProfile, parseProfile, purchase, rewardUnlock } from './profile';
 import { BUNDLES, SHAKE_PACKS, bundleOffer, purchaseBundle, purchaseShakes, rewardCoinPack } from './commerce';
 
 describe('Bundles and persistent supplies',()=>{
+  it('keeps cosmic cosmetics exclusive to their bundle and restores its purchase',()=>{
+    const fresh=defaultProfile(),bundle=BUNDLES.find(b=>b.id==='cosmic')!;
+    for(const key of bundle.items){
+      const item=itemByKey(key)!;
+      expect(purchase(fresh,item,10000).purchased).toBe(false);
+      expect(rewardUnlock(fresh,item).unlocked).toBe(false);
+    }
+    expect(bundleOffer(fresh,bundle)).toMatchObject({price:4400,saving:2975});
+    const bought=purchaseBundle(fresh,bundle,5000);
+    const restored=parseProfile(JSON.stringify(bought.profile));
+    expect(bought.coins).toBe(600);expect(restored.bundles).toContain('cosmic');
+    expect(restored.selected).toEqual({skins:'cosmos',backgrounds:'cosmos',boxes:'cosmos'});
+    expect(restored.shakeTokens).toBe(7);
+    expect(purchaseBundle(restored,bundle,5000).purchased).toBe(false);
+  });
   it('charges once, grants every missing cosmetic and banks the advertised shakes',()=>{
     const fresh=defaultProfile(),bundle=BUNDLES[0];
     expect(bundleOffer(fresh,bundle)).toMatchObject({price:1800,saving:825});

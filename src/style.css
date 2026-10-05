@@ -290,3 +290,48 @@ h1 { font-size: 26px; line-height: 1.2; margin: 9px 0 16px; font-weight: 900; le
 .small-dialog-scroll .soft-scroll-track { padding: 30px 24px; }
 .soft-scroll-track { min-height: 100%; }
 .restart-delayed { animation: item-enter .25s ease-out both; }
+
+.settings-caption { margin-top: 20px; }
+.interstitial-overlay { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 24px; background: #fffaf0; text-align: center; outline: none; }
+.interstitial-warning { width: min(360px, 100%); }
+.interstitial-warning h1 { font-size: 27px; margin: 12px 0; }
+.interstitial-warning p { font-size: 13px; color: var(--muted); }
+.interstitial-seconds { display: grid; place-items: center; margin: 28px auto; width: 88px; height: 88px; border-radius: 30px; background: #e7d9f6; color: #8a57b3; font-size: 44px; font-weight: 900; }
+.interstitial-creative { position: relative; width: min(900px, 100%); overflow: hidden; border-radius: 28px; background: #f5ffe8; }
+.interstitial-creative > img { width: 100%; max-height: 65dvh; display: block; object-fit: cover; }
+.interstitial-creative > div { padding: 20px; }
+.interstitial-creative h1 { font-size: clamp(19px, 3vw, 29px); margin: 10px 0; }
+.interstitial-creative p { font-size: 13px; color: var(--muted); }
+.landscape .ambient-background::before { background-image: var(--scenery-wide); }
+.landscape .scene { width: 860px; height: 550px; padding: 7px 10px; grid-template-columns: 190px 420px 190px; grid-template-rows: 60px 420px 56px; column-gap: 20px; }
+.landscape .header { grid-column: 1 / -1; grid-row: 1; padding-inline: 24px; grid-template-columns: 1fr 88px 88px; }
+.landscape .scoreboard { grid-column: 1; grid-row: 2; align-self: start; margin: 42px 0 0; width: 100%; height: 148px; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+.landscape .score-card, .landscape .best-card { width: 100%; }
+.landscape .game-toolbar { grid-column: 3; grid-row: 2; width: 100%; height: 160px; margin: 28px 0 0; flex-direction: column; align-items: center; justify-content: center; gap: 15px; }
+.landscape .playfield { grid-column: 2; grid-row: 2; }
+.landscape .evolution { grid-column: 1 / -1; grid-row: 3; width: 420px; height: 78px; margin: -20px auto 0; }
+.landscape .controls { position: absolute; left: 10px; top: 305px; width: 190px; height: 154px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 66px 66px; gap: 14px 8px; }
+.landscape .shake-button { grid-column: 1 / -1; grid-row: 1; width: 190px; font-size: 16px; gap: 6px; }
+.landscape .utility-button { justify-self: center; }
+.landscape .controls > :first-child { grid-column: 1; grid-row: 2; }
+.landscape .controls > :last-child { grid-column: 2; grid-row: 2; }
+@media (orientation: landscape) and (min-width: 600px) { .desktop-note { display: none; } }
+
+.loading-screen { padding: calc(30px + var(--safe-top)) 24px calc(46px + var(--safe-bottom)); background: #9bcf93 var(--cover) center / cover no-repeat; }
+.loading-content { width: min(340px, 100%); height: 100%; max-height: none; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+.loading-logo { font-size: clamp(48px, 8vw, 64px); color: #fffdf4; text-shadow: 0 3px 0 #568a66, 0 7px 25px #2c574d44; margin-top: min(7dvh, 50px); }
+.loading-logo span { color: #ffe199; }
+.loading-status { width: 100%; padding: 18px 20px 15px; background: #fffdf4eb; backdrop-filter: blur(8px); border-radius: 25px; box-shadow: 0 8px 30px #2c574d26; }
+.loading-content h1 { font-size: 22px; }
+.loading-content p { margin-bottom: 16px; color: #728268; }
+.loading-bar { width: 100%; height: 12px; background: #e1e8d1; }
+.loading-bar > span { background: linear-gradient(90deg, #75ba8c, #b5d579); }
+.loading-caption { color: #fffdf0; text-shadow: 0 1px 6px #35594e; }
+.landscape .loading-screen { background-image: var(--cover-wide); padding-block: 20px; }
+.landscape .loading-content { width: min(420px, 55%); }
+.landscape .loading-logo { margin-top: 0; font-size: 52px; }
+.landscape .loading-status { padding: 12px 20px 10px; }
+.landscape .loading-status h1 { font-size: 18px; margin: 0 0 4px; }
+.landscape .loading-status p { margin-bottom: 10px; font-size: 11px; }
+.landscape .loading-caption { display: none; }
+@media (max-height: 520px) { .loading-content { transform: none; } }

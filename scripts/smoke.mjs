@@ -6,6 +6,7 @@ import { checkGameover } from './gameover-smoke.mjs';
 import { checkRewardsAndOffers } from './rewards-smoke.mjs';
 import { checkShopBehavior } from './shop-behavior-smoke.mjs';
 import { checkUiMotion } from './ui-motion-smoke.mjs';
+import { checkRefresh } from './refresh-smoke.mjs';
 
 const browser = await chromium.launch({
   ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
@@ -201,6 +202,7 @@ try {
   await checkUiMotion(browser,base,errors);
   await checkShopBehavior(browser,base,errors);
   await checkGameover(browser,base,errors);
+  await checkRefresh(browser,base,errors);
   assert.deepEqual(errors, [], 'No browser errors or missing assets');
   console.log('✓ preview tilt, elastic edges, inertia, fading masks, animated dialogs, touch drop, merges and saved progress');
 } finally { await browser.close(); }

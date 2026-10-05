@@ -17,6 +17,13 @@ export const DAILY_PRIZES:DailyPrize[]=[
   {type:'coins',amount:220},
   {type:'shakes',amount:5},
   {type:'item',key:'skins:crystals',duplicateCoins:480},
+  {type:'coins',amount:180},
+  {type:'shakes',amount:3},
+  {type:'coins',amount:240},
+  {type:'item',key:'boxes:cloud',duplicateCoins:350},
+  {type:'coins',amount:300},
+  {type:'shakes',amount:5},
+  {type:'item',key:'skins:pillows',duplicateCoins:500},
 ];
 
 export const calendarDay=(date=new Date())=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;

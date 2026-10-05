@@ -7,6 +7,7 @@ export interface Bundle {id:string;name:string;caption:string;items:string[];sha
 export const BUNDLES:Bundle[]=[
   {id:'cozy',name:'Уютный набор',caption:'Шушистики, сакура и розовый бокс',items:['skins:fuzzies','backgrounds:sunset','boxes:rose'],shakes:3,price:360*PRICE_MULTIPLIER},
   {id:'crystal',name:'Звёздный набор',caption:'Кристаллики, лунный сад и ледяной бокс',items:['skins:crystals','backgrounds:moonlight','boxes:ice'],shakes:5,price:720*PRICE_MULTIPLIER},
+  {id:'cosmic',name:'Космический набор',caption:'Три эксклюзивных оформления и 7 встрясок',items:['skins:cosmos','backgrounds:cosmos','boxes:cosmos'],shakes:7,price:4400},
 ];
 export const SHAKE_PACKS=[{id:'one',amount:1,price:25*PRICE_MULTIPLIER},{id:'five',amount:5,price:100*PRICE_MULTIPLIER}] as const;
 

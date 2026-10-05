@@ -16,7 +16,7 @@ export function parseProfile(raw:string):Profile {
     clean.dailyCount=integer(data.dailyCount,clean.daily?1:0);
     clean.shakeTokens=integer(data.shakeTokens);
     clean.coinVideo=integer(data.coinVideo)%2;
-    if(Array.isArray(data.bundles))clean.bundles=[...new Set(data.bundles.filter((id):id is string=>id==='cozy'||id==='crystal'))];
+    if(Array.isArray(data.bundles))clean.bundles=[...new Set(data.bundles.filter((id):id is string=>id==='cozy'||id==='crystal'||id==='cosmic'))];
   } catch { /* A fresh profile is fine when browser storage is unavailable. */ }
   return clean;
 }

@@ -210,9 +210,6 @@
 @media (prefers-reduced-motion: reduce) { .rail-card-wave { animation: none; } }
 
 .shop-scroll-content { position: relative; padding: 16px 0 28px; }
-.collection-contents { display: grid; place-items: center; }
-.contents-button { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 30px; padding: 0 6px; background: transparent; color: #946daf; font-size: 10px; font-weight: 900; }
-.bundle-copy .contents-button { margin-top: 3px; padding: 0; }
 .shop-offers { margin: 0 16px 14px; }
 .offer-viewport { width: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; touch-action: none; border-radius: 24px; }
 .offer-viewport::-webkit-scrollbar { display: none; }
@@ -244,3 +241,23 @@
 .contents-item > span { display: flex; align-items: center; justify-content: center; gap: 3px; font-size: 8px; color: #9a77b3; margin-top: 4px; }
 .contents-item > span img { width: 14px; height: 14px; }
 .contents-shakes { display: grid; align-content: center; justify-items: center; gap: 8px; border-radius: 18px; background: #fff0c8; font-size: 13px; }
+
+.snap-viewport { touch-action: none; overscroll-behavior: none; }
+.shop-collection { height: 466px; grid-template-rows: 52px 212px 58px 28px 116px; }
+.snap-viewport[data-visible="true"][data-moving="false"] .rail-card:not([data-centred="true"]) .rail-card-wave { animation-play-state: paused; }
+.contents-preview { grid-column: 1 / -1; margin: 0; width: 100%; text-align: center; }
+.contents-grid .contents-preview img { width: 100%; height: auto; max-height: 45dvh; object-fit: contain; border-radius: 18px; }
+.contents-grid .contents-preview.boxes img { width: 220px; max-width: 100%; }
+.contents-preview figcaption { margin: 14px 0; font-size: 13px; color: var(--muted); }
+.bundle-copy[role="button"] { cursor: pointer; }
+.bundle-card.cosmic { background: linear-gradient(125deg, #e4dbfb, #e1efff); }
+.skins [data-theme="candies"] .card-art { background: #fce2ed; }
+.skins [data-theme="bakery"] .card-art { background: #faedcf; }
+.skins [data-theme="balls"] .card-art { background: #dfeefb; }
+.skins [data-theme="pillows"] .card-art { background: #eae1fa; }
+.skins [data-theme="cosmos"] .card-art { background: #dcd9f5; }
+.shop-scroll-content, .soft-scroll-track { backface-visibility: hidden; }
+@media (orientation: landscape) and (min-width: 600px) {
+  .shop-dialog > .dialog-content { width: min(100%, 760px); }
+  .rewards-dialog > .dialog-content { width: min(100%, 690px); }
+}

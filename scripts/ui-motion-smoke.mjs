@@ -35,6 +35,8 @@ export async function checkUiMotion(browser,base,errors){
   for(const [name,category] of [['Сакура на закате','backgrounds'],['Розовый кварц','boxes'],['Шушистики','skins']]){
     await jump('Наборы','bundles');
     await bundle.getByRole('button',{name:`Посмотреть ${name}`,exact:true}).click();
+    await page.getByRole('dialog',{name:'Содержимое: Уютный набор'}).waitFor();
+    await page.locator(`.contents-item.${category}`).click();await page.locator('.contents-overlay').waitFor({state:'detached'});
     await page.waitForFunction(({name,category})=>{
       const section=document.querySelector(`[data-category="${category}"]`),rail=section.querySelector('.snap-viewport'),card=section.querySelector('.rail-card[data-centred=true]');
       if(!card||section.querySelector('.shop-current').textContent!==name)return false;
@@ -61,6 +63,7 @@ export async function checkUiMotion(browser,base,errors){
   await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await touch.detach();
   await page.waitForFunction(()=>{
     const rail=document.querySelector('[data-category=skins] .snap-viewport'),card=rail.querySelector('.rail-card[data-centred=true]');
+    if(!card)return false;
     const a=card.getBoundingClientRect(),b=rail.getBoundingClientRect();return rail.dataset.moving==='false'&&Math.abs(a.left+a.width/2-b.left-b.width/2)<1;
   });
   await jump('Наборы','bundles');await page.waitForTimeout(450);
