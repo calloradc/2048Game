@@ -1,3 +1,4 @@
+import { localizedProperty } from '../i18n';
 import { itemByKey } from './catalog';
 import type { Profile } from './profile';
 import { SHAKE_PRICE } from './physics';
@@ -9,6 +10,7 @@ export const BUNDLES:Bundle[]=[
   {id:'crystal',name:'Звёздный набор',caption:'Кристаллики, лунный сад и ледяной бокс',items:['skins:crystals','backgrounds:moonlight','boxes:ice'],shakes:5,price:720*PRICE_MULTIPLIER},
   {id:'cosmic',name:'Космический набор',caption:'Три эксклюзивных оформления и 7 встрясок',items:['skins:cosmos','backgrounds:cosmos','boxes:cosmos'],shakes:7,price:4400},
 ];
+BUNDLES.forEach(bundle=>{localizedProperty(bundle,'name');localizedProperty(bundle,'caption');});
 export const SHAKE_PACKS=[{id:'one',amount:1,price:25*PRICE_MULTIPLIER},{id:'five',amount:5,price:100*PRICE_MULTIPLIER}] as const;
 
 export function bundleOffer(profile:Profile,bundle:Bundle) {

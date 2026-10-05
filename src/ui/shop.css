@@ -112,7 +112,7 @@
 @keyframes photo-wave { 0%, 100% { transform: rotate(-1.4deg) translate3d(0, 1px, 0); } 50% { transform: rotate(1.4deg) translate3d(0, -1px, 0); } }
 .shop-dialog .ad-overlay { position: fixed; inset: 0; z-index: 20; border-radius: 0; }
 
-@media (max-width: 350px) {
+@container game-viewport (max-width: 350px) {
   .shop-heading { gap: 6px; padding-left: 12px; padding-right: 60px; }
   .shop-heading h1 { font-size: 21px; gap: 5px; }
   .shop-heading h1 .ui-icon { width: 40px; height: 40px; }
@@ -124,7 +124,7 @@
   .shop-arrow.prev { left: 12px; }
   .shop-arrow.next { right: 12px; }
 }
-@media (max-height: 480px) {
+@container game-viewport (max-height: 480px) {
   .shop-dialog > .dialog-content { grid-template-rows: calc(62px + var(--safe-top)) 64px minmax(0, 1fr) calc(64px + var(--safe-bottom)); }
   .shop-dialog .dialog-close { top: calc(11px + var(--safe-top)); }
   .shop-footer { padding-top: 6px; padding-bottom: calc(6px + var(--safe-bottom)); }
@@ -201,10 +201,10 @@
 .exclusive-card { overflow: hidden; }
 .supply-card .sale-ribbon { width: 113px; height: 20px; top: 14px; right: -29px; font-size: 7px; }
 .item-copy { animation: item-change .2s ease-out; }
-@media (min-width: 520px) { .bundle-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 350px) { .shop-nav > button { font-size: 10px; padding-inline: 7px; } .shop-feature { padding-inline: 12px; } .feature-mascot { width: 95px; height: 95px; right: 19px; } .shop-feature h2 { font-size: 16px; } .supply-card h3 { font-size: 15px; } .bundle-copy h3 { font-size: 19px; } .bundle-preview.skins { width: 102px; height: 102px; left: calc(50% - 51px); } .bundle-preview.backgrounds { width: 61px; height: 82px; left: 7px; } .bundle-preview.boxes { width: 60px; right: 8px; } }
+@container game-viewport (min-width: 520px) { .bundle-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container game-viewport (max-width: 350px) { .shop-nav > button { font-size: 10px; padding-inline: 7px; } .shop-feature { padding-inline: 12px; } .feature-mascot { width: 95px; height: 95px; right: 19px; } .shop-feature h2 { font-size: 16px; } .supply-card h3 { font-size: 15px; } .bundle-copy h3 { font-size: 19px; } .bundle-preview.skins { width: 102px; height: 102px; left: calc(50% - 51px); } .bundle-preview.backgrounds { width: 61px; height: 82px; left: 7px; } .bundle-preview.boxes { width: 60px; right: 8px; } }
 
-@media (max-height: 480px) { .shop-toolbar { padding-bottom: 3px; } .shop-toolbar-top { height: 30px; } .shop-nav { height: 31px; } .shop-nav > button { height: 27px; } .shop-nav-pill { height: 27px; top: 2px; } }
+@container game-viewport (max-height: 480px) { .shop-toolbar { padding-bottom: 3px; } .shop-toolbar-top { height: 30px; } .shop-nav { height: 31px; } .shop-nav > button { height: 27px; } .shop-nav-pill { height: 27px; top: 2px; } }
 .supply-card > * { flex-shrink: 0; }
 .supply-card > button { margin-top: auto; }
 @media (prefers-reduced-motion: reduce) { .rail-card-wave { animation: none; } }
@@ -220,7 +220,7 @@
 .offer-controls span { width: 5px; height: 5px; border-radius: 5px; background: #bdc5b2; transition: width .2s, background .2s; }
 .offer-controls [aria-pressed="true"] span { width: 13px; background: #a574cc; }
 .contents-overlay { position: absolute; inset: 0; z-index: 50; display: grid; place-items: center; padding: calc(16px + var(--safe-top)) 16px calc(16px + var(--safe-bottom)); background: #254e3c50; backdrop-filter: blur(10px); animation: overlay-in .2s both; }
-.contents-dialog { width: min(410px,100%); max-height: min(620px,calc(100dvh - 32px - var(--safe-top) - var(--safe-bottom))); display: grid; grid-template-rows: auto minmax(0,1fr) 48px; gap: 12px; padding: 20px 16px 16px; border-radius: 28px; corner-shape: squircle; background: var(--paper); box-shadow: 0 15px 50px #294d3733; animation: dialog-in .25s both; outline: none; overflow: hidden; }
+.contents-dialog { width: min(410px,100%); max-height: min(620px,calc(var(--viewport-height, 100dvh) - 32px - var(--safe-top) - var(--safe-bottom))); display: grid; grid-template-rows: auto minmax(0,1fr) 48px; gap: 12px; padding: 20px 16px 16px; border-radius: 28px; corner-shape: squircle; background: var(--paper); box-shadow: 0 15px 50px #294d3733; animation: dialog-in .25s both; outline: none; overflow: hidden; }
 .contents-dialog > header { position: relative; padding-right: 40px; }
 .contents-dialog h2 { font-size: 22px; margin: 4px 0 0; font-weight: 900; }
 .contents-dialog .dialog-close { top: 0; right: 0; }
@@ -246,7 +246,7 @@
 .shop-collection { height: 466px; grid-template-rows: 52px 212px 58px 28px 116px; }
 .snap-viewport[data-visible="true"][data-moving="false"] .rail-card:not([data-centred="true"]) .rail-card-wave { animation-play-state: paused; }
 .contents-preview { grid-column: 1 / -1; margin: 0; width: 100%; text-align: center; }
-.contents-grid .contents-preview img { width: 100%; height: auto; max-height: 45dvh; object-fit: contain; border-radius: 18px; }
+.contents-grid .contents-preview img { width: 100%; height: auto; max-height: calc(var(--viewport-height, 100dvh) * .45); object-fit: contain; border-radius: 18px; }
 .contents-grid .contents-preview.boxes img { width: 220px; max-width: 100%; }
 .contents-preview figcaption { margin: 14px 0; font-size: 13px; color: var(--muted); }
 .bundle-copy[role="button"] { cursor: pointer; }
@@ -257,7 +257,17 @@
 .skins [data-theme="pillows"] .card-art { background: #eae1fa; }
 .skins [data-theme="cosmos"] .card-art { background: #dcd9f5; }
 .shop-scroll-content, .soft-scroll-track { backface-visibility: hidden; }
-@media (orientation: landscape) and (min-width: 600px) {
+@container game-viewport (aspect-ratio > 1) and (min-width: 600px) {
   .shop-dialog > .dialog-content { width: min(100%, 760px); }
   .rewards-dialog > .dialog-content { width: min(100%, 690px); }
+}
+
+.shop-nav > button { transition: color .22s, translate .22s ease, scale .22s ease, filter .22s ease; }
+.collection-info p { white-space: normal; height: auto; min-height: 15px; }
+.collection-info h3 { font-size: clamp(18px, 3cqw, 21px); }
+.collection-heading .eyebrow { letter-spacing: .6px; }
+@media (hover: hover) and (pointer: fine) {
+  .rail-card[data-centred="true"] .shop-card { transition: scale .22s, filter .22s; }
+  .rail-card[data-centred="true"] .shop-card:hover { scale: 1.025; filter: brightness(1.025); }
+  .rail-card[data-centred="true"] .shop-card:active { scale: .97; }
 }

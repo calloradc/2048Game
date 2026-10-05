@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useLayoutEffect, useRef } from 'react';
 
 export const SHOP_LINKS=[['skins','Персонажи'],['backgrounds','Фоны'],['boxes','Боксы'],['bundles','Наборы'],['supplies','Монеты']] as const;
@@ -14,6 +15,6 @@ export function ShopNav({active,onJump}:{active:string;onJump:(id:string)=>void}
     };
     measure();const observer=new ResizeObserver(measure);observer.observe(el);
     return()=>observer.disconnect();
-  },[active]);
-  return <nav className="shop-nav" ref={nav} aria-label="Разделы магазина"><span className="shop-nav-pill" ref={pill} aria-hidden="true"/>{SHOP_LINKS.map(([id,label])=><button key={id} aria-current={active===id?'true':undefined} onClick={()=>onJump(id)}>{label}</button>)}</nav>;
+  },[active,t("Разделы магазина")]);
+  return <nav className="shop-nav" ref={nav} aria-label={t("Разделы магазина")}><span className="shop-nav-pill" ref={pill} aria-hidden="true"/>{SHOP_LINKS.map(([id,label])=><button key={id} aria-current={active===id?'true':undefined} onClick={()=>onJump(id)}>{t(label)}</button>)}</nav>;
 }

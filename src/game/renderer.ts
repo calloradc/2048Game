@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { asset, FRUITS, fruitAsset } from './fruits';
 import { BOARD, type Cube, type FruitWorld, type MergeEvent } from './physics';
 import { bodyUV, bodyRect, spriteFans, textureTransform, type UV } from './spriteShape';
@@ -63,15 +64,24 @@ export class GameRenderer {
     this.skin=skin;this.sprites=images.slice(0,11);this.glass=images[11];this.sleepingSprites.clear();this.needsDraw=true;return true;
   }
 
+  private displayWidth() {
+    const scene=this.canvas.closest<HTMLElement>('.scene');
+    // The field can shake/rotate; its axis-aligned bounds must not change
+    // the backing resolution or redraw a paused game during that animation.
+    return scene?this.canvas.clientWidth*scene.getBoundingClientRect().width/scene.offsetWidth:this.canvas.getBoundingClientRect().width;
+  }
+
   private resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const width = Math.max(1, Math.round(this.canvas.getBoundingClientRect().width * dpr));
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.max(1, Math.round(this.displayWidth() * dpr));
     this.sleepingSprites.clear();
     this.canvas.width = width; this.canvas.height = Math.round(width * BOARD.height / BOARD.width);
     this.needsDraw=true;
   }
 
   private tick = (now: number) => {
+    const pixels=Math.round(this.displayWidth()*(window.devicePixelRatio||1));
+    if(Math.abs(this.canvas.width-pixels)>1)this.resize();
     const dt = this.last ? Math.min((now - this.last) / 1000, 0.05) : 1 / 60;
     this.last = now;
     const suspended=this.paused||document.hidden;
@@ -99,7 +109,7 @@ export class GameRenderer {
 
   merge(event: MergeEvent) {
     const { x, y, level, combo } = event;
-    this.floats.push({ x, y: y - FRUITS[level].size / 2, text: combo > 1 ? 'КОМБО!' : 'СОЧНО!', age: 0, combo });
+    this.floats.push({ x, y: y - FRUITS[level].size / 2, text: combo > 1 ? t('КОМБО!') : t('СОЧНО!'), age: 0, combo });
     this.floats=this.floats.slice(-3);
     this.bursts.push({x,y,age:0,color:FRUITS[level].color,radius:FRUITS[level].size*0.55});
     const juice=[0,0,1,2,3,4,5,5,2,2,0][level];
@@ -116,7 +126,7 @@ export class GameRenderer {
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     ctx.clearRect(0, 0, BOARD.width, BOARD.height);
     // Use the original glass image once; no drawn tint, duplicate rim or wash.
-    if (this.glass) ctx.drawImage(this.glass, 27, 95, 366, 370);
+    if (this.glass) ctx.drawImage(this.glass, 20, 88, 380, 384);
     for (const id of this.sleepingSprites.keys()) if (!this.world.cubes.has(id)) this.sleepingSprites.delete(id);
 
     const { state, aim } = this.world;
@@ -182,10 +192,12 @@ export class GameRenderer {
             minX=Math.min(minX,px);maxX=Math.max(maxX,px);minY=Math.min(minY,py);maxY=Math.max(maxY,py);
           }
         }
-        const x=minX-1,y=minY-1;
+        // Align the cache to the main canvas pixel grid. A second fractional
+        // resample made resting cubes softer than the live mesh.
+        const resolution = this.canvas.width / BOARD.width;
+        const x=Math.floor((minX-1)*resolution)/resolution,y=Math.floor((minY-1)*resolution)/resolution;
         const canvas = document.createElement('canvas');
-        const resolution = Math.min(this.canvas.width / BOARD.width, 2);
-        canvas.width = Math.ceil((maxX-minX+2)*resolution);canvas.height = Math.ceil((maxY-minY+2)*resolution);
+        canvas.width = Math.ceil((maxX+1-x)*resolution);canvas.height = Math.ceil((maxY+1-y)*resolution);
         const w=canvas.width/resolution,h=canvas.height/resolution;
         const offscreen = canvas.getContext('2d')!;
         offscreen.setTransform(resolution,0,0,resolution,-x*resolution,-y*resolution);

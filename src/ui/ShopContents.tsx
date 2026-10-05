@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { itemByKey, itemPreview, SKIN_NAMES, type ShopItem } from '../game/catalog';
@@ -19,7 +20,7 @@ export function ShopContents({contents,onClose,onItem}:{contents:Contents|null;o
   if(!rendered)return null;
   const title=rendered.type==='item'?rendered.item.name:rendered.bundle.name;
   return createPortal(<div className={`contents-overlay ${leaving?'is-leaving':''}`} onPointerDown={event=>{event.stopPropagation();if(event.target===event.currentTarget)onClose();}}>
-    <div className="contents-dialog" ref={dialog} role="dialog" aria-modal="true" aria-label={`Содержимое: ${title}`} tabIndex={-1} inert={leaving} onKeyDown={event=>{
+    <div className="contents-dialog" ref={dialog} role="dialog" aria-modal="true" aria-label={t("Содержимое: {item}",{item:title})} tabIndex={-1} inert={leaving} onKeyDown={event=>{
       if(event.key==='Escape'){event.stopPropagation();onClose();}
       if(event.key==='Tab'){
         const buttons=dialog.current?.querySelectorAll<HTMLButtonElement>('button');if(!buttons?.length)return;
@@ -27,14 +28,14 @@ export function ShopContents({contents,onClose,onItem}:{contents:Contents|null;o
         else if(!event.shiftKey&&document.activeElement===buttons[buttons.length-1]){event.preventDefault();buttons[0].focus();}
       }
     }}>
-      <header><span className="eyebrow">СОДЕРЖИМОЕ</span><h2>{title}</h2><button className="dialog-close" aria-label="Закрыть содержимое" onClick={onClose}><Icon name="close" size={24}/></button></header>
+      <header><span className="eyebrow">{t("СОДЕРЖИМОЕ")}</span><h2>{title}</h2><button className="dialog-close" aria-label={t("Закрыть содержимое")} onClick={onClose}><Icon name="close" size={24}/></button></header>
       <SoftScroll className="contents-scroll"><div className={`contents-grid ${rendered.type==='item'&&rendered.item.category==='skins'?'skin':rendered.type}`}>
         {rendered.type==='item'&&rendered.item.category==='skins'?SKIN_NAMES[rendered.item.id].map((name,level)=><figure key={level} style={{animationDelay:`${Math.min(level*30,180)}ms`}}><PreviewImage src={fruitAsset(level,rendered.item.id)} eager/><figcaption>{name}</figcaption></figure>):rendered.type==='item'?<figure className={`contents-preview ${rendered.item.category}`}><PreviewImage src={itemPreview(rendered.item)} eager/><figcaption>{rendered.item.description}</figcaption></figure>:<>
-          {rendered.bundle.items.map(key=>{const item=itemByKey(key)!;return <button className={`contents-item ${item.category}`} key={key} onClick={()=>{onClose();onItem(item);}}><div><PreviewImage src={itemPreview(item)} eager/></div><strong>{item.name}</strong><span>Посмотреть в магазине<Icon name="right" size={14}/></span></button>;})}
-          <div className="contents-shakes"><Icon name="shake" size={40}/><strong>+{rendered.bundle.shakes} встряски</strong></div>
+          {rendered.bundle.items.map(key=>{const item=itemByKey(key)!;return <button className={`contents-item ${item.category}`} key={key} onClick={()=>{onClose();onItem(item);}}><div><PreviewImage src={itemPreview(item)} eager/></div><strong>{item.name}</strong><span>{t("Посмотреть в магазине")}<Icon name="right" size={14}/></span></button>;})}
+          <div className="contents-shakes"><Icon name="shake" size={40}/><strong>{t("+{n} встряски",{n:rendered.bundle.shakes})}</strong></div>
         </>}
       </div></SoftScroll>
-      <button className="primary-button" onClick={onClose}>Понятно</button>
+      <button className="primary-button" onClick={onClose}>{t("Понятно")}</button>
     </div>
   </div>,document.querySelector('.game-screen')!);
 }

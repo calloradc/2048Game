@@ -64,7 +64,7 @@
 @keyframes reward-float { 0%, 100% { transform: translate3d(0, 1px, 0) rotate(-2deg); } 50% { transform: translate3d(0, -2px, 0) rotate(2deg); } }
 @keyframes reward-collected { 0% { transform: scale(1); } 35% { transform: scale(1.14) rotate(-4deg); } 100% { transform: scale(1); } }
 @keyframes reward-stamp { from { opacity: 0; transform: scale(.5) rotate(-15deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
-@media (max-width: 350px) {
+@container game-viewport (max-width: 350px) {
   .rewards-heading { padding-left: 14px; gap: 7px; }
   .rewards-heading h1 { font-size: 18px; }
   .rewards-heading .eyebrow { font-size: 5px; }
@@ -78,7 +78,7 @@
   .daily-hero h2 { font-size: 21px; }
   .daily-hero > img { width: 111px; height: 111px; }
 }
-@media (max-height: 480px) {
+@container game-viewport (max-height: 480px) {
   .rewards-dialog > .dialog-content { grid-template-rows: calc(66px + var(--safe-top)) minmax(0, 1fr) calc(64px + var(--safe-bottom)); }
   .rewards-heading { padding-top: calc(10px + var(--safe-top)); }
   .rewards-dialog .dialog-close { top: calc(15px + var(--safe-top)); }

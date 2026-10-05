@@ -1,4 +1,5 @@
-import { asset, FRUITS, fruitAsset } from './fruits';
+import { t, localizedProperty } from '../i18n';
+import { asset, FRUIT_NAMES, fruitAsset } from './fruits';
 import { PRICE_MULTIPLIER } from './economy';
 
 export type Category = 'skins'|'backgrounds'|'boxes';
@@ -44,13 +45,14 @@ for(const [category,name,description,price] of [
   ['boxes','Орбитальный бокс','Звёздные самоцветы и золотые орбиты',2100],
 ] as [Category,string,string,number][]){CATALOG[category].push({id:'cosmos',key:`${category}:cosmos`,category,name,description,price,videos:0,exclusive:true,bundle:'cosmic'});}
 export const ALL_ITEMS=Object.values(CATALOG).flat();
+ALL_ITEMS.forEach(item=>{localizedProperty(item,'name');localizedProperty(item,'description');});
 export const STARTERS:Record<Category,string>={skins:'fruit',backgrounds:'meadow',boxes:'glass'};
 export const itemByKey=(key:string)=>ALL_ITEMS.find(item=>item.key===key);
 export const backgroundAsset=(id:string)=>asset(id==='meadow'?'countryside.webp':`backgrounds/${id}.webp`);
 export const wideBackgroundAsset=(id:string)=>asset(`backgrounds/${id}-wide.webp`);
 export const boxAsset=(id:string)=>asset(id==='glass'?'glass.webp':`boxes/${id}.webp`);
-export const SKIN_NAMES:Record<string,string[]>={
-  fruit:FRUITS.map(f=>f.name),
+const skinNames:Record<string,string[]>={
+  fruit:FRUIT_NAMES,
   fuzzies:['Пушик','Мятушка','Солнышко','Лилу','Облачко','Лисёнок','Зайчик','Совушка','Мишутка','Радужик','Лёвушка'],
   sushi:['Каппа','Лосось','Тунец','Авокадо','Тамаго','Нигири','Креветка','Онигири','Овощной','Икура','Делюкс'],
   vegetables:['Томат','Морковка','Огурчик','Свёкла','Перчик','Брокколи','Баклажан','Лучок','Кукуруза','Тыква','Капуста'],
@@ -63,4 +65,5 @@ export const SKIN_NAMES:Record<string,string[]>={
   pillows:['Мятный сон','Дрёма','Солнечная','Лунная','Лоскутная','Бархатная','Сердечная','Бантик','Снежная','Радужная','Звёздная'],
   cosmos:['Кометка','Туманность','Звёздочка','Лунная конфета','Галактика','Планетка','Метеорчик','Звёздная пыль','Жемчужинка','Аврора','Король галактики'],
 };
+export const SKIN_NAMES=new Proxy(skinNames,{get:(target,key:string)=>target[key]?.map(name=>t(name))});
 export const itemPreview=(item:ShopItem)=>item.category==='skins'?fruitAsset(5,item.id):item.category==='boxes'?boxAsset(item.id):backgroundAsset(item.id);

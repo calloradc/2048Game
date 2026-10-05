@@ -78,7 +78,7 @@ export class ElasticScroll {
     const overscroll=this.vertical?32:this.size*.6;
     const outward=this.position<=0&&delta<0||this.position>=this.max&&delta>0;
     this.position=clamp(this.position+delta*(outward?.35:1),-overscroll,this.max+overscroll);
-    this.velocity=this.velocity*.35+clamp(delta/dt,this.vertical?-2800:-1800,this.vertical?2800:1800)*.65;
+    this.velocity=this.velocity*.25+clamp(delta/dt,this.vertical?-4200:-1800,this.vertical?4200:1800)*.75;
     drag.x=event.clientX;drag.y=event.clientY;drag.time=event.timeStamp;this.animate();
   };
   private release(event:PointerEvent,cancelled:boolean){
@@ -101,8 +101,9 @@ export class ElasticScroll {
   private wheel=(event:WheelEvent)=>{
     if(event.defaultPrevented)return;
     if(this.vertical&&Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
+    if(event.ctrlKey)return; // Browser zoom gestures belong to the viewport.
     event.preventDefault();this.options.onInterrupt?.();
-    const delta=(this.vertical?event.deltaY:event.deltaX||event.deltaY)*(event.deltaMode===1?18:event.deltaMode===2?this.size:1);
+    const delta=(this.vertical?event.deltaY:event.deltaX||event.deltaY)*(event.deltaMode===1?18:event.deltaMode===2?this.size:1)*(this.vertical?1.35:1);
     const destination=(this.target??this.position)+delta;
     if(this.reduced){this.scrollTo(destination,true);return;}
     if(destination<0||destination>this.max){this.stop();this.velocity=0;this.position=clamp(destination,-32,this.max+32);this.paint();}
@@ -119,7 +120,7 @@ export class ElasticScroll {
   private tick=(now:number)=>{
     this.frame=0;
     if(this.drag){this.paint();return;}
-    const dt=this.lastFrame?Math.min((now-this.lastFrame)/1000,1/30):1/60;this.lastFrame=now;
+    const dt=this.lastFrame?Math.min((now-this.lastFrame)/1000,.08):1/60;this.lastFrame=now;
     const edge=clamp(this.position,0,this.max);
     if(this.target===null&&this.position!==edge)this.target=edge;
     const goal=this.target??edge;
@@ -130,7 +131,7 @@ export class ElasticScroll {
       this.position=goal+(displacement+impulse*dt)*decay;
       this.velocity=(this.velocity-omega*impulse*dt)*decay;
     } else {
-      const friction=this.vertical?7:5,decay=Math.exp(-friction*dt);
+      const friction=this.vertical?3.4:5,decay=Math.exp(-friction*dt);
       this.position+=this.velocity*(1-decay)/friction;this.velocity*=decay;
     }
     if(Math.abs(this.velocity)<2&&Math.abs(this.position-goal)<.5){this.position=goal;this.velocity=0;this.lastFrame=0;this.target=null;this.paint();this.options.onSettled?.();return;}

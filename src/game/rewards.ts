@@ -1,3 +1,4 @@
+import { t, localeTag } from '../i18n';
 import { itemByKey } from './catalog';
 import type { Profile } from './profile';
 
@@ -43,8 +44,7 @@ export function claimDaily(profile:Profile,date:string) {
 }
 export function prizeName(prize:DailyPrize) {
   if(prize.type==='item')return itemByKey(prize.key)!.name;
-  if(prize.type==='coins')return `+${prize.amount} монет`;
-  const last=prize.amount%10,teen=prize.amount%100>=11&&prize.amount%100<=14;
-  const word=teen?'встрясок':last===1?'встряска':last>=2&&last<=4?'встряски':'встрясок';
-  return `+${prize.amount} ${word}`;
+  if(prize.type==='coins')return t('+{n} монет',{n:prize.amount});
+  const form=new Intl.PluralRules(localeTag()).select(prize.amount);
+  return t(form==='one'?'+{n} встряска':form==='few'?'+{n} встряски':'+{n} встрясок',{n:prize.amount});
 }

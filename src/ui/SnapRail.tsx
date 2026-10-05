@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { Children, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Icon } from './Icon';
 
@@ -122,15 +123,15 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
   useLayoutEffect(()=>{if(current!==active.current)go.current(current);},[current]);
 
   return <div className="snap-rail" data-reveal>
-    <div className="snap-viewport" ref={viewport} tabIndex={0} role="region" aria-roledescription="карусель" aria-label="Карточки. Листай влево или вправо." onKeyDown={event=>{
+    <div className="snap-viewport" ref={viewport} tabIndex={0} role="region" aria-roledescription={t("карусель")} aria-label={t("Карточки. Листай влево или вправо.")} onKeyDown={event=>{
       if(['ArrowRight','ArrowLeft','Home','End'].includes(event.key)){
         event.preventDefault();go.current(event.key==='Home'?0:event.key==='End'?count-1:active.current+(event.key==='ArrowRight'?1:-1));
       }
       if(event.key==='Enter'||event.key===' '){event.preventDefault();activate.current?.(active.current);}
     }}>
-      <div className="snap-track" ref={track}>{Children.toArray(children).map((item,index)=><div className="rail-card" data-rail-index={index} key={index} style={{'--rail-index':index} as CSSProperties} role="group" aria-roledescription="карточка" aria-label={`${index+1} из ${count}`} aria-current={current===index?'true':undefined}><div className="rail-card-visual"><div className="rail-card-wave">{item}</div></div></div>)}</div>
+      <div className="snap-track" ref={track}>{Children.toArray(children).map((item,index)=><div className="rail-card" data-rail-index={index} key={index} style={{'--rail-index':index} as CSSProperties} role="group" aria-roledescription={t("карточка")} aria-label={t("{n} из {total}",{n:index+1,total:count})} aria-current={current===index?'true':undefined}><div className="rail-card-visual"><div className="rail-card-wave">{item}</div></div></div>)}</div>
     </div>
-    <button className="shop-arrow prev" aria-label="Предыдущий товар" disabled={current<=0} onClick={()=>go.current(active.current-1)}><Icon name="right" size={23}/></button>
-    <button className="shop-arrow next" aria-label="Следующий товар" disabled={current>=count-1} onClick={()=>go.current(active.current+1)}><Icon name="right" size={23}/></button>
+    <button className="shop-arrow prev" aria-label={t("Предыдущий товар")} disabled={current<=0} onClick={()=>go.current(active.current-1)}><Icon name="right" size={23}/></button>
+    <button className="shop-arrow next" aria-label={t("Следующий товар")} disabled={current>=count-1} onClick={()=>go.current(active.current+1)}><Icon name="right" size={23}/></button>
   </div>;
 }

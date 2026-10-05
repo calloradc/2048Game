@@ -7,11 +7,15 @@ import { checkRewardsAndOffers } from './rewards-smoke.mjs';
 import { checkShopBehavior } from './shop-behavior-smoke.mjs';
 import { checkUiMotion } from './ui-motion-smoke.mjs';
 import { checkRefresh } from './refresh-smoke.mjs';
+import { checkLocalization } from './localization-smoke.mjs';
+import { checkDesktop } from './desktop-smoke.mjs';
 
 const browser = await chromium.launch({
   ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
   headless: true, args: ['--no-sandbox'],
 });
+const createPage=browser.newPage.bind(browser);
+browser.newPage=options=>createPage({locale:'ru-RU',...options});
 const base = process.env.GAME_URL || 'http://localhost:5173/';
 const errors = [];
 await mkdir('test-results', { recursive: true });
@@ -203,6 +207,8 @@ try {
   await checkShopBehavior(browser,base,errors);
   await checkGameover(browser,base,errors);
   await checkRefresh(browser,base,errors);
+  await checkLocalization(browser,base,errors);
+  await checkDesktop(browser,base,errors);
   assert.deepEqual(errors, [], 'No browser errors or missing assets');
   console.log('✓ preview tilt, elastic edges, inertia, fading masks, animated dialogs, touch drop, merges and saved progress');
 } finally { await browser.close(); }

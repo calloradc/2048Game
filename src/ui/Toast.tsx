@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useLayoutEffect, useRef, type PointerEvent } from 'react';
 import { Icon } from './Icon';
 import { usePresence } from './usePresence';
@@ -21,7 +22,7 @@ export function Toast({text,onDismiss}:{text:string|null;onDismiss:()=>void}) {
     drag.current=null;onDismiss();
   };
   const down=(event:PointerEvent<HTMLDivElement>)=>{
-    if(leaving||(event.target as HTMLElement).closest('button')||(event.pointerType==='mouse'&&event.button!==0))return;
+    if(leaving||(event.target as HTMLElement).closest("button")||(event.pointerType==='mouse'&&event.button!==0))return;
     drag.current={id:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now(),dx:0,dy:0};
     event.currentTarget.setPointerCapture(event.pointerId);event.currentTarget.dataset.dragging='true';
   };
@@ -38,5 +39,5 @@ export function Toast({text,onDismiss}:{text:string|null;onDismiss:()=>void}) {
     if(event.type!=='pointercancel'&&(gesture.dx>65||gesture.dy< -40||gesture.dx>20&&gesture.dx/duration>.45||gesture.dy< -15&&-gesture.dy/duration>.45))dismiss(gesture.dx>0?'right':'up');
     else {drag.current=null;event.currentTarget.dataset.dragging='false';event.currentTarget.style.removeProperty('transform');event.currentTarget.style.removeProperty('opacity');}
   };
-  return rendered===null?null:<div className="toast-position"><div ref={node} className={`toast ${leaving?'is-leaving':''}`} role="status" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}><Icon name="check" size={19}/><span>{rendered}</span><button className="toast-close" aria-label="Закрыть уведомление" onClick={()=>dismiss()}><Icon name="close" size={18}/></button></div></div>;
+  return rendered===null?null:<div className="toast-position"><div ref={node} className={`toast ${leaving?'is-leaving':''}`} role="status" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}><Icon name="check" size={19}/><span>{rendered}</span><button className="toast-close" aria-label={t("Закрыть уведомление")} onClick={()=>dismiss()}><Icon name="close" size={18}/></button></div></div>;
 }

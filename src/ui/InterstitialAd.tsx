@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEffect, useRef, useState } from 'react';
 import { asset } from '../game/fruits';
 
@@ -17,7 +18,7 @@ export function InterstitialAd({onComplete}:{onComplete:()=>void}) {
     return()=>clearInterval(timer);
   },[]);
   const warning=elapsed<2000;
-  return <div className="interstitial-overlay" ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label={warning?'Предупреждение о рекламе':'Межстраничная реклама'} onKeyDown={e=>{e.stopPropagation();if(e.key==='Tab')e.preventDefault();}}>
-    {warning?<div className="interstitial-warning"><span className="eyebrow">КОРОТКАЯ ПАУЗА</span><h1>Сейчас будет реклама</h1><div className="interstitial-seconds" aria-live="polite">{Math.max(1,Math.ceil((2000-elapsed)/1000))}</div><p>После неё вернёмся к результатам игры</p></div>:<div className="interstitial-creative"><img src={asset('cover-wide.webp')} alt="Фруктовая семья Jelly Fruit"/><div><span className="eyebrow">ДЕМОНСТРАЦИОННАЯ РЕКЛАМА</span><h1>Ещё немного сочного настроения</h1><p>Вернёмся к урожаю через {Math.max(1,Math.ceil((5000-elapsed)/1000))} сек.</p></div></div>}
+  return <div className="interstitial-overlay" ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-label={warning?t("Предупреждение о рекламе"):t("Межстраничная реклама")} onKeyDown={e=>{e.stopPropagation();if(e.key==='Tab')e.preventDefault();}}>
+    {warning?<div className="interstitial-warning"><span className="eyebrow">{t("КОРОТКАЯ ПАУЗА")}</span><h1>{t("Сейчас будет реклама")}</h1><div className="interstitial-seconds" aria-live="polite">{Math.max(1,Math.ceil((2000-elapsed)/1000))}</div><p>{t("После неё вернёмся к результатам игры")}</p></div>:<div className="interstitial-creative"><img src={asset("cover-wide.webp")} alt={t("Фруктовая семья Jelly Fruit")}/><div><span className="eyebrow">{t("ДЕМОНСТРАЦИОННАЯ РЕКЛАМА")}</span><h1>{t("Ещё немного сочного настроения")}</h1><p>{t("Вернёмся к урожаю через {n} сек.",{n:Math.max(1,Math.ceil((5000-elapsed)/1000))})}</p></div></div>}
   </div>;
 }

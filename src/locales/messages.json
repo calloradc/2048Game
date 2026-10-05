@@ -1,0 +1,2360 @@
+{
+  "Игра окончена": [
+    "Game over",
+    "Oyun bitti",
+    "Partita finita",
+    "Fim de jogo"
+  ],
+  "Победа": [
+    "Victory",
+    "Zafer",
+    "Vittoria",
+    "Vitória"
+  ],
+  "Как играть": [
+    "How to play",
+    "Nasıl oynanır",
+    "Come giocare",
+    "Como jogar"
+  ],
+  "Монеты": [
+    "Coins",
+    "Paralar",
+    "Monete",
+    "Moedas"
+  ],
+  "Новая игра": [
+    "New game",
+    "Yeni oyun",
+    "Nuova partita",
+    "Novo jogo"
+  ],
+  "Настройки": [
+    "Settings",
+    "Ayarlar",
+    "Impostazioni",
+    "Configurações"
+  ],
+  "Магазин": [
+    "Shop",
+    "Mağaza",
+    "Negozio",
+    "Loja"
+  ],
+  "Подарки": [
+    "Gifts",
+    "Hediyeler",
+    "Regali",
+    "Presentes"
+  ],
+  "Закрыть": [
+    "Close",
+    "Kapat",
+    "Chiudi",
+    "Fechar"
+  ],
+  "УСТРОИМ ВСЁ ПО-ТВОЕМУ": [
+    "MAKE IT YOURS",
+    "TAM SANA GÖRE",
+    "COME PIACE A TE",
+    "DO SEU JEITO"
+  ],
+  "Звук": [
+    "Sound",
+    "Ses",
+    "Audio",
+    "Som"
+  ],
+  "На весь экран": [
+    "Fullscreen",
+    "Tam ekran",
+    "Schermo intero",
+    "Tela cheia"
+  ],
+  "Начать заново": [
+    "Start over",
+    "Yeniden başla",
+    "Ricomincia",
+    "Recomeçar"
+  ],
+  "Вернуться в игру": [
+    "Back to game",
+    "Oyuna dön",
+    "Torna al gioco",
+    "Voltar ao jogo"
+  ],
+  "2048! ВСЯ СЕМЬЯ В СБОРЕ!": [
+    "2048! THE WHOLE FAMILY!",
+    "2048! BÜTÜN AİLE BURADA!",
+    "2048! TUTTA LA FAMIGLIA!",
+    "2048! A FAMÍLIA COMPLETA!"
+  ],
+  "КОНТЕЙНЕР ПОЛОН": [
+    "THE BOX IS FULL",
+    "KUTU DOLDU",
+    "IL BOX È PIENO",
+    "A CAIXA ESTÁ CHEIA"
+  ],
+  "Сочный финал!": [
+    "A juicy finale!",
+    "Lezzetli bir final!",
+    "Un finale succoso!",
+    "Um final suculento!"
+  ],
+  "Хороший урожай!": [
+    "A lovely harvest!",
+    "Güzel bir hasat!",
+    "Un bel raccolto!",
+    "Uma bela colheita!"
+  ],
+  "очков за эту игру": [
+    "points this round",
+    "bu turdaki puan",
+    "punti in questa partita",
+    "pontos nesta partida"
+  ],
+  "Спасти урожай": [
+    "Save the harvest",
+    "Hasadı kurtar",
+    "Salva il raccolto",
+    "Salvar a colheita"
+  ],
+  "Убрать верхние кубики · 1 раз за игру": [
+    "Remove the top cubes · once per round",
+    "Üstteki küpleri kaldır · tur başına bir kez",
+    "Rimuovi i cubi in cima · una volta a partita",
+    "Remova os cubos do topo · uma vez por partida"
+  ],
+  "Монеты за игру ×2": [
+    "Round coins ×2",
+    "Tur parası ×2",
+    "Monete della partita ×2",
+    "Moedas da partida ×2"
+  ],
+  "Продолжить играть": [
+    "Keep playing",
+    "Oynamaya devam et",
+    "Continua a giocare",
+    "Continuar jogando"
+  ],
+  "Ещё разок": [
+    "Play again",
+    "Tekrar oyna",
+    "Gioca ancora",
+    "Jogar de novo"
+  ],
+  "ТВОЯ КОПИЛКА": [
+    "YOUR COIN BANK",
+    "KUMBARAN",
+    "IL TUO SALVADANAIO",
+    "SEU COFRINHO"
+  ],
+  "Получай монеты за слияния и выбирай новые образы в магазине.": [
+    "Earn coins by merging and choose new looks in the shop.",
+    "Birleştirerek para kazan ve mağazadan yeni görünümler seç.",
+    "Guadagna monete con le fusioni e scegli nuovi stili nel negozio.",
+    "Ganhe moedas fazendo fusões e escolha novos visuais na loja."
+  ],
+  "Три встряски на игру бесплатно. Потом — по {n} монет. Покупки и монеты сохраняются.": [
+    "Three free shakes per round. After that, {n} coins each. Your purchases and coins are saved.",
+    "Her turda üç ücretsiz sarsma. Sonrakiler {n} para. Satın aldıkların ve paraların kaydedilir.",
+    "Tre scosse gratis a partita. Poi costano {n} monete ciascuna. Acquisti e monete vengono salvati.",
+    "Três sacudidas grátis por partida. Depois, {n} moedas cada. Suas compras e moedas ficam salvas."
+  ],
+  "За короткое видео": [
+    "For a short video",
+    "Kısa bir video karşılığında",
+    "Per un breve video",
+    "Por um vídeo curto"
+  ],
+  "В магазин": [
+    "Go to shop",
+    "Mağazaya git",
+    "Vai al negozio",
+    "Ir à loja"
+  ],
+  "За сочным урожаем!": [
+    "Back to the harvest!",
+    "Hasada dön!",
+    "Torniamo al raccolto!",
+    "Voltar à colheita!"
+  ],
+  "ПРОЩЕ ПРОСТОГО": [
+    "EASY AS PIE",
+    "ÇOK KOLAY",
+    "FACILISSIMO",
+    "É MUITO FÁCIL"
+  ],
+  "Устрой переполох": [
+    "Let the fun begin",
+    "Eğlence başlasın",
+    "Scatena il divertimento",
+    "Comece a diversão"
+  ],
+  "Прицелься и отпусти": [
+    "Aim and release",
+    "Nişan al ve bırak",
+    "Mira e rilascia",
+    "Mire e solte"
+  ],
+  "Веди пальцем над контейнером.": [
+    "Move your finger above the box.",
+    "Parmağını kutunun üzerinde gezdir.",
+    "Muovi il dito sopra il box.",
+    "Mova o dedo sobre a caixa."
+  ],
+  "Соединяй одинаковые": [
+    "Merge matching cubes",
+    "Aynı küpleri birleştir",
+    "Unisci i cubi uguali",
+    "Junte cubos iguais"
+  ],
+  "Два одинаковых кубика — один побольше.": [
+    "Two matching cubes become one bigger cube.",
+    "İki aynı küp birleşip daha büyük bir küp olur.",
+    "Due cubi uguali diventano un cubo più grande.",
+    "Dois cubos iguais viram um cubo maior."
+  ],
+  "Собери всю семью": [
+    "Collect the whole family",
+    "Bütün aileyi topla",
+    "Riunisci tutta la famiglia",
+    "Reúna toda a família"
+  ],
+  "Переполнение выше линии ведёт к проигрышу.": [
+    "Overflow above the line ends the round.",
+    "Küpler çizginin üzerinde taşarsa tur biter.",
+    "Se i cubi superano la linea, la partita finisce.",
+    "Se os cubos transbordarem acima da linha, a partida termina."
+  ],
+  "Три встряски бесплатно. Если кубики остаются выше линии, красная полоска заполняется — освободи место!": [
+    "You get three free shakes. If cubes stay above the line, the red bar fills up. Make some room!",
+    "Üç ücretsiz sarsma hakkın var. Küpler çizginin üzerinde kalırsa kırmızı çubuk dolar. Yer aç!",
+    "Hai tre scosse gratis. Se i cubi restano sopra la linea, la barra rossa si riempie. Libera spazio!",
+    "Você tem três sacudidas grátis. Se os cubos ficarem acima da linha, a barra vermelha enche. Abra espaço!"
+  ],
+  "Понятно, играем!": [
+    "Got it, let's play!",
+    "Anladım, oynayalım!",
+    "Capito, giochiamo!",
+    "Entendi, vamos jogar!"
+  ],
+  "Новый урожай?": [
+    "A fresh harvest?",
+    "Yeni bir hasat mı?",
+    "Un nuovo raccolto?",
+    "Uma nova colheita?"
+  ],
+  "Начнём с пустого счёта и трёх встрясок. Рекорд, монеты и покупки сохранятся. Желешки будем открывать снова.": [
+    "Start with zero points and three shakes. Your best score, coins and purchases stay saved. Discover the jellies again.",
+    "Sıfır puan ve üç sarsmayla başla. Rekorun, paraların ve satın aldıkların korunur. Jelileri yeniden keşfet.",
+    "Riparti da zero con tre scosse. Record, monete e acquisti restano salvati. Riscopri tutte le gelatine.",
+    "Recomece com zero pontos e três sacudidas. Recorde, moedas e compras ficam salvos. Descubra as geleias de novo."
+  ],
+  "Продолжить эту игру": [
+    "Continue this round",
+    "Bu tura devam et",
+    "Continua questa partita",
+    "Continuar esta partida"
+  ],
+  "Баланс монет": [
+    "Coin balance",
+    "Para bakiyesi",
+    "Saldo monete",
+    "Saldo de moedas"
+  ],
+  "Включить звук": [
+    "Turn sound on",
+    "Sesi aç",
+    "Attiva l'audio",
+    "Ativar som"
+  ],
+  "Выключить звук": [
+    "Turn sound off",
+    "Sesi kapat",
+    "Disattiva l'audio",
+    "Desativar som"
+  ],
+  "Результат": [
+    "Score",
+    "Puan",
+    "Punteggio",
+    "Pontuação"
+  ],
+  "ТВОЙ СЧЁТ": [
+    "YOUR SCORE",
+    "PUANIN",
+    "IL TUO PUNTEGGIO",
+    "SUA PONTUAÇÃO"
+  ],
+  "РЕКОРД": [
+    "BEST",
+    "REKOR",
+    "RECORD",
+    "RECORDE"
+  ],
+  "МАГАЗИН": [
+    "SHOP",
+    "MAĞAZA",
+    "NEGOZIO",
+    "LOJA"
+  ],
+  "ДАЛЬШЕ": [
+    "NEXT",
+    "SIRADAKİ",
+    "PROSSIMO",
+    "PRÓXIMO"
+  ],
+  "Следующий кубик": [
+    "Next cube",
+    "Sıradaki küp",
+    "Prossimo cubo",
+    "Próximo cubo"
+  ],
+  "Игровой контейнер. Веди пальцем и отпусти, чтобы бросить фрукт.": [
+    "Game box. Move your finger and release to drop a fruit.",
+    "Oyun kutusu. Meyveyi düşürmek için parmağını hareket ettir ve bırak.",
+    "Box di gioco. Muovi il dito e rilascia per far cadere un frutto.",
+    "Caixa de jogo. Mova o dedo e solte para deixar uma fruta cair."
+  ],
+  "Контейнер почти полон!": [
+    "The box is almost full!",
+    "Kutu neredeyse dolu!",
+    "Il box è quasi pieno!",
+    "A caixa está quase cheia!"
+  ],
+  "Освободи место": [
+    "Make some room",
+    "Yer aç",
+    "Libera spazio",
+    "Abra espaço"
+  ],
+  "Встряхнуть": [
+    "Shake",
+    "Sars",
+    "Scuoti",
+    "Sacudir"
+  ],
+  "монет": [
+    "coins",
+    "para",
+    "monete",
+    "moedas"
+  ],
+  "Загрузка игры": [
+    "Loading game",
+    "Oyun yükleniyor",
+    "Caricamento del gioco",
+    "Carregando jogo"
+  ],
+  "Фрукты задержались": [
+    "The fruit is running late",
+    "Meyveler gecikti",
+    "La frutta è in ritardo",
+    "As frutas atrasaram"
+  ],
+  "Скоро будет сочно!": [
+    "Juicy fun is on its way!",
+    "Lezzetli eğlence yolda!",
+    "Sta arrivando il divertimento!",
+    "A diversão está chegando!"
+  ],
+  "Не удалось загрузить ассеты. Попробуй ещё раз.": [
+    "Couldn't load the artwork. Try again.",
+    "Görseller yüklenemedi. Tekrar dene.",
+    "Impossibile caricare le immagini. Riprova.",
+    "Não foi possível carregar as imagens. Tente de novo."
+  ],
+  "Собираем маленькую фруктовую семью": [
+    "Gathering our little fruit family",
+    "Küçük meyve ailemizi topluyoruz",
+    "Riuniamo la nostra piccola famiglia di frutti",
+    "Reunindo nossa pequena família de frutas"
+  ],
+  "Попробовать ещё": [
+    "Try again",
+    "Tekrar dene",
+    "Riprova",
+    "Tentar de novo"
+  ],
+  "НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА": [
+    "A LITTLE JELLY MAGIC",
+    "BİRAZ JELİ SİHRİ",
+    "UN PIZZICO DI MAGIA GELATINOSA",
+    "UM POUCO DE MAGIA DE GELEIA"
+  ],
+  "Наведи мышку и нажми, чтобы бросить": [
+    "Move the mouse and click to drop",
+    "Bırakmak için fareyi hareket ettir ve tıkla",
+    "Muovi il mouse e clicca per far cadere",
+    "Mova o mouse e clique para soltar"
+  ],
+  "КОМБО!": [
+    "COMBO!",
+    "KOMBO!",
+    "COMBO!",
+    "COMBO!"
+  ],
+  "СОЧНО!": [
+    "JUICY!",
+    "LEZZETLİ!",
+    "SUCCOSO!",
+    "SUCULENTO!"
+  ],
+  "Язык": [
+    "Language",
+    "Dil",
+    "Lingua",
+    "Idioma"
+  ],
+  "Фруктовая семья": [
+    "Fruit family",
+    "Meyve ailesi",
+    "Famiglia di frutti",
+    "Família de frutas"
+  ],
+  "ВСЕ СОБРАНЫ": [
+    "ALL COLLECTED",
+    "HEPSİ TOPLANDI",
+    "TUTTI RACCOLTI",
+    "TODOS REUNIDOS"
+  ],
+  "ЦЕЛЬ": [
+    "GOAL",
+    "HEDEF",
+    "OBIETTIVO",
+    "META"
+  ],
+  "Предыдущие фрукты": [
+    "Previous fruit",
+    "Önceki meyveler",
+    "Frutti precedenti",
+    "Frutas anteriores"
+  ],
+  "Следующие фрукты": [
+    "Next fruit",
+    "Sonraki meyveler",
+    "Frutti successivi",
+    "Próximas frutas"
+  ],
+  "Лента фруктов. Листай пальцем или стрелками.": [
+    "Fruit collection. Swipe or use the arrows.",
+    "Meyve koleksiyonu. Kaydır veya okları kullan.",
+    "Collezione di frutti. Scorri o usa le frecce.",
+    "Coleção de frutas. Deslize ou use as setas."
+  ],
+  "Неоткрытый фрукт": [
+    "Undiscovered fruit",
+    "Keşfedilmemiş meyve",
+    "Frutto da scoprire",
+    "Fruta não descoberta"
+  ],
+  "Закрыть уведомление": [
+    "Dismiss notification",
+    "Bildirimi kapat",
+    "Chiudi notifica",
+    "Fechar notificação"
+  ],
+  "{item} теперь в коллекции!": [
+    "{item} is now in your collection!",
+    "{item} artık koleksiyonunda!",
+    "{item} è nella tua collezione!",
+    "{item} agora faz parte da sua coleção!"
+  ],
+  "{item} в коллекции! +{n} встряски": [
+    "{item} collected! +{n} shakes",
+    "{item} koleksiyonunda! +{n} sarsma",
+    "{item} nella collezione! +{n} scosse",
+    "{item} na coleção! +{n} sacudidas"
+  ],
+  "+{n} встрясок в запасе!": [
+    "+{n} shakes saved!",
+    "+{n} sarsma yedekte!",
+    "+{n} scosse di riserva!",
+    "+{n} sacudidas na reserva!"
+  ],
+  "Не удалось загрузить оформление. Попробуй ещё раз.": [
+    "Couldn't load this look. Try again.",
+    "Bu görünüm yüklenemedi. Tekrar dene.",
+    "Impossibile caricare questo stile. Riprova.",
+    "Não foi possível carregar este visual. Tente de novo."
+  ],
+  "+{n} монет в копилку!": [
+    "+{n} coins in your bank!",
+    "Kumbarana +{n} para!",
+    "+{n} monete nel salvadanaio!",
+    "+{n} moedas no cofrinho!"
+  ],
+  "Ещё одно видео до +{n} монет": [
+    "One more video for +{n} coins",
+    "+{n} para için bir video daha",
+    "Un altro video per +{n} monete",
+    "Mais um vídeo para +{n} moedas"
+  ],
+  "+1 встряска в запасе!": [
+    "+1 shake saved!",
+    "+1 sarsma yedekte!",
+    "+1 scossa di riserva!",
+    "+1 sacudida na reserva!"
+  ],
+  "Верхние кубики убраны. Продолжаем!": [
+    "The top cubes are gone. Keep playing!",
+    "Üstteki küpler kaldırıldı. Devam!",
+    "I cubi in cima sono spariti. Continuiamo!",
+    "Os cubos do topo foram removidos. Vamos continuar!"
+  ],
+  "Монеты за игру удвоены!": [
+    "Round coins doubled!",
+    "Tur parası ikiye katlandı!",
+    "Monete della partita raddoppiate!",
+    "Moedas da partida dobradas!"
+  ],
+  "{item} открыт!": [
+    "{item} unlocked!",
+    "{item} açıldı!",
+    "{item} sbloccato!",
+    "{item} desbloqueado!"
+  ],
+  "Ещё {n} видео до открытия": [
+    "{n} more videos to unlock",
+    "Açmak için {n} video daha",
+    "Ancora {n} video per sbloccare",
+    "Mais {n} vídeos para desbloquear"
+  ],
+  "Твой подарок: {item}!": [
+    "Your gift: {item}!",
+    "Hediyen: {item}!",
+    "Il tuo regalo: {item}!",
+    "Seu presente: {item}!"
+  ],
+  "Ещё +{n} монет": [
+    "Another +{n} coins",
+    "+{n} para daha",
+    "Altre +{n} monete",
+    "Mais +{n} moedas"
+  ],
+  "+{n} монет": [
+    "+{n} coins",
+    "+{n} para",
+    "+{n} monete",
+    "+{n} moedas"
+  ],
+  "{n} монет": [
+    "{n} coins",
+    "{n} para",
+    "{n} monete",
+    "{n} moedas"
+  ],
+  "+{n} встряска": [
+    "+{n} shake",
+    "+{n} sarsma",
+    "+{n} scossa",
+    "+{n} sacudida"
+  ],
+  "+{n} встряски": [
+    "+{n} shakes",
+    "+{n} sarsma",
+    "+{n} scosse",
+    "+{n} sacudidas"
+  ],
+  "+{n} встрясок": [
+    "+{n} shakes",
+    "+{n} sarsma",
+    "+{n} scosse",
+    "+{n} sacudidas"
+  ],
+  "Персонажи": [
+    "Characters",
+    "Karakterler",
+    "Personaggi",
+    "Personagens"
+  ],
+  "Твой мир": [
+    "Your world",
+    "Dünyan",
+    "Il tuo mondo",
+    "Seu mundo"
+  ],
+  "Боксы": [
+    "Boxes",
+    "Kutular",
+    "Box",
+    "Caixas"
+  ],
+  "Фоны": [
+    "Backgrounds",
+    "Arka planlar",
+    "Sfondi",
+    "Fundos"
+  ],
+  "Наборы": [
+    "Bundles",
+    "Paketler",
+    "Pacchetti",
+    "Pacotes"
+  ],
+  "КТО СЕГОДНЯ В ИГРЕ?": [
+    "WHO'S PLAYING TODAY?",
+    "BUGÜN KİMLER OYNUYOR?",
+    "CHI GIOCA OGGI?",
+    "QUEM VAI JOGAR HOJE?"
+  ],
+  "НОВОЕ МЕСТО ДЛЯ СЛИЯНИЙ": [
+    "A NEW PLACE TO MERGE",
+    "BİRLEŞTİRMEK İÇİN YENİ BİR YER",
+    "UN NUOVO POSTO PER LE FUSIONI",
+    "UM NOVO LUGAR PARA FUSÕES"
+  ],
+  "СОБЕРИ СВОЙ ИДЕАЛЬНЫЙ НАБОР": [
+    "BUILD YOUR PERFECT SET",
+    "MÜKEMMEL SETİNİ OLUŞTUR",
+    "CREA IL TUO SET PERFETTO",
+    "MONTE SEU CONJUNTO PERFEITO"
+  ],
+  "Посмотреть {item}": [
+    "View {item}",
+    "{item} görüntüle",
+    "Vedi {item}",
+    "Ver {item}"
+  ],
+  "НОВОЕ": [
+    "NEW",
+    "YENİ",
+    "NOVITÀ",
+    "NOVO"
+  ],
+  "ЭКСКЛЮЗИВ": [
+    "EXCLUSIVE",
+    "ÖZEL",
+    "ESCLUSIVO",
+    "EXCLUSIVO"
+  ],
+  "Выбор: {item}": [
+    "Choose: {item}",
+    "Seç: {item}",
+    "Scegli: {item}",
+    "Escolher: {item}"
+  ],
+  "Показать {item}": [
+    "Show {item}",
+    "{item} göster",
+    "Mostra {item}",
+    "Mostrar {item}"
+  ],
+  "Только в космическом наборе": [
+    "Only in the Cosmic Bundle",
+    "Yalnızca Kozmik Paket'te",
+    "Solo nel Pacchetto Cosmico",
+    "Só no Pacote Cósmico"
+  ],
+  "В ежедневных наградах": [
+    "In daily rewards",
+    "Günlük ödüllerde",
+    "Nelle ricompense giornaliere",
+    "Nas recompensas diárias"
+  ],
+  "Скин, фон и бокс вместе": [
+    "Characters, background and box together",
+    "Karakterler, arka plan ve kutu birlikte",
+    "Personaggi, sfondo e box insieme",
+    "Personagens, fundo e caixa juntos"
+  ],
+  "Забирай новые подарки каждый день": [
+    "Claim new gifts every day",
+    "Her gün yeni hediyeler al",
+    "Ritira nuovi regali ogni giorno",
+    "Resgate novos presentes todos os dias"
+  ],
+  "Нужно ещё {n}": [
+    "Need {n} more",
+    "{n} daha gerekli",
+    "Ne servono altre {n}",
+    "Faltam {n}"
+  ],
+  "Купить за {n}": [
+    "Buy for {n}",
+    "{n} karşılığında al",
+    "Compra per {n}",
+    "Comprar por {n}"
+  ],
+  "Открыть за видео": [
+    "Unlock with videos",
+    "Videolarla aç",
+    "Sblocca con i video",
+    "Desbloquear com vídeos"
+  ],
+  "{n} / {total} просмотрено": [
+    "{n} / {total} watched",
+    "{n} / {total} izlendi",
+    "{n} / {total} visti",
+    "{n} / {total} assistidos"
+  ],
+  "{n} образов в коллекции": [
+    "{n} looks collected",
+    "Koleksiyonda {n} görünüm",
+    "{n} stili nella collezione",
+    "{n} visuais na coleção"
+  ],
+  "+{n} монет за видео": [
+    "+{n} coins for a video",
+    "Bir video için +{n} para",
+    "+{n} monete per un video",
+    "+{n} moedas por um vídeo"
+  ],
+  "БОЛЬШЕ ПРИЯТНОСТЕЙ ЗА МЕНЬШЕ МОНЕТ": [
+    "MORE JOY FOR FEWER COINS",
+    "DAHA AZ PARAYA DAHA ÇOK KEYİF",
+    "PIÙ SORPRESE PER MENO MONETE",
+    "MAIS ALEGRIA POR MENOS MOEDAS"
+  ],
+  "Всё в одном наборе": [
+    "Everything in one bundle",
+    "Hepsi bir pakette",
+    "Tutto in un pacchetto",
+    "Tudo em um pacote"
+  ],
+  "ВЫГОДНО": [
+    "GREAT VALUE",
+    "AVANTAJLI",
+    "CONVIENE",
+    "VALE A PENA"
+  ],
+  "Содержимое: {item}": [
+    "Contents: {item}",
+    "İçerik: {item}",
+    "Contenuto: {item}",
+    "Conteúdo: {item}"
+  ],
+  "В коллекции": [
+    "Collected",
+    "Koleksiyonda",
+    "Nella collezione",
+    "Na coleção"
+  ],
+  "Выгода {n} монет": [
+    "Save {n} coins",
+    "{n} para tasarruf",
+    "Risparmia {n} monete",
+    "Economize {n} moedas"
+  ],
+  "Купить {item} за {n}": [
+    "Buy {item} for {n}",
+    "{item} için {n} öde",
+    "Compra {item} per {n}",
+    "Comprar {item} por {n}"
+  ],
+  "Собран": [
+    "Collected",
+    "Toplandı",
+    "Raccolto",
+    "Completo"
+  ],
+  "Купить": [
+    "Buy",
+    "Satın al",
+    "Compra",
+    "Comprar"
+  ],
+  "Монеты и встряски": [
+    "Coins and shakes",
+    "Para ve sarsmalar",
+    "Monete e scosse",
+    "Moedas e sacudidas"
+  ],
+  "ДЛЯ НОВЫХ РЕКОРДОВ": [
+    "FOR NEW RECORDS",
+    "YENİ REKORLAR İÇİN",
+    "PER NUOVI RECORD",
+    "PARA NOVOS RECORDES"
+  ],
+  "В запасе: {n}": [
+    "In reserve: {n}",
+    "Yedekte: {n}",
+    "Di riserva: {n}",
+    "Na reserva: {n}"
+  ],
+  "{n} / 2 видео": [
+    "{n} / 2 videos",
+    "{n} / 2 video",
+    "{n} / 2 video",
+    "{n} / 2 vídeos"
+  ],
+  "Смотреть": [
+    "Watch",
+    "İzle",
+    "Guarda",
+    "Assistir"
+  ],
+  "+1 встряска": [
+    "+1 shake",
+    "+1 sarsma",
+    "+1 scossa",
+    "+1 sacudida"
+  ],
+  "Добавить встряску за видео": [
+    "Get a shake for a video",
+    "Video izleyerek sarsma al",
+    "Ottieni una scossa con un video",
+    "Ganhar uma sacudida por um vídeo"
+  ],
+  "На 20% выгоднее": [
+    "20% better value",
+    "%20 daha avantajlı",
+    "Risparmi il 20%",
+    "20% mais econômico"
+  ],
+  "Всегда под рукой": [
+    "Always handy",
+    "Her zaman elinin altında",
+    "Sempre a portata di mano",
+    "Sempre à mão"
+  ],
+  "Купить {n} встрясок за {price}": [
+    "Buy {n} shakes for {price}",
+    "{price} karşılığında {n} sarsma al",
+    "Compra {n} scosse per {price}",
+    "Comprar {n} sacudidas por {price}"
+  ],
+  "Играть": [
+    "Play",
+    "Oyna",
+    "Gioca",
+    "Jogar"
+  ],
+  "Разделы магазина": [
+    "Shop sections",
+    "Mağaza bölümleri",
+    "Sezioni del negozio",
+    "Seções da loja"
+  ],
+  "Предложения магазина": [
+    "Shop offers",
+    "Mağaza teklifleri",
+    "Offerte del negozio",
+    "Ofertas da loja"
+  ],
+  "карусель": [
+    "carousel",
+    "karusel",
+    "carosello",
+    "carrossel"
+  ],
+  "карточка": [
+    "card",
+    "kart",
+    "scheda",
+    "cartão"
+  ],
+  "Смотреть {item}": [
+    "View {item}",
+    "{item} görüntüle",
+    "Vedi {item}",
+    "Ver {item}"
+  ],
+  "СОБРАН": [
+    "COLLECTED",
+    "TOPLANDI",
+    "RACCOLTO",
+    "COMPLETO"
+  ],
+  "ПРЕДЛОЖЕНИЕ {n} / {total}": [
+    "OFFER {n} / {total}",
+    "TEKLİF {n} / {total}",
+    "OFFERTA {n} / {total}",
+    "OFERTA {n} / {total}"
+  ],
+  "3 образа + {n} встряски": [
+    "3 looks + {n} shakes",
+    "3 görünüm + {n} sarsma",
+    "3 stili + {n} scosse",
+    "3 visuais + {n} sacudidas"
+  ],
+  "Предложение {n}": [
+    "Offer {n}",
+    "Teklif {n}",
+    "Offerta {n}",
+    "Oferta {n}"
+  ],
+  "Карточки. Листай влево или вправо.": [
+    "Cards. Swipe left or right.",
+    "Kartlar. Sola veya sağa kaydır.",
+    "Schede. Scorri a sinistra o a destra.",
+    "Cartões. Deslize para a esquerda ou direita."
+  ],
+  "{n} из {total}": [
+    "{n} of {total}",
+    "{n} / {total}",
+    "{n} di {total}",
+    "{n} de {total}"
+  ],
+  "Предыдущий товар": [
+    "Previous item",
+    "Önceki ürün",
+    "Articolo precedente",
+    "Item anterior"
+  ],
+  "Следующий товар": [
+    "Next item",
+    "Sonraki ürün",
+    "Articolo successivo",
+    "Próximo item"
+  ],
+  "СОДЕРЖИМОЕ": [
+    "CONTENTS",
+    "İÇERİK",
+    "CONTENUTO",
+    "CONTEÚDO"
+  ],
+  "Закрыть содержимое": [
+    "Close contents",
+    "İçeriği kapat",
+    "Chiudi contenuto",
+    "Fechar conteúdo"
+  ],
+  "Посмотреть в магазине": [
+    "View in shop",
+    "Mağazada görüntüle",
+    "Vedi nel negozio",
+    "Ver na loja"
+  ],
+  "Понятно": [
+    "Got it",
+    "Anladım",
+    "Capito",
+    "Entendi"
+  ],
+  "КАЖДЫЙ ДЕНЬ ЧТО-ТО ПРИЯТНОЕ": [
+    "A LITTLE JOY EVERY DAY",
+    "HER GÜN KÜÇÜK BİR MUTLULUK",
+    "UNA SORPRESA OGNI GIORNO",
+    "UMA ALEGRIA TODOS OS DIAS"
+  ],
+  "Ежедневные награды": [
+    "Daily rewards",
+    "Günlük ödüller",
+    "Ricompense giornaliere",
+    "Recompensas diárias"
+  ],
+  "21 ДЕНЬ МАЛЕНЬКИХ ЧУДЕС": [
+    "21 DAYS OF LITTLE WONDERS",
+    "21 GÜNLÜK KÜÇÜK MUCİZELER",
+    "21 GIORNI DI PICCOLE MERAVIGLIE",
+    "21 DIAS DE PEQUENAS MARAVILHAS"
+  ],
+  "Три недели подарков": [
+    "Three weeks of gifts",
+    "Üç hafta boyunca hediyeler",
+    "Tre settimane di regali",
+    "Três semanas de presentes"
+  ],
+  "Лунная коллекция, облачный бокс и сонные подушки": [
+    "Lunar collection, Cloud Box and Sleepy Pillows",
+    "Ay koleksiyonu, Bulut Kutusu ve Uykucu Yastıklar",
+    "Collezione lunare, Box delle Nuvole e Cuscini Sonnolenti",
+    "Coleção lunar, Caixa das Nuvens e Almofadas Sonolentas"
+  ],
+  "{n} / {total} подарков": [
+    "{n} / {total} gifts",
+    "{n} / {total} hediye",
+    "{n} / {total} regali",
+    "{n} / {total} presentes"
+  ],
+  "Получено подарков": [
+    "Gifts claimed",
+    "Alınan hediyeler",
+    "Regali ritirati",
+    "Presentes resgatados"
+  ],
+  "Звёздная подушка": [
+    "Star pillow",
+    "Yıldız yastık",
+    "Cuscino stellare",
+    "Almofada estelar"
+  ],
+  "Подарки на 21 день": [
+    "Gifts for 21 days",
+    "21 günlük hediyeler",
+    "Regali per 21 giorni",
+    "Presentes para 21 dias"
+  ],
+  "День {n}: {item}, {status}": [
+    "Day {n}: {item}, {status}",
+    "{n}. gün: {item}, {status}",
+    "Giorno {n}: {item}, {status}",
+    "Dia {n}: {item}, {status}"
+  ],
+  "получено": [
+    "claimed",
+    "alındı",
+    "ritirato",
+    "resgatado"
+  ],
+  "доступно сегодня": [
+    "available today",
+    "bugün alınabilir",
+    "disponibile oggi",
+    "disponível hoje"
+  ],
+  "скоро": [
+    "coming soon",
+    "yakında",
+    "in arrivo",
+    "em breve"
+  ],
+  "ДЕНЬ {n}": [
+    "DAY {n}",
+    "{n}. GÜN",
+    "GIORNO {n}",
+    "DIA {n}"
+  ],
+  "СЕГОДНЯ": [
+    "TODAY",
+    "BUGÜN",
+    "OGGI",
+    "HOJE"
+  ],
+  "В копилку": [
+    "To your coin bank",
+    "Kumbarana",
+    "Nel salvadanaio",
+    "Para o cofrinho"
+  ],
+  "В запас": [
+    "To your reserve",
+    "Yedeğe",
+    "Di riserva",
+    "Para a reserva"
+  ],
+  "Эксклюзив": [
+    "Exclusive",
+    "Özel",
+    "Esclusivo",
+    "Exclusivo"
+  ],
+  "11 сияющих героев": [
+    "11 sparkling heroes",
+    "11 ışıltılı kahraman",
+    "11 eroi scintillanti",
+    "11 heróis brilhantes"
+  ],
+  "Забрать ежедневный подарок": [
+    "Claim daily gift",
+    "Günlük hediyeyi al",
+    "Ritira il regalo giornaliero",
+    "Resgatar presente diário"
+  ],
+  "Забрать": [
+    "Claim",
+    "Al",
+    "Ritira",
+    "Resgatar"
+  ],
+  "Надеть {item}": [
+    "Equip {item}",
+    "{item} kullan",
+    "Usa {item}",
+    "Usar {item}"
+  ],
+  "В игре": [
+    "In play",
+    "Oyunda",
+    "In gioco",
+    "Em uso"
+  ],
+  "Надеть": [
+    "Equip",
+    "Kullan",
+    "Usa",
+    "Usar"
+  ],
+  "Получено": [
+    "Claimed",
+    "Alındı",
+    "Ritirato",
+    "Resgatado"
+  ],
+  "Завтра": [
+    "Tomorrow",
+    "Yarın",
+    "Domani",
+    "Amanhã"
+  ],
+  "Скоро": [
+    "Soon",
+    "Yakında",
+    "Presto",
+    "Em breve"
+  ],
+  "Заходи за новым подарком каждый день. Пропуск дня не сбрасывает прогресс.": [
+    "Come back for a new gift every day. Missing a day doesn't reset your progress.",
+    "Her gün yeni bir hediye için gel. Bir günü kaçırmak ilerlemeni sıfırlamaz.",
+    "Torna ogni giorno per un nuovo regalo. Saltare un giorno non azzera i progressi.",
+    "Volte todos os dias para um novo presente. Perder um dia não reinicia seu progresso."
+  ],
+  "В игру": [
+    "Back to game",
+    "Oyuna dön",
+    "Torna al gioco",
+    "Voltar ao jogo"
+  ],
+  "Имитация рекламы": [
+    "Demo ad",
+    "Demo reklam",
+    "Pubblicità dimostrativa",
+    "Anúncio demonstrativo"
+  ],
+  "ИМИТАЦИЯ РЕКЛАМЫ": [
+    "DEMO AD",
+    "DEMO REKLAM",
+    "PUBBLICITÀ DIMOSTRATIVA",
+    "ANÚNCIO DEMONSTRATIVO"
+  ],
+  "Маленький бонус": [
+    "A little bonus",
+    "Küçük bir bonus",
+    "Un piccolo bonus",
+    "Um pequeno bônus"
+  ],
+  "Шаг к +{n} монетам": [
+    "A step toward +{n} coins",
+    "+{n} paraya bir adım",
+    "Un passo verso +{n} monete",
+    "Um passo para +{n} moedas"
+  ],
+  "Спасение урожая": [
+    "Harvest rescue",
+    "Hasadı kurtarma",
+    "Salvataggio del raccolto",
+    "Resgate da colheita"
+  ],
+  "Шаг к новому оформлению": [
+    "A step toward a new look",
+    "Yeni bir görünüme bir adım",
+    "Un passo verso un nuovo stile",
+    "Um passo para um novo visual"
+  ],
+  "Просмотр видео": [
+    "Watching video",
+    "Video izleniyor",
+    "Riproduzione del video",
+    "Assistindo ao vídeo"
+  ],
+  "Ещё {n} сек.": [
+    "{n} seconds left",
+    "{n} saniye kaldı",
+    "Ancora {n} secondi",
+    "Faltam {n} segundos"
+  ],
+  "Закрыть без награды": [
+    "Close without reward",
+    "Ödül almadan kapat",
+    "Chiudi senza ricompensa",
+    "Fechar sem recompensa"
+  ],
+  "Предупреждение о рекламе": [
+    "Ad notice",
+    "Reklam uyarısı",
+    "Avviso pubblicitario",
+    "Aviso de anúncio"
+  ],
+  "Межстраничная реклама": [
+    "Interstitial ad",
+    "Geçiş reklamı",
+    "Pubblicità interstitial",
+    "Anúncio intersticial"
+  ],
+  "КОРОТКАЯ ПАУЗА": [
+    "A SHORT BREAK",
+    "KISA BİR MOLA",
+    "UNA BREVE PAUSA",
+    "UMA PAUSA RÁPIDA"
+  ],
+  "Сейчас будет реклама": [
+    "An ad is coming up",
+    "Birazdan reklam var",
+    "Sta per iniziare una pubblicità",
+    "Um anúncio vai começar"
+  ],
+  "После неё вернёмся к результатам игры": [
+    "We'll return to your results afterward",
+    "Ardından oyun sonuçlarına döneceğiz",
+    "Poi torneremo ai risultati della partita",
+    "Depois voltaremos aos resultados da partida"
+  ],
+  "Фруктовая семья Jelly Fruit": [
+    "The Jelly Fruit family",
+    "Jelly Fruit ailesi",
+    "La famiglia di Jelly Fruit",
+    "A família Jelly Fruit"
+  ],
+  "ДЕМОНСТРАЦИОННАЯ РЕКЛАМА": [
+    "DEMO AD",
+    "DEMO REKLAM",
+    "PUBBLICITÀ DIMOSTRATIVA",
+    "ANÚNCIO DEMONSTRATIVO"
+  ],
+  "Ещё немного сочного настроения": [
+    "A little more juicy fun",
+    "Biraz daha lezzetli eğlence",
+    "Ancora un po' di divertimento succoso",
+    "Mais um pouco de diversão suculenta"
+  ],
+  "Вернёмся к урожаю через {n} сек.": [
+    "Back to the harvest in {n} seconds",
+    "{n} saniye sonra hasada dönüyoruz",
+    "Torniamo al raccolto tra {n} secondi",
+    "Voltamos à colheita em {n} segundos"
+  ],
+  "Jelly Fruit — фруктовый переполох": [
+    "Jelly Fruit — fruity fun",
+    "Jelly Fruit — meyve eğlencesi",
+    "Jelly Fruit — allegria alla frutta",
+    "Jelly Fruit — diversão com frutas"
+  ],
+  "Сливай упругие фруктовые кубики и собери арбуз 2048. Уютная игра для телефона.": [
+    "Merge bouncy fruit cubes and reach the 2048 watermelon. A cozy game for any screen.",
+    "Esnek meyve küplerini birleştir ve 2048 karpuzuna ulaş. Her ekranda keyifli bir oyun.",
+    "Unisci morbidi cubi di frutta e raggiungi l'anguria 2048. Un gioco rilassante per ogni schermo.",
+    "Junte cubos elásticos de frutas e alcance a melancia 2048. Um jogo aconchegante para qualquer tela."
+  ],
+  "11 сочных фруктовых кубиков": [
+    "11 juicy fruit cubes",
+    "11 lezzetli meyve küpü",
+    "11 succosi cubi di frutta",
+    "11 cubos suculentos de frutas"
+  ],
+  "Шушистики": [
+    "Fluffies",
+    "Pofuduklar",
+    "Batuffolini",
+    "Fofinhos"
+  ],
+  "11 пушистых малышей": [
+    "11 fluffy little friends",
+    "11 küçük pofuduk dost",
+    "11 piccoli amici soffici",
+    "11 amiguinhos fofinhos"
+  ],
+  "Суши-пати": [
+    "Sushi Party",
+    "Suşi Partisi",
+    "Sushi Party",
+    "Festa do Sushi"
+  ],
+  "Роллы, рис и немного кавая": [
+    "Rolls, rice and a little kawaii",
+    "Rulolar, pirinç ve biraz kawaii",
+    "Roll, riso e un pizzico di kawaii",
+    "Rolinhos, arroz e um pouco de kawaii"
+  ],
+  "Весёлый огород": [
+    "Happy Veggie Patch",
+    "Neşeli Bostan",
+    "Orto Allegro",
+    "Horta Alegre"
+  ],
+  "11 кубиков прямо с грядки": [
+    "11 cubes fresh from the garden",
+    "Bahçeden taptaze 11 küp",
+    "11 cubi appena raccolti nell'orto",
+    "11 cubos fresquinhos da horta"
+  ],
+  "Вкусный переполох": [
+    "Snack Attack",
+    "Lezzet Şenliği",
+    "Festa degli Spuntini",
+    "Festa dos Lanches"
+  ],
+  "Бургеры, вафли и лимонад": [
+    "Burgers, waffles and lemonade",
+    "Burgerler, waffle ve limonata",
+    "Hamburger, waffle e limonata",
+    "Hambúrgueres, waffles e limonada"
+  ],
+  "Кристаллики": [
+    "Crystal Cuties",
+    "Minik Kristaller",
+    "Cristallini",
+    "Cristalzinhos"
+  ],
+  "11 сияющих драгоценностей": [
+    "11 sparkling gems",
+    "11 ışıltılı mücevher",
+    "11 gemme scintillanti",
+    "11 joias brilhantes"
+  ],
+  "Конфетти": [
+    "Candy Confetti",
+    "Şeker Konfeti",
+    "Confetti di Dolci",
+    "Confete de Doces"
+  ],
+  "11 конфетных кубиков": [
+    "11 candy cubes",
+    "11 şeker küpü",
+    "11 cubi di caramelle",
+    "11 cubos de doces"
+  ],
+  "Тёплая пекарня": [
+    "Cozy Bakery",
+    "Sıcacık Fırın",
+    "Forno Accogliente",
+    "Padaria Aconchegante"
+  ],
+  "Булочки, пирожные и хрустящие вафли": [
+    "Buns, pastries and crispy waffles",
+    "Çörekler, pastalar ve çıtır waffle",
+    "Panini, pasticcini e waffle croccanti",
+    "Pãezinhos, bolinhos e waffles crocantes"
+  ],
+  "Прыг-скок": [
+    "Bounce Buddies",
+    "Zıp Zıp",
+    "Saltelli",
+    "Pula-Pula"
+  ],
+  "11 мягких спортивных мячиков": [
+    "11 soft sports balls",
+    "11 yumuşak spor topu",
+    "11 morbide palle sportive",
+    "11 bolas esportivas macias"
+  ],
+  "Тёплый луг": [
+    "Sunny Meadow",
+    "Sıcak Çayır",
+    "Prato Soleggiato",
+    "Prado Ensolarado"
+  ],
+  "Природа и деревянный стол": [
+    "Nature and a wooden table",
+    "Doğa ve ahşap bir masa",
+    "Natura e un tavolo di legno",
+    "Natureza e uma mesa de madeira"
+  ],
+  "Сакура на закате": [
+    "Sunset Sakura",
+    "Gün Batımında Sakura",
+    "Sakura al Tramonto",
+    "Sakura ao Pôr do Sol"
+  ],
+  "Тёплое небо и розовые лепестки": [
+    "Warm skies and pink petals",
+    "Sıcak gökyüzü ve pembe yapraklar",
+    "Cieli caldi e petali rosa",
+    "Céu acolhedor e pétalas rosas"
+  ],
+  "Лунный сад": [
+    "Moonlit Garden",
+    "Ay Işığı Bahçesi",
+    "Giardino al Chiaro di Luna",
+    "Jardim ao Luar"
+  ],
+  "Звёзды и тихая бирюзовая ночь": [
+    "Stars and a calm turquoise night",
+    "Yıldızlar ve sakin turkuaz bir gece",
+    "Stelle e una tranquilla notte turchese",
+    "Estrelas e uma noite tranquila em turquesa"
+  ],
+  "Сладкие холмы": [
+    "Candy Hills",
+    "Şeker Tepeleri",
+    "Colline di Dolci",
+    "Colinas de Doces"
+  ],
+  "Маленькая страна сладостей": [
+    "A tiny land of sweets",
+    "Küçük bir tatlılar ülkesi",
+    "Un piccolo paese di dolci",
+    "Um pequeno mundo de doces"
+  ],
+  "Снежные вершины": [
+    "Snowy Peaks",
+    "Karlı Zirveler",
+    "Cime Innevate",
+    "Picos Nevados"
+  ],
+  "Горное озеро и зимнее солнце": [
+    "A mountain lake and winter sun",
+    "Dağ gölü ve kış güneşi",
+    "Un lago di montagna e il sole d'inverno",
+    "Um lago nas montanhas e o sol de inverno"
+  ],
+  "Лазурная лагуна": [
+    "Azure Lagoon",
+    "Masmavi Lagün",
+    "Laguna Azzurra",
+    "Lagoa Azul"
+  ],
+  "Пальмы, острова и тихое море": [
+    "Palm trees, islands and a calm sea",
+    "Palmiyeler, adalar ve sakin deniz",
+    "Palme, isole e mare calmo",
+    "Palmeiras, ilhas e um mar tranquilo"
+  ],
+  "Чистое стекло": [
+    "Clear Glass",
+    "Berrak Cam",
+    "Vetro Trasparente",
+    "Vidro Transparente"
+  ],
+  "Классика со звонким блеском": [
+    "A sparkling classic",
+    "Işıltılı bir klasik",
+    "Un classico scintillante",
+    "Um clássico brilhante"
+  ],
+  "Розовый кварц": [
+    "Rose Quartz",
+    "Pembe Kuvars",
+    "Quarzo Rosa",
+    "Quartzo Rosa"
+  ],
+  "Фарфор и цветущие веточки сакуры": [
+    "Porcelain and blossoming sakura branches",
+    "Porselen ve çiçekli sakura dalları",
+    "Porcellana e rami di sakura in fiore",
+    "Porcelana e ramos floridos de sakura"
+  ],
+  "Медовый янтарь": [
+    "Honey Amber",
+    "Bal Kehribarı",
+    "Ambra di Miele",
+    "Âmbar de Mel"
+  ],
+  "Деревянные соты и капельки мёда": [
+    "Wooden honeycombs and drops of honey",
+    "Ahşap petekler ve bal damlaları",
+    "Favi di legno e gocce di miele",
+    "Favos de madeira e gotas de mel"
+  ],
+  "Ледяной блеск": [
+    "Ice Sparkle",
+    "Buz Işıltısı",
+    "Scintillio di Ghiaccio",
+    "Brilho de Gelo"
+  ],
+  "Грани ледника и морозные узоры": [
+    "Glacier facets and frosty patterns",
+    "Buzul yüzeyleri ve buz desenleri",
+    "Sfaccettature di ghiaccio e motivi di brina",
+    "Facetas de geleira e desenhos de geada"
+  ],
+  "Бамбуковый дзен": [
+    "Bamboo Zen",
+    "Bambu Zen",
+    "Zen di Bambù",
+    "Zen de Bambu"
+  ],
+  "Бамбук, зелёные листья и чистое стекло": [
+    "Bamboo, green leaves and clear glass",
+    "Bambu, yeşil yapraklar ve berrak cam",
+    "Bambù, foglie verdi e vetro trasparente",
+    "Bambu, folhas verdes e vidro transparente"
+  ],
+  "Неоновая аркада": [
+    "Neon Arcade",
+    "Neon Arcade",
+    "Sala Giochi Neon",
+    "Arcade Neon"
+  ],
+  "Яркие пиксели и игровой автомат": [
+    "Bright pixels and an arcade machine",
+    "Parlak pikseller ve oyun makinesi",
+    "Pixel vivaci e un cabinato arcade",
+    "Pixels vibrantes e uma máquina de arcade"
+  ],
+  "Лунные моти": [
+    "Moon Mochi",
+    "Ay Mochileri",
+    "Mochi Lunari",
+    "Mochis Lunares"
+  ],
+  "11 маленьких хранителей сладких снов": [
+    "11 little guardians of sweet dreams",
+    "Tatlı rüyaların 11 küçük koruyucusu",
+    "11 piccoli custodi dei sogni d'oro",
+    "11 pequenos guardiões de sonhos doces"
+  ],
+  "Сияющий сад": [
+    "Aurora Garden",
+    "Işıltılı Bahçe",
+    "Giardino dell'Aurora",
+    "Jardim da Aurora"
+  ],
+  "Северное сияние и лунные цветы": [
+    "Northern lights and moonlit flowers",
+    "Kuzey ışıkları ve ay çiçekleri",
+    "Aurora boreale e fiori al chiaro di luna",
+    "Aurora boreal e flores ao luar"
+  ],
+  "Лунное стекло": [
+    "Lunar Glass",
+    "Ay Camı",
+    "Vetro Lunare",
+    "Vidro Lunar"
+  ],
+  "Перламутровый бокс со звёздным блеском": [
+    "A pearly box with starlight sparkles",
+    "Yıldız ışıltılı sedef kutu",
+    "Un box madreperlato con scintille di stelle",
+    "Uma caixa perolada com brilho de estrelas"
+  ],
+  "Сонные подушки": [
+    "Sleepy Pillows",
+    "Uykucu Yastıklar",
+    "Cuscini Sonnolenti",
+    "Almofadas Sonolentas"
+  ],
+  "11 мягких хранителей уютных снов": [
+    "11 soft guardians of cozy dreams",
+    "Huzurlu rüyaların 11 yumuşak koruyucusu",
+    "11 morbidi custodi di sogni sereni",
+    "11 guardiões macios de sonhos aconchegantes"
+  ],
+  "Облачный сон": [
+    "Cloud Dream",
+    "Bulut Rüyası",
+    "Sogno tra le Nuvole",
+    "Sonho nas Nuvens"
+  ],
+  "Жемчужная оправа с маленькими облаками": [
+    "A pearly frame with little clouds",
+    "Minik bulutlarla sedef çerçeve",
+    "Una cornice perlata con piccole nuvole",
+    "Uma moldura perolada com pequenas nuvens"
+  ],
+  "Космические сладости": [
+    "Cosmic Sweets",
+    "Kozmik Tatlılar",
+    "Dolci Cosmici",
+    "Doces Cósmicos"
+  ],
+  "11 звёздных конфет только в наборе": [
+    "11 star candies exclusive to the bundle",
+    "Yalnızca pakette bulunan 11 yıldız şekeri",
+    "11 caramelle stellari esclusive del pacchetto",
+    "11 doces estelares exclusivos do pacote"
+  ],
+  "Звёздная кондитерская": [
+    "Starlight Bakery",
+    "Yıldız Pastanesi",
+    "Pasticceria Stellare",
+    "Confeitaria Estelar"
+  ],
+  "Сладкая галактика с парящими островами": [
+    "A sweet galaxy with floating islands",
+    "Yüzen adalarla tatlı bir galaksi",
+    "Una dolce galassia con isole fluttuanti",
+    "Uma galáxia doce com ilhas flutuantes"
+  ],
+  "Орбитальный бокс": [
+    "Orbital Box",
+    "Yörünge Kutusu",
+    "Box Orbitale",
+    "Caixa Orbital"
+  ],
+  "Звёздные самоцветы и золотые орбиты": [
+    "Star gems and golden orbits",
+    "Yıldız mücevherleri ve altın yörüngeler",
+    "Gemme stellari e orbite dorate",
+    "Joias estelares e órbitas douradas"
+  ],
+  "Уютный набор": [
+    "Cozy Bundle",
+    "Sıcacık Paket",
+    "Pacchetto Accogliente",
+    "Pacote Aconchegante"
+  ],
+  "Шушистики, сакура и розовый бокс": [
+    "Fluffies, sakura and a pink box",
+    "Pofuduklar, sakura ve pembe kutu",
+    "Batuffolini, sakura e box rosa",
+    "Fofinhos, sakura e caixa rosa"
+  ],
+  "Звёздный набор": [
+    "Starlight Bundle",
+    "Yıldız Paketi",
+    "Pacchetto Stellare",
+    "Pacote Estelar"
+  ],
+  "Кристаллики, лунный сад и ледяной бокс": [
+    "Crystal Cuties, Moonlit Garden and Ice Box",
+    "Minik Kristaller, Ay Işığı Bahçesi ve Buz Kutusu",
+    "Cristallini, Giardino al Chiaro di Luna e Box di Ghiaccio",
+    "Cristalzinhos, Jardim ao Luar e Caixa de Gelo"
+  ],
+  "Космический набор": [
+    "Cosmic Bundle",
+    "Kozmik Paket",
+    "Pacchetto Cosmico",
+    "Pacote Cósmico"
+  ],
+  "Три эксклюзивных оформления и 7 встрясок": [
+    "Three exclusive looks and 7 shakes",
+    "Üç özel görünüm ve 7 sarsma",
+    "Tre stili esclusivi e 7 scosse",
+    "Três visuais exclusivos e 7 sacudidas"
+  ],
+  "Вишня": [
+    "Cherry",
+    "Kiraz",
+    "Ciliegia",
+    "Cereja"
+  ],
+  "Клубника": [
+    "Strawberry",
+    "Çilek",
+    "Fragola",
+    "Morango"
+  ],
+  "Мандарин": [
+    "Tangerine",
+    "Mandalina",
+    "Mandarino",
+    "Tangerina"
+  ],
+  "Лимон": [
+    "Lemon",
+    "Limon",
+    "Limone",
+    "Limão"
+  ],
+  "Киви": [
+    "Kiwi",
+    "Kivi",
+    "Kiwi",
+    "Kiwi"
+  ],
+  "Черника": [
+    "Blueberry",
+    "Yaban mersini",
+    "Mirtillo",
+    "Mirtilo"
+  ],
+  "Персик": [
+    "Peach",
+    "Şeftali",
+    "Pesca",
+    "Pêssego"
+  ],
+  "Питайя": [
+    "Dragon fruit",
+    "Ejder meyvesi",
+    "Pitaya",
+    "Pitaya"
+  ],
+  "Кокос": [
+    "Coconut",
+    "Hindistan cevizi",
+    "Cocco",
+    "Coco"
+  ],
+  "Ананас": [
+    "Pineapple",
+    "Ananas",
+    "Ananas",
+    "Abacaxi"
+  ],
+  "Арбуз": [
+    "Watermelon",
+    "Karpuz",
+    "Anguria",
+    "Melancia"
+  ],
+  "Пушик": [
+    "Fluffy",
+    "Pofuduk",
+    "Batuffolo",
+    "Fofinho"
+  ],
+  "Мятушка": [
+    "Minty",
+    "Naneli",
+    "Mentina",
+    "Hortelãzinha"
+  ],
+  "Солнышко": [
+    "Sunny",
+    "Güneşçik",
+    "Solellino",
+    "Solzinho"
+  ],
+  "Лилу": [
+    "Lilu",
+    "Lilu",
+    "Lilu",
+    "Lilu"
+  ],
+  "Облачко": [
+    "Little Cloud",
+    "Bulutçuk",
+    "Nuvoletta",
+    "Nuvemzinha"
+  ],
+  "Лисёнок": [
+    "Little Fox",
+    "Tilki Yavrusu",
+    "Volpina",
+    "Raposinha"
+  ],
+  "Зайчик": [
+    "Bunny",
+    "Tavşancık",
+    "Coniglietto",
+    "Coelhinho"
+  ],
+  "Совушка": [
+    "Little Owl",
+    "Baykuşçuk",
+    "Gufetto",
+    "Corujinha"
+  ],
+  "Мишутка": [
+    "Little Bear",
+    "Ayıcık",
+    "Orsetto",
+    "Ursinho"
+  ],
+  "Радужик": [
+    "Rainbow Buddy",
+    "Gökkuşağı Dostu",
+    "Arcobalenino",
+    "Arco-Íris"
+  ],
+  "Лёвушка": [
+    "Little Lion",
+    "Aslancık",
+    "Leoncino",
+    "Leãozinho"
+  ],
+  "Каппа": [
+    "Kappa",
+    "Kappa",
+    "Kappa",
+    "Kappa"
+  ],
+  "Лосось": [
+    "Salmon",
+    "Somon",
+    "Salmone",
+    "Salmão"
+  ],
+  "Тунец": [
+    "Tuna",
+    "Ton Balığı",
+    "Tonno",
+    "Atum"
+  ],
+  "Авокадо": [
+    "Avocado",
+    "Avokado",
+    "Avocado",
+    "Abacate"
+  ],
+  "Тамаго": [
+    "Tamago",
+    "Tamago",
+    "Tamago",
+    "Tamago"
+  ],
+  "Нигири": [
+    "Nigiri",
+    "Nigiri",
+    "Nigiri",
+    "Nigiri"
+  ],
+  "Креветка": [
+    "Shrimp",
+    "Karides",
+    "Gamberetto",
+    "Camarão"
+  ],
+  "Онигири": [
+    "Onigiri",
+    "Onigiri",
+    "Onigiri",
+    "Onigiri"
+  ],
+  "Овощной": [
+    "Veggie Roll",
+    "Sebzeli Rulo",
+    "Roll di Verdure",
+    "Rolinho Vegetal"
+  ],
+  "Икура": [
+    "Ikura",
+    "Ikura",
+    "Ikura",
+    "Ikura"
+  ],
+  "Делюкс": [
+    "Deluxe",
+    "Lüks",
+    "Deluxe",
+    "Deluxe"
+  ],
+  "Томат": [
+    "Tomato",
+    "Domates",
+    "Pomodoro",
+    "Tomate"
+  ],
+  "Морковка": [
+    "Carrot",
+    "Havuç",
+    "Carotina",
+    "Cenourinha"
+  ],
+  "Огурчик": [
+    "Cucumber",
+    "Salatalık",
+    "Cetriolino",
+    "Pepininho"
+  ],
+  "Свёкла": [
+    "Beetroot",
+    "Pancar",
+    "Barbabietola",
+    "Beterraba"
+  ],
+  "Перчик": [
+    "Pepper",
+    "Biber",
+    "Peperoncino",
+    "Pimentãozinho"
+  ],
+  "Брокколи": [
+    "Broccoli",
+    "Brokoli",
+    "Broccolo",
+    "Brócolis"
+  ],
+  "Баклажан": [
+    "Eggplant",
+    "Patlıcan",
+    "Melanzana",
+    "Berinjela"
+  ],
+  "Лучок": [
+    "Onion",
+    "Soğancık",
+    "Cipollina",
+    "Cebolinha"
+  ],
+  "Кукуруза": [
+    "Corn",
+    "Mısır",
+    "Mais",
+    "Milho"
+  ],
+  "Тыква": [
+    "Pumpkin",
+    "Balkabağı",
+    "Zucca",
+    "Abóbora"
+  ],
+  "Капуста": [
+    "Cabbage",
+    "Lahana",
+    "Cavolo",
+    "Repolho"
+  ],
+  "Картошка": [
+    "Fries",
+    "Patates Kızartması",
+    "Patatine",
+    "Batatinhas"
+  ],
+  "Тостик": [
+    "Toast",
+    "Tost",
+    "Toastino",
+    "Torradinha"
+  ],
+  "Бургер": [
+    "Burger",
+    "Burger",
+    "Hamburger",
+    "Hambúrguer"
+  ],
+  "Пицца": [
+    "Pizza",
+    "Pizza",
+    "Pizza",
+    "Pizza"
+  ],
+  "Наггетс": [
+    "Nugget",
+    "Nugget",
+    "Nugget",
+    "Nugget"
+  ],
+  "Лимонад": [
+    "Lemonade",
+    "Limonata",
+    "Limonata",
+    "Limonada"
+  ],
+  "Тако": [
+    "Taco",
+    "Taco",
+    "Taco",
+    "Taco"
+  ],
+  "Вафля": [
+    "Waffle",
+    "Waffle",
+    "Waffle",
+    "Waffle"
+  ],
+  "Брауни": [
+    "Brownie",
+    "Brownie",
+    "Brownie",
+    "Brownie"
+  ],
+  "Мороженка": [
+    "Ice Cream",
+    "Dondurma",
+    "Gelatino",
+    "Sorvetinho"
+  ],
+  "Дабл-бургер": [
+    "Double Burger",
+    "Duble Burger",
+    "Doppio Hamburger",
+    "Hambúrguer Duplo"
+  ],
+  "Кварц": [
+    "Quartz",
+    "Kuvars",
+    "Quarzo",
+    "Quartzo"
+  ],
+  "Бирюза": [
+    "Turquoise",
+    "Turkuaz",
+    "Turchese",
+    "Turquesa"
+  ],
+  "Янтарь": [
+    "Amber",
+    "Kehribar",
+    "Ambra",
+    "Âmbar"
+  ],
+  "Аметист": [
+    "Amethyst",
+    "Ametist",
+    "Ametista",
+    "Ametista"
+  ],
+  "Изумруд": [
+    "Emerald",
+    "Zümrüt",
+    "Smeraldo",
+    "Esmeralda"
+  ],
+  "Сапфир": [
+    "Sapphire",
+    "Safir",
+    "Zaffiro",
+    "Safira"
+  ],
+  "Цитрин": [
+    "Citrine",
+    "Sitrin",
+    "Citrino",
+    "Citrino"
+  ],
+  "Рубин": [
+    "Ruby",
+    "Yakut",
+    "Rubino",
+    "Rubi"
+  ],
+  "Опал": [
+    "Opal",
+    "Opal",
+    "Opale",
+    "Opala"
+  ],
+  "Обсидиан": [
+    "Obsidian",
+    "Obsidyen",
+    "Ossidiana",
+    "Obsidiana"
+  ],
+  "Алмаз": [
+    "Diamond",
+    "Elmas",
+    "Diamante",
+    "Diamante"
+  ],
+  "Мятный сон": [
+    "Mint Dream",
+    "Naneli Rüya",
+    "Sogno alla Menta",
+    "Sonho de Hortelã"
+  ],
+  "Соня": [
+    "Sleepyhead",
+    "Uykucu",
+    "Dormiglione",
+    "Soninho"
+  ],
+  "Звёздочка": [
+    "Little Star",
+    "Yıldızcık",
+    "Stellina",
+    "Estrelinha"
+  ],
+  "Лунушка": [
+    "Little Moon",
+    "Aycık",
+    "Lunetta",
+    "Luazinha"
+  ],
+  "Лиловый сон": [
+    "Lilac Dream",
+    "Leylak Rüyası",
+    "Sogno Lilla",
+    "Sonho Lilás"
+  ],
+  "Розовый сон": [
+    "Pink Dream",
+    "Pembe Rüya",
+    "Sogno Rosa",
+    "Sonho Rosa"
+  ],
+  "Льдинка": [
+    "Little Ice",
+    "Buzcuk",
+    "Ghiaccetto",
+    "Gelinho"
+  ],
+  "Сияш": [
+    "Glow Buddy",
+    "Işıltı",
+    "Luminello",
+    "Brilhinho"
+  ],
+  "Аврора": [
+    "Aurora",
+    "Aurora",
+    "Aurora",
+    "Aurora"
+  ],
+  "Лунный король": [
+    "Moon King",
+    "Ay Kralı",
+    "Re della Luna",
+    "Rei da Lua"
+  ],
+  "Малинка": [
+    "Raspberry Drop",
+    "Ahududu Şekeri",
+    "Lampone",
+    "Framboesinha"
+  ],
+  "Мятный леденец": [
+    "Mint Candy",
+    "Naneli Şeker",
+    "Caramella alla Menta",
+    "Bala de Hortelã"
+  ],
+  "Лимонка": [
+    "Lemon Drop",
+    "Limon Şekeri",
+    "Caramella al Limone",
+    "Balinha de Limão"
+  ],
+  "Бонбон": [
+    "Bonbon",
+    "Bonbon",
+    "Bonbon",
+    "Bombom"
+  ],
+  "Желейка": [
+    "Jelly Candy",
+    "Jöle Şekeri",
+    "Gelatina",
+    "Jujuba"
+  ],
+  "Карамелька": [
+    "Caramel",
+    "Karamel",
+    "Caramellina",
+    "Caramelinho"
+  ],
+  "Зефирка": [
+    "Marshmallow",
+    "Marshmallow",
+    "Marshmallow",
+    "Marshmallow"
+  ],
+  "Ириска": [
+    "Toffee",
+    "Toffee",
+    "Mou",
+    "Bala de Caramelo"
+  ],
+  "Пралинка": [
+    "Praline",
+    "Pralin",
+    "Pralina",
+    "Praliné"
+  ],
+  "Нуга": [
+    "Nougat",
+    "Nuga",
+    "Torrone",
+    "Nougat"
+  ],
+  "Радужная конфета": [
+    "Rainbow Candy",
+    "Gökkuşağı Şekeri",
+    "Caramella Arcobaleno",
+    "Doce Arco-Íris"
+  ],
+  "Печенька": [
+    "Cookie",
+    "Kurabiye",
+    "Biscottino",
+    "Biscoitinho"
+  ],
+  "Булочка": [
+    "Sweet Bun",
+    "Çörek",
+    "Panino Dolce",
+    "Pãozinho"
+  ],
+  "Коричный тост": [
+    "Cinnamon Toast",
+    "Tarçınlı Tost",
+    "Toast alla Cannella",
+    "Torrada de Canela"
+  ],
+  "Пирожное": [
+    "Little Cake",
+    "Minik Pasta",
+    "Pasticcino",
+    "Bolinho"
+  ],
+  "Матча": [
+    "Matcha",
+    "Matcha",
+    "Matcha",
+    "Matcha"
+  ],
+  "Маффин": [
+    "Muffin",
+    "Muffin",
+    "Muffin",
+    "Muffin"
+  ],
+  "Бисквит": [
+    "Sponge Cake",
+    "Pandispanya",
+    "Pan di Spagna",
+    "Pão de Ló"
+  ],
+  "Мильфей": [
+    "Mille-feuille",
+    "Milföy",
+    "Millefoglie",
+    "Mil-folhas"
+  ],
+  "Вафелька": [
+    "Little Waffle",
+    "Minik Waffle",
+    "Wafflettino",
+    "Wafflezinho"
+  ],
+  "Праздничный торт": [
+    "Celebration Cake",
+    "Kutlama Pastası",
+    "Torta delle Feste",
+    "Bolo de Festa"
+  ],
+  "Попрыгун": [
+    "Bouncer",
+    "Zıpzıp",
+    "Saltellino",
+    "Pulador"
+  ],
+  "Дворовый": [
+    "Playground Ball",
+    "Bahçe Topu",
+    "Palla del Cortile",
+    "Bola do Quintal"
+  ],
+  "Теннисик": [
+    "Tennis Ball",
+    "Tenis Topu",
+    "Pallina da Tennis",
+    "Bolinha de Tênis"
+  ],
+  "Воздушик": [
+    "Air Ball",
+    "Hafif Top",
+    "Palla Leggera",
+    "Bola Leve"
+  ],
+  "Футболик": [
+    "Soccer Ball",
+    "Futbol Topu",
+    "Pallone da Calcio",
+    "Bola de Futebol"
+  ],
+  "Волейболик": [
+    "Volleyball",
+    "Voleybol Topu",
+    "Palla da Pallavolo",
+    "Bola de Vôlei"
+  ],
+  "Пляжик": [
+    "Beach Ball",
+    "Plaj Topu",
+    "Pallone da Spiaggia",
+    "Bola de Praia"
+  ],
+  "Пружинка": [
+    "Springy",
+    "Yaycık",
+    "Molletta",
+    "Molinha"
+  ],
+  "Баскетик": [
+    "Basketball",
+    "Basketbol Topu",
+    "Palla da Basket",
+    "Bola de Basquete"
+  ],
+  "Поролончик": [
+    "Foam Ball",
+    "Sünger Top",
+    "Palla di Gommapiuma",
+    "Bola de Espuma"
+  ],
+  "Радужный мяч": [
+    "Rainbow Ball",
+    "Gökkuşağı Topu",
+    "Palla Arcobaleno",
+    "Bola Arco-Íris"
+  ],
+  "Дрёма": [
+    "Drowsy",
+    "Uykulu",
+    "Sonnolino",
+    "Soneca"
+  ],
+  "Солнечная": [
+    "Sunny Pillow",
+    "Güneş Yastığı",
+    "Cuscino Solare",
+    "Almofada Solar"
+  ],
+  "Лунная": [
+    "Moon Pillow",
+    "Ay Yastığı",
+    "Cuscino Lunare",
+    "Almofada Lunar"
+  ],
+  "Лоскутная": [
+    "Patchwork Pillow",
+    "Kırkyama Yastık",
+    "Cuscino Patchwork",
+    "Almofada de Retalhos"
+  ],
+  "Бархатная": [
+    "Velvet Pillow",
+    "Kadife Yastık",
+    "Cuscino di Velluto",
+    "Almofada de Veludo"
+  ],
+  "Сердечная": [
+    "Heart Pillow",
+    "Kalp Yastığı",
+    "Cuscino del Cuore",
+    "Almofada de Coração"
+  ],
+  "Бантик": [
+    "Bow Pillow",
+    "Fiyonk Yastık",
+    "Cuscino con Fiocco",
+    "Almofada de Laço"
+  ],
+  "Снежная": [
+    "Snow Pillow",
+    "Kar Yastığı",
+    "Cuscino di Neve",
+    "Almofada de Neve"
+  ],
+  "Радужная": [
+    "Rainbow Pillow",
+    "Gökkuşağı Yastığı",
+    "Cuscino Arcobaleno",
+    "Almofada Arco-Íris"
+  ],
+  "Звёздная": [
+    "Star Pillow",
+    "Yıldız Yastığı",
+    "Cuscino Stellare",
+    "Almofada Estelar"
+  ],
+  "Кометка": [
+    "Little Comet",
+    "Kuyruklu Yıldızcık",
+    "Cometina",
+    "Cometinha"
+  ],
+  "Туманность": [
+    "Nebula",
+    "Bulutsu",
+    "Nebulosa",
+    "Nebulosa"
+  ],
+  "Лунная конфета": [
+    "Moon Candy",
+    "Ay Şekeri",
+    "Caramella Lunare",
+    "Doce Lunar"
+  ],
+  "Галактика": [
+    "Galaxy",
+    "Galaksi",
+    "Galassia",
+    "Galáxia"
+  ],
+  "Планетка": [
+    "Little Planet",
+    "Gezegencik",
+    "Pianetino",
+    "Planetinha"
+  ],
+  "Метеорчик": [
+    "Little Meteor",
+    "Meteorcuk",
+    "Meteorino",
+    "Meteorinho"
+  ],
+  "Звёздная пыль": [
+    "Stardust",
+    "Yıldız Tozu",
+    "Polvere di Stelle",
+    "Poeira Estelar"
+  ],
+  "Жемчужинка": [
+    "Little Pearl",
+    "İncicik",
+    "Perlina",
+    "Perolinha"
+  ],
+  "Король галактики": [
+    "Galaxy King",
+    "Galaksi Kralı",
+    "Re della Galassia",
+    "Rei da Galáxia"
+  ]
+}
