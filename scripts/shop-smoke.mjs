@@ -24,6 +24,9 @@ export async function checkShop(browser,base,errors){
   const next=async(category,name)=>{await section(category).getByRole('button',{name:'Следующий товар'}).click();await waitItem(category,name);};
   const watch=async(button)=>{await button.click();await page.getByRole('dialog',{name:'Имитация рекламы'}).waitFor();await page.locator('.ad-overlay').waitFor({state:'detached'});};
   await openShop();await page.waitForTimeout(400);
+  assert.ok(await page.locator('.dialog-close img').evaluate(el=>el.src.includes('icon-close-coral.webp')&&el.naturalWidth>0),'Close uses generated raster artwork');
+  assert.ok(await page.locator('.shop-quick-coins .ui-icon').evaluate(el=>getComputedStyle(el).filter==='none'),'Ad icon preserves its generated colors');
+  assert.equal(await page.locator('.collection-end,.shake-bank').count(),0,'Shop has no trailing promotional filler');
   assert.deepEqual(await page.locator('.shop-collection').evaluateAll(els=>els.map(el=>el.dataset.category)),['skins','backgrounds','boxes'],'All three collections are stacked on one page');
   assert.equal(await page.locator('svg').count(),0,'Every visible icon is raster artwork');
   assert.deepEqual(await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox(),{x:0,y:0,width:390,height:844});

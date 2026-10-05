@@ -61,7 +61,7 @@ try {
       const canvas = page.locator('canvas'), bounds = await canvas.boundingBox();
       assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
       assert.ok(await page.locator('.utility-button').evaluateAll(els=>els.every(el=>el.textContent.trim()==='')),'Help and gift buttons have no visual labels');
-      assert.ok(await page.locator('.shop-launch').evaluate(el=>{const square=el.querySelector('.shop-launch-square').getBoundingClientRect();return Math.abs(square.width-square.height)<1&&getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)';}),'Shop has a square icon with a separate centered label');
+      assert.ok(await page.locator('.shop-launch').evaluate(el=>{const art=el.querySelector('.shop-launch-art'),s=getComputedStyle(art);return getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)'&&s.backgroundColor==='rgba(0, 0, 0, 0)'&&s.boxShadow==='none'&&el.querySelector('img').src.includes('icon-shop-basket-red.webp');}),'Shop uses the refreshed red basket artwork with no backing panel');
       assert.ok(await page.locator('.hint').evaluate(el=>parseFloat(getComputedStyle(el.querySelector('span')).webkitTextStrokeWidth)>0&&getComputedStyle(el.querySelector('img')).filter.includes('drop-shadow')),'Hint and hand have a white outline');
       assert.ok(await page.locator('.score-card').evaluate(el=>{
         const number=el.querySelector('strong'),label=el.querySelector('.small-label');

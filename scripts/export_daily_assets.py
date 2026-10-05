@@ -48,7 +48,7 @@ def body(image):
     bottom=min(bbox[3],broad[-1]+2);return [left,bottom-(right-left),right,bottom]
 
 assets=ROOT/'public/assets'
-fit(Image.open(SOURCE/FILES['basket']).convert('RGBA'),128,5).save(assets/'ui/generated/icon-shop.webp',quality=94,method=6)
+fit(Image.open(SOURCE/FILES['basket']).convert('RGBA'),128,5).save(assets/'ui/generated/icon-shop-basket-red.webp',quality=94,method=6)
 atlas=Image.open(SOURCE/FILES['mochi']).convert('RGBA');w,h=atlas.size
 folder=assets/'skins/mochi';folder.mkdir(parents=True,exist_ok=True);rects=[]
 preview=Image.new('RGB',(11*128,152),'#ebe8fa');draw=ImageDraw.Draw(preview)

@@ -22,6 +22,7 @@ export async function checkRewardsAndOffers(browser,base,errors){
   await page.getByRole('button',{name:'Магазин',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('[data-category=boxes] .shop-current').textContent.startsWith('Лунное стекло'));
   assert.ok(await page.locator('[data-category=boxes] .shop-arrow.next').isDisabled(),'Shop opens on the equipped last box');
+  await page.waitForFunction(()=>document.querySelector('.shop-toolbar').getAnimations().every(animation=>animation.playState==='finished'));
   const header=await page.locator('.shop-heading').boundingBox(),quick=await page.locator('.shop-quick-coins').boundingBox();
   assert.ok(quick.y>=header.y+header.height-1&&quick.x>195,'Coin video button stays at the top right under the header');
   const nav=page.getByRole('navigation',{name:'Разделы магазина'}),navPosition=await nav.boundingBox();
@@ -33,6 +34,9 @@ export async function checkRewardsAndOffers(browser,base,errors){
   const sectionsLayout=()=>page.locator('[data-shop-section]').evaluateAll(els=>els.map(el=>({id:el.dataset.shopSection,top:el.offsetTop,height:el.offsetHeight})));
   const fixedSections=await sectionsLayout();
   await jump('Наборы','bundles');
+  await page.waitForFunction(()=>document.querySelector('.bundle-card.cozy').getAnimations().every(animation=>animation.playState==='finished'));
+  assert.ok(await page.locator('.bundle-card.cozy .sale-ribbon').isVisible(),'A red diagonal deal ribbon is visible');
+  await page.screenshot({path:'test-results/shop-offers-before.png',animations:'disabled'});
   await page.getByRole('button',{name:'Купить Уютный набор за 360'}).click();
   assert.equal(await coins(),640);assert.equal((await profile()).shakeTokens,3);
   for(const key of ['skins:fuzzies','backgrounds:sunset','boxes:rose'])assert.ok((await profile()).owned.includes(key));

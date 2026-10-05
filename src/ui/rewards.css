@@ -39,5 +39,13 @@
 .daily-note { text-align: center; color: #a9a38e; font-size: 10px; line-height: 1.5; margin: 20px 12px 0; }
 .rewards-footer { display: flex; align-items: center; justify-content: center; padding: 12px 20px calc(14px + var(--safe-bottom)); background: #fffdf4cf; }
 .rewards-footer .primary-button { width: 200px; height: 50px; }
+.rewards-heading, .daily-hero { animation: content-arrive .4s both; }
+.daily-prize { animation: content-arrive .35s both; }
+.daily-prize:nth-child(2) { animation-delay: .03s; }
+.daily-prize:nth-child(3) { animation-delay: .06s; }
+.daily-prize:nth-child(4) { animation-delay: .09s; }
+.daily-prize:nth-child(5) { animation-delay: .12s; }
+.daily-prize:nth-child(6) { animation-delay: .15s; }
+.daily-prize:nth-child(7) { animation-delay: .18s; }
 @media (max-width: 350px) { .rewards-heading { padding-left: 14px; gap: 7px; } .rewards-heading h1 { font-size: 18px; } .rewards-heading .eyebrow { font-size: 5px; } .daily-prize { grid-template-columns: 46px minmax(0, 1fr) 58px; gap: 8px; padding: 10px; } .daily-prize-art { width: 46px; height: 52px; } .daily-prize-copy h3 { font-size: 12px; } .daily-prize-note { font-size: 8px; } .daily-claim { width: 58px; font-size: 9px; } .daily-hero h2 { font-size: 18px; } .daily-hero > img { width: 111px; height: 111px; } }
 @media (max-height: 480px) { .rewards-dialog > .dialog-content { grid-template-rows: calc(66px + var(--safe-top)) minmax(0, 1fr) calc(64px + var(--safe-bottom)); } .rewards-heading { padding-top: calc(10px + var(--safe-top)); } .rewards-dialog .dialog-close { top: calc(15px + var(--safe-top)); } .rewards-footer { padding-block: 7px; } }
