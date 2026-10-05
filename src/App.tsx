@@ -11,6 +11,7 @@ import { usePresence } from './ui/usePresence';
 import { Icon } from './ui/Icon';
 import { Shop } from './ui/Shop';
 import { RewardedAd, type AdReward } from './ui/RewardedAd';
+import { UI_TEXTURES } from './ui/assets';
 
 const read = (key: string, fallback: string) => { try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; } };
 const save = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch { /* Storage is optional in embedded web games. */ } };
@@ -179,7 +180,7 @@ export default function App() {
         </div>
       </div>;
 
-  return <main className="game-screen" ref={shellRef} aria-busy={!loaded} style={{'--scenery':`url("${new URL(backgroundAsset(profile.selected.backgrounds),document.baseURI).href}")`} as CSSProperties}>
+  return <main className="game-screen" ref={shellRef} aria-busy={!loaded} style={{...UI_TEXTURES,'--scenery':`url("${new URL(backgroundAsset(profile.selected.backgrounds),document.baseURI).href}")`} as CSSProperties}>
     <div className="ambient-background" aria-hidden="true" />
     <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={!loaded||overlay} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
       <header className="header">

@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { FRUITS, fruitAsset } from '../game/fruits';
 import { ElasticScroll } from './ElasticScroll';
 import { CATALOG, SKIN_NAMES } from '../game/catalog';
+import { Icon } from './Icon';
 
-const Arrow = ({left=false}:{left?:boolean}) => <svg className="arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={left?{transform:'rotate(180deg)'}:undefined}><path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+const Arrow = ({left=false}:{left?:boolean}) => <Icon name={left?'left':'right'} size={19}/>;
 
 export function FruitCarousel({discovered,skin='fruit'}:{discovered:number;skin?:string}) {
   const viewport=useRef<HTMLDivElement>(null),track=useRef<HTMLDivElement>(null);

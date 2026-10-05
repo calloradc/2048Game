@@ -1,0 +1,362 @@
+[
+  {
+    "name": "button-gold",
+    "subject": "glossy mango-orange and gold, cream rim, tiny coin-like studs only at far corners",
+    "w": 900,
+    "h": 180,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-539e3784-bc64-4ac4-b425-523a0eed4880.png"
+  },
+  {
+    "name": "button-green",
+    "subject": "glossy emerald and lime green, golden rim, subtle leaf ornament only at far corners",
+    "w": 900,
+    "h": 180,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-c1c4b3db-4f9e-4155-bb4e-e46197b84cd5.png"
+  },
+  {
+    "name": "button-play",
+    "subject": "glossy turquoise and electric blue, golden rim, small sparkling corner ornaments",
+    "w": 540,
+    "h": 180,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-3549df15-0fb7-44fe-9e09-d60582107ffc.png"
+  },
+  {
+    "name": "button-purple",
+    "subject": "glossy vivid violet and magenta, lavender rim, tiny gem studs only at far corners",
+    "w": 900,
+    "h": 180,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-fa580035-5bad-4aee-82bb-1118430e8395.png"
+  },
+  {
+    "name": "button-shop",
+    "subject": "glossy coral-pink and tangerine, golden rim, small striped awning decoration confined to top left edge",
+    "w": 432,
+    "h": 144,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-987c5d1f-d9b7-49a7-aeed-80a47660318a.png"
+  },
+  {
+    "name": "button-square",
+    "subject": "chunky glossy cobalt-blue square with turquoise beveled rim and rounded corners",
+    "w": 192,
+    "h": 192,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-949090f4-8ba5-421d-941b-50019a208653.png"
+  },
+  {
+    "name": "button-square-close",
+    "kind": "surface",
+    "subject": "a chunky glossy coral red square button with creamy white beveled rim and rounded corners",
+    "w": 192,
+    "h": 192,
+    "path": "/workspace/generated_images/exec-bda4d973-f508-4ce9-9c91-43666ccdba25.png"
+  },
+  {
+    "name": "button-square-pink",
+    "subject": "chunky glossy hot pink square with gold beveled rim and rounded corners",
+    "w": 192,
+    "h": 192,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-7881a702-f55e-413e-8487-31565cbb0bbd.png"
+  },
+  {
+    "name": "button-square-purple",
+    "subject": "chunky glossy violet square with pink beveled rim and rounded corners",
+    "w": 192,
+    "h": 192,
+    "kind": "surface",
+    "path": "/workspace/generated_images/exec-ae69afa9-3568-4642-aa51-5e6a86136e3e.png"
+  },
+  {
+    "name": "card-background",
+    "kind": "surface",
+    "subject": "a square collectible postcard with thick glossy creamy white and gold beveled frame and smooth empty turquoise center",
+    "w": 768,
+    "h": 768,
+    "path": "/workspace/generated_images/exec-099f1141-83e0-47eb-b0f9-3a5e291f2f80.png"
+  },
+  {
+    "name": "card-box",
+    "kind": "surface",
+    "subject": "a square collectible card with thick glossy amethyst and gold beveled frame, small blue corner jewels and smooth empty lavender center",
+    "w": 768,
+    "h": 768,
+    "path": "/workspace/generated_images/exec-85743e39-f17a-4937-89e3-ee19e2cdfa16.png"
+  },
+  {
+    "name": "card-skin",
+    "kind": "surface",
+    "subject": "a square collectible card with thick glossy turquoise beveled frame, tiny gold corner studs and smooth dark turquoise empty center",
+    "w": 768,
+    "h": 768,
+    "path": "/workspace/generated_images/exec-50c74007-18f2-4256-902b-1bafb23d02a6.png"
+  },
+  {
+    "name": "dialog-panel",
+    "kind": "surface",
+    "subject": "a portrait panel with thick glossy turquoise border, gold decorative rounded corners and warm cream smooth empty center",
+    "w": 1080,
+    "h": 1440,
+    "path": "/workspace/generated_images/exec-0831dedf-7b45-449b-893d-3d071a38e53c.png"
+  },
+  {
+    "name": "evolution-panel",
+    "kind": "surface",
+    "subject": "a long horizontal parchment and gold tray with bright turquoise beveled border, rounded ends, smooth pale yellow empty center",
+    "w": 1080,
+    "h": 270,
+    "path": "/workspace/generated_images/exec-25c506f0-f34f-40b2-9c2d-db59b6edd062.png"
+  },
+  {
+    "name": "icon-background",
+    "kind": "icon",
+    "subject": "a small golden framed landscape with azure sky, orange sun and green hills",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-1bfe385a-748f-482f-a745-fba81737a014.png"
+  },
+  {
+    "name": "icon-box",
+    "kind": "icon",
+    "subject": "a luminous cyan transparent glass container with gold rim",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-336dd1d6-8f17-4e40-b707-0f6ebbdbb5aa.png"
+  },
+  {
+    "name": "icon-check",
+    "kind": "icon",
+    "subject": "a thick bright emerald green checkmark with lime highlights",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-861251c0-2ea4-449a-bcae-8c8b686d0b21.png"
+  },
+  {
+    "name": "icon-close",
+    "kind": "icon",
+    "subject": "a chunky creamy white X cross with coral-red glossy bevel",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-fa408c7f-f79e-45a0-8e5f-4d7403b52c0e.png"
+  },
+  {
+    "name": "icon-double",
+    "kind": "icon",
+    "subject": "two overlapping shining golden coins with star emblems, no digits",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-9adc4a63-15ca-4395-a3b4-ad39e7e42d44.png"
+  },
+  {
+    "name": "icon-fullscreen",
+    "kind": "icon",
+    "subject": "four shiny cyan L-shaped corners forming an expand symbol",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-aa72c6f0-6eba-4482-b761-e0349f8976f7.png"
+  },
+  {
+    "name": "icon-gift",
+    "kind": "icon",
+    "subject": "a hot-pink gift box with oversized shiny golden ribbon and bow",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-0edb869b-c152-4fab-afa4-fbad06a70fa2.png"
+  },
+  {
+    "name": "icon-hand",
+    "kind": "icon",
+    "subject": "a cute golden cartoon hand with index finger raised",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-a3b88c5e-68c4-477d-8e62-828c38115320.png"
+  },
+  {
+    "name": "icon-help",
+    "kind": "icon",
+    "subject": "a violet round candy medallion with a single large white question-mark symbol",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-c1cb20b4-424b-45f0-bbd0-c3b8b5e31bdc.png"
+  },
+  {
+    "name": "icon-leaf",
+    "kind": "icon",
+    "subject": "a lush bright lime-green leaf with emerald veins",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-273ea307-237b-412d-ac75-ef057c492828.png"
+  },
+  {
+    "name": "icon-left",
+    "kind": "icon",
+    "subject": "a chunky glossy turquoise chevron arrow pointing LEFT",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-d28339b0-a8ee-48a0-97e4-7ed610fb818a.png"
+  },
+  {
+    "name": "icon-lock",
+    "kind": "icon",
+    "subject": "a golden shiny toy padlock with orange bevel and tiny dark keyhole",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-277a465c-da99-418d-b481-afed08c59c53.png"
+  },
+  {
+    "name": "icon-mute",
+    "kind": "icon",
+    "subject": "a blue speaker with a vivid coral red cross",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-60042469-e884-49bc-bde1-85883ae23c29.png"
+  },
+  {
+    "name": "icon-play",
+    "kind": "icon",
+    "subject": "a bright lime-green triangular play arrow with thick emerald bevel",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-33c2041f-bfe7-49d9-9b23-d2801e9a3db7.png"
+  },
+  {
+    "name": "icon-rescue",
+    "kind": "icon",
+    "subject": "a coral-pink heart with a raised creamy white medical cross",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-edc271b0-94fc-4f63-b8a2-7c32b3f60c75.png"
+  },
+  {
+    "name": "icon-restart",
+    "kind": "icon",
+    "subject": "a chunky circular emerald arrow with a golden arrowhead",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-b532275a-79de-4d81-807c-606f01893068.png"
+  },
+  {
+    "name": "icon-right",
+    "kind": "icon",
+    "subject": "a chunky glossy turquoise chevron arrow pointing RIGHT",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-149a593a-ae9d-40e0-ae23-b9ef6b87e1a7.png"
+  },
+  {
+    "name": "icon-settings",
+    "kind": "icon",
+    "subject": "a chunky cobalt-blue gear with cyan glossy bevels and golden center",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-3cf5290a-aaf0-4f8e-b3b5-c1624e82d88d.png"
+  },
+  {
+    "name": "icon-shake",
+    "kind": "icon",
+    "subject": "a honey-orange glass game container tilted with turquoise shaking swooshes",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-2e0d12a8-3fa5-4600-8bd4-071e7ed19245.png"
+  },
+  {
+    "name": "icon-shop",
+    "kind": "icon",
+    "subject": "a tiny coral-pink toy storefront with striped orange-and-cream awning, turquoise window and golden door",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-269b595b-7ace-4e44-8dee-f46c14eb6e0c.png"
+  },
+  {
+    "name": "icon-skin",
+    "kind": "icon",
+    "subject": "an adorable smiling bright green round jelly creature with leaf ears and rosy cheeks",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-6123f383-15b3-4cee-82ae-bd89771e2088.png"
+  },
+  {
+    "name": "icon-sound",
+    "kind": "icon",
+    "subject": "a bright turquoise-blue speaker with two blue sound waves and lemon-yellow accent",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-1ef746b8-365a-4534-a44d-f3992ff30b2c.png"
+  },
+  {
+    "name": "icon-sparkle",
+    "kind": "icon",
+    "subject": "one golden four-point star with orange bevel and two tiny glints",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-7eddcda6-105d-4fef-81c1-209830878537.png"
+  },
+  {
+    "name": "icon-trophy",
+    "kind": "icon",
+    "subject": "a gleaming golden trophy with orange bevel, handles and turquoise jewel",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-8e68cc7d-3a6e-4abb-b4e2-d00de5d92ffb.png"
+  },
+  {
+    "name": "icon-vibrate",
+    "kind": "icon",
+    "subject": "a violet toy smartphone with cyan screen and wavy shaking marks",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-9de783af-c214-488d-98f5-3388181c9588.png"
+  },
+  {
+    "name": "icon-video",
+    "kind": "icon",
+    "subject": "a violet toy movie camera with yellow lens and a white play triangle",
+    "w": 128,
+    "h": 128,
+    "path": "/workspace/generated_images/exec-baf59037-3ed8-474a-ba76-6ad3527224de.png"
+  },
+  {
+    "name": "next-panel",
+    "kind": "surface",
+    "subject": "a glossy teal pill-shaped panel with lime rim and smooth dark turquoise empty center",
+    "w": 324,
+    "h": 135,
+    "path": "/workspace/generated_images/exec-57bef7b6-851a-48fc-b9cb-c2769d07fb43.png"
+  },
+  {
+    "name": "setting-strip",
+    "kind": "surface",
+    "subject": "a horizontal glossy pale lavender panel with vivid purple border and smooth empty center",
+    "w": 900,
+    "h": 180,
+    "path": "/workspace/generated_images/exec-1e508d8e-87d3-4e36-b24e-084a45d9364b.png"
+  },
+  {
+    "name": "shop-wallpaper",
+    "kind": "wallpaper",
+    "subject": "a seamless azure and royal-blue checkerboard pattern, richly saturated mobile arcade game background, softly polished fabric-like subtle shading inside each square, perfectly straight large square checker tiles, no objects no text no symbols, completely flat front view, seamless tile, square image",
+    "w": 768,
+    "h": 768,
+    "path": "/workspace/generated_images/exec-7bd66ee3-0af4-4cda-a17e-9d03116c5fdc.png"
+  },
+  {
+    "name": "toast-panel",
+    "kind": "surface",
+    "subject": "a horizontal glossy cream-yellow notification panel with rich orange gold beveled rim and smooth empty center",
+    "w": 900,
+    "h": 180,
+    "path": "/workspace/generated_images/exec-7be26ed3-ee04-4873-8140-cdaf00e796e7.png"
+  },
+  {
+    "name": "wallet",
+    "kind": "surface",
+    "subject": "a glossy gold pill-shaped panel with orange bevel and smooth cream-yellow empty center",
+    "w": 300,
+    "h": 120,
+    "path": "/workspace/generated_images/exec-876e4fec-ddd6-40ec-9952-26a0844d8c35.png"
+  }
+]

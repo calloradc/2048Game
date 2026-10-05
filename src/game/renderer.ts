@@ -3,6 +3,7 @@ import { BOARD, type Cube, type FruitWorld, type MergeEvent } from './physics';
 import { bodyUV, bodyRect, spriteFans, textureTransform, type UV } from './spriteShape';
 import { AimPreview } from './aimPreview';
 import { backgroundAsset, boxAsset } from './catalog';
+import { UI_ARTWORK } from '../ui/assets';
 
 interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; texture: number; size: number; angle: number; spin: number }
 interface Burst { x: number; y: number; age: number; color: string; radius: number }
@@ -43,7 +44,7 @@ export class GameRenderer {
 
   async start(progress: (loaded: number, total: number) => void = () => {},skin='fruit',box='glass',background='meadow') {
     this.skin=skin;
-    const files=[...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),asset('wood-sign.webp'),backgroundAsset(background)];
+    const files=[...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),asset('wood-sign.webp'),backgroundAsset(background),...UI_ARTWORK];
     let completed=0;const total=files.length+1;
     const images=await Promise.all(files.map(async src=>{const image=await loadImage(src);if(!this.destroyed)progress(++completed,total);return image;}));
     await document.fonts.ready;

@@ -116,7 +116,7 @@ try {
       };
       const translate=()=>page.locator('.fruit-chain').evaluate(el=>new DOMMatrixReadOnly(getComputedStyle(el).transform).m41);
       assert.ok(await page.locator('.fruit-scroller').evaluate(el=>getComputedStyle(el).maskImage!=='none'),'Carousel edges fade');
-      assert.equal(await page.locator('.chain-arrow svg').count(),10,'Fruit progression uses arrow icons');
+      assert.equal(await page.locator('.chain-arrow img.ui-icon').count(),10,'Fruit progression uses generated raster arrows');
       await pull(100);
       const leftStretch=await translate();assert.ok(leftStretch>15&&leftStretch<100,'Left edge stretches with resistance');
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
