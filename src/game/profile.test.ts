@@ -7,10 +7,10 @@ describe('Saved shop ownership and rewarded unlocks',()=>{
   it('deducts the price once and only equips an owned item',()=>{
     const fresh=defaultProfile();
     expect(selectItem(fresh,fuzzy)).toBe(fresh);
-    expect(purchase(fresh,fuzzy,179).purchased).toBe(false);
-    const bought=purchase(fresh,fuzzy,200);
-    expect(bought.coins).toBe(20);expect(bought.profile.owned).toContain(fuzzy.key);
-    const again=purchase(bought.profile,fuzzy,200);expect(again.purchased).toBe(false);expect(again.coins).toBe(200);
+    expect(purchase(fresh,fuzzy,899).purchased).toBe(false);
+    const bought=purchase(fresh,fuzzy,1000);
+    expect(bought.coins).toBe(100);expect(bought.profile.owned).toContain(fuzzy.key);expect(bought.profile.selected.skins).toBe('fuzzies');
+    const again=purchase(bought.profile,fuzzy,1000);expect(again.purchased).toBe(false);expect(again.coins).toBe(1000);
     expect(selectItem(bought.profile,fuzzy).selected.skins).toBe('fuzzies');
     expect(fresh.owned).not.toContain(fuzzy.key);
   });
@@ -24,7 +24,7 @@ describe('Saved shop ownership and rewarded unlocks',()=>{
     expect(fourth.profile.videos[fuzzy.key]).toBe(3);
   });
   it('restores purchases, selections and video progress and rejects invalid selections',()=>{
-    let profile=selectItem(purchase(defaultProfile(),fuzzy,500).profile,fuzzy);
+    let profile=selectItem(purchase(defaultProfile(),fuzzy,1000).profile,fuzzy);
     profile=rewardUnlock(profile,CATALOG.boxes[1]).profile;
     profile.daily='2026-10-04';
     const restored=parseProfile(JSON.stringify(profile));expect(restored.selected.skins).toBe('fuzzies');expect(restored.daily).toBe(profile.daily);

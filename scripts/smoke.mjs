@@ -4,6 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import { checkShop } from './shop-smoke.mjs';
 import { checkGameover } from './gameover-smoke.mjs';
 import { checkRewardsAndOffers } from './rewards-smoke.mjs';
+import { checkShopBehavior } from './shop-behavior-smoke.mjs';
 import { checkUiMotion } from './ui-motion-smoke.mjs';
 
 const browser = await chromium.launch({
@@ -52,7 +53,7 @@ try {
     assert.equal(metrics.w, width); assert.equal(metrics.h, height);
     assert.ok(await page.evaluate(() => {
       const field=document.querySelector('.playfield').getBoundingClientRect(),canvas=document.querySelector('canvas').getBoundingClientRect();
-      return Math.abs(field.y-canvas.y)<1 && Math.abs(field.height-canvas.height)<1 && document.fonts.check('900 14px Nunito');
+      return Math.abs(field.y-canvas.y-70*field.width/420)<1 && Math.abs(field.y+field.height-canvas.y-canvas.height)<1 && document.fonts.check('900 14px Nunito');
     }), 'Canvas stays inside its field; Nunito loaded');
     assert.ok(metrics.x >= -1 && metrics.y >= -1 && metrics.bottom <= height + 1 && metrics.right <= width + 1, `Scene fits ${width}×${height}`);
     assert.ok(await page.locator('.ambient-background').evaluate(el=>{
@@ -63,7 +64,8 @@ try {
       assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
       assert.ok(await page.locator('.utility-button').evaluateAll(els=>els.every(el=>el.textContent.trim()==='')),'Help and gift buttons have no visual labels');
       assert.ok(await page.locator('.shop-launch').evaluate(el=>{const art=el.querySelector('.shop-launch-art'),s=getComputedStyle(art);return getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)'&&s.backgroundColor!=='rgba(0, 0, 0, 0)'&&s.borderRadius==='50%'&&getComputedStyle(el.querySelector('.shop-launch-label')).color==='rgb(255, 255, 255)'&&el.querySelector('img').src.includes('icon-shop-basket-red.webp');}),'Shop has a translucent circle and a white outlined label');
-      assert.ok(await page.locator('.hint').evaluate(el=>parseFloat(getComputedStyle(el.querySelector('span')).webkitTextStrokeWidth)>0&&getComputedStyle(el.querySelector('img')).filter.includes('drop-shadow')),'Hint and hand have a white outline');
+      assert.equal(await page.locator('.hint').count(),0,'The extra drop hint has been removed');
+      assert.equal(await page.locator('.playfield .shop-launch,.playfield .next-fruit').count(),0,'Shop and next preview have a separate toolbar');
       assert.ok(await page.locator('.score-card').evaluate(el=>{
         const number=el.querySelector('strong'),label=el.querySelector('.small-label');
         return Math.abs(number.getBoundingClientRect().left-label.getBoundingClientRect().left)<1&&parseFloat(getComputedStyle(number).webkitTextStrokeWidth)===0&&getComputedStyle(el.parentElement).backgroundImage==='none';
@@ -79,10 +81,10 @@ try {
       await page.waitForFunction(()=>Math.abs(window.__jellyPreviewAngle)<.01);
       await aimTouch.detach();
       await page.screenshot({path:'test-results/empty-start.png'});
-      await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.13);
+      await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.22);
       await page.waitForTimeout(1000);
       assert.equal(await page.getByTestId('score').textContent(), '0', 'One fruit cannot merge');
-      await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.13);
+      await page.touchscreen.tap(bounds.x + bounds.width * 77 / 420, bounds.y + bounds.height * 0.22);
       await page.waitForFunction(() => Number(document.querySelector('[data-testid="score"]').textContent.replace(/\D/g, '')) >= 4);
       assert.equal(await page.getByTestId('coins').textContent(),'1','A merge rewards coins');
       assert.equal(await page.locator('.chain-fruit[data-level="1"]').getAttribute('data-discovered'),'true');
@@ -157,7 +159,7 @@ try {
       await page.waitForFunction(()=>document.querySelector('.fruit-scroller').scrollLeft<1);
       await page.screenshot({path:'test-results/collection.png'});
       await page.getByRole('button',{name:'Баланс монет'}).click();
-      assert.match(await page.getByRole('dialog').textContent(),/25 монет/);
+      assert.match(await page.getByRole('dialog').textContent(),/125 монет/);
       await page.getByRole('button',{name:'За сочным урожаем!'}).click();
       await page.locator('.overlay').waitFor({state:'detached'});
       assert.ok(await page.locator('.scene').evaluate((el,original)=>{
@@ -167,12 +169,11 @@ try {
       await page.screenshot({path:'test-results/mobile.png'});
       const record = await page.locator('.best-card strong').textContent();
       const coins=await page.getByTestId('coins').textContent();
-      const discoveries=await page.locator('.chain-fruit[data-discovered="true"]').count();
       await page.reload({waitUntil:'networkidle'});
       await page.waitForFunction(()=>!document.querySelector('.loading'));
       assert.equal(await page.locator('.best-card strong').textContent(), record, 'Record survives a reload');
       assert.equal(await page.getByTestId('coins').textContent(),coins,'Wallet survives a reload');
-      assert.equal(await page.locator('.chain-fruit[data-discovered="true"]').count(),discoveries,'Discoveries survive a reload');
+      assert.equal(await page.locator('.chain-fruit[data-discovered="true"]').count(),1,'A fresh round resets discovered fruit');
       await page.getByRole('button', {name:'Настройки',exact:true}).click();
       await page.getByRole('button', {name:'Начать заново',exact:true}).click();
       await page.getByRole('dialog').getByRole('button', {name:'Начать заново',exact:true}).click();
@@ -185,19 +186,20 @@ try {
     console.log(`✓ ${width}×${height}: no scroll, all controls fit`);
   }
   const paid=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-  await paid.addInitScript(()=>localStorage.setItem('jelly-coins','25'));
+  await paid.addInitScript(()=>localStorage.setItem('jelly-coins','125'));
   await paid.goto(base,{waitUntil:'networkidle'});
   await paid.waitForFunction(()=>!document.querySelector('.loading'));
   const shake=paid.getByRole('button',{name:/Встряхнуть/});
   for(let i=0;i<3;i++)await shake.click();
-  assert.equal(await paid.getByTestId('coins').textContent(),'25','Free shakes keep coins');
+  assert.equal(await paid.getByTestId('coins').textContent(),'125','Free shakes keep coins');
   await shake.click();
-  assert.equal(await paid.getByTestId('coins').textContent(),'0','Extra shake costs 25 coins');
+  assert.equal(await paid.getByTestId('coins').textContent(),'0','Extra shake costs 125 coins');
   assert.ok(await shake.isDisabled(),'An unaffordable shake is disabled');
   await paid.close();
   await checkShop(browser,base,errors);
   await checkRewardsAndOffers(browser,base,errors);
   await checkUiMotion(browser,base,errors);
+  await checkShopBehavior(browser,base,errors);
   await checkGameover(browser,base,errors);
   assert.deepEqual(errors, [], 'No browser errors or missing assets');
   console.log('✓ preview tilt, elastic edges, inertia, fading masks, animated dialogs, touch drop, merges and saved progress');

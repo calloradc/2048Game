@@ -63,8 +63,7 @@ describe('FruitWorld: rules and soft bodies', () => {
     expect(world.state.discovered & (1<<2)).toBeTruthy();
     world.add(0,190,410);world.add(0,218,410);advance(world,0.3);
     expect(world.state.coins).toBe(11);expect(world.state.discovered & (1<<1)).toBeTruthy();
-    const discoveries=world.state.discovered;
-    world.reset();expect(world.state.coins).toBe(11);expect(world.state.discovered).toBe(discoveries);
+    world.reset();expect(world.state.coins).toBe(11);expect(world.state.discovered).toBe(1);
     expect(world.state.score).toBe(0);world.destroy();
   });
   it('uses three free shakes before spending coins and refuses an unaffordable shake', () => {

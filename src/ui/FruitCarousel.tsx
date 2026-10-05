@@ -4,7 +4,7 @@ import { ElasticScroll } from './ElasticScroll';
 import { CATALOG, SKIN_NAMES } from '../game/catalog';
 import { Icon } from './Icon';
 
-const Arrow = ({left=false}:{left?:boolean}) => <Icon name={left?'left':'right'} size={19}/>;
+const Arrow = () => <Icon name="right" size={19}/>;
 
 export function FruitCarousel({discovered,skin='fruit'}:{discovered:number;skin?:string}) {
   const viewport=useRef<HTMLDivElement>(null),track=useRef<HTMLDivElement>(null);
@@ -12,6 +12,7 @@ export function FruitCarousel({discovered,skin='fruit'}:{discovered:number;skin?
   const [edges,setEdges]=useState({left:false,right:true});
   const count=FRUITS.filter((_,level)=>discovered&(1<<level)).length;
   useEffect(()=>{
+    if(discovered===1&&previous.current!==1){motion.current?.scrollTo(0);previous.current=discovered;return;}
     const scroll=new ElasticScroll(viewport.current!,track.current!,setEdges);motion.current=scroll;
     return()=>{scroll.destroy();motion.current=null;};
   },[]);
@@ -21,7 +22,7 @@ export function FruitCarousel({discovered,skin='fruit'}:{discovered:number;skin?
   },[discovered]);
   return <section className="evolution" aria-label="Фруктовая семья">
     <div className="evolution-title"><span>{CATALOG.skins.find(item=>item.id===skin)?.name.toUpperCase()}</span><span>{count<11?`${count} / 11`:'ВСЕ СОБРАНЫ'} · ЦЕЛЬ <b>2048</b></span></div>
-    <button className="carousel-arrow prev" aria-label="Предыдущие фрукты" onClick={()=>motion.current?.scrollBy(-180)} disabled={!edges.left}><Arrow left /></button>
+    <button className="carousel-arrow prev" aria-label="Предыдущие фрукты" onClick={()=>motion.current?.scrollBy(-180)} disabled={!edges.left}><Arrow /></button>
     <div className="fruit-scroller" ref={viewport} tabIndex={0} aria-label="Лента фруктов. Листай пальцем или стрелками.">
       <div className="fruit-chain" ref={track}>{FRUITS.map((fruit,level)=>{
         const known=!!(discovered&(1<<level));

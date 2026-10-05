@@ -116,7 +116,7 @@ export class GameRenderer {
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
     ctx.clearRect(0, 0, BOARD.width, BOARD.height);
     // Use the original glass image once; no drawn tint, duplicate rim or wash.
-    if (this.glass) ctx.drawImage(this.glass, 25, 95, 370, 370);
+    if (this.glass) ctx.drawImage(this.glass, 27, 95, 366, 370);
     for (const id of this.sleepingSprites.keys()) if (!this.world.cubes.has(id)) this.sleepingSprites.delete(id);
 
     const { state, aim } = this.world;

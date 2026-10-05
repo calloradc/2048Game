@@ -8,7 +8,7 @@
 .rewards-heading > .ui-icon { flex-shrink: 0; }
 .rewards-heading .eyebrow { font-size: 6px; letter-spacing: 1px; color: #af9abe; }
 .rewards-heading h1 { font-size: 21px; margin: 4px 0 0; letter-spacing: -.4px; }
-.rewards-scroll { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; padding: 18px 16px 24px; }
+.rewards-scroll { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; padding: 0; touch-action: pan-x; }
 .rewards-scroll::-webkit-scrollbar { display: none; }
 .daily-hero { position: relative; display: flex; align-items: center; min-height: 155px; padding: 19px; margin-bottom: 16px; border-radius: 25px; corner-shape: squircle; background: linear-gradient(110deg, #e9d6fb, #fff1dc); text-align: left; overflow: hidden; }
 .daily-hero > div { position: relative; z-index: 1; width: 66%; }
@@ -89,3 +89,8 @@
 .daily-background-preview { width: 60px; height: 55px; padding: 4px 4px 9px; border-radius: 9px; corner-shape: squircle; background: #fffdf8; box-shadow: 0 3px 7px #35594e16; }
 .daily-background-preview .card-art { border-radius: 5px; }
 .daily-background-preview .item-image { object-fit: cover; }
+
+.rewards-scroll > .soft-scroll-track { padding: 18px 16px 24px; }
+.shop-fullscreen.overlay, .rewards-fullscreen.overlay { animation: none; overflow: hidden; }
+.shop-fullscreen .shop-dialog, .rewards-fullscreen .rewards-dialog { position: absolute; inset: 0; height: 100%; animation-duration: .3s; }
+.shop-fullscreen.is-leaving .shop-dialog, .rewards-fullscreen.is-leaving .rewards-dialog { animation-duration: .22s; }

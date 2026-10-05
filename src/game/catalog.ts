@@ -1,8 +1,9 @@
 import { asset, FRUITS, fruitAsset } from './fruits';
+import { PRICE_MULTIPLIER } from './economy';
 
 export type Category = 'skins'|'backgrounds'|'boxes';
 export interface ShopItem {id:string;key:string;category:Category;name:string;description:string;price:number;videos:number;exclusive?:boolean}
-const items=(category:Category,rows:[string,string,string,number,number][]):ShopItem[]=>rows.map(([id,name,description,price,videos])=>({id,key:`${category}:${id}`,category,name,description,price,videos}));
+const items=(category:Category,rows:[string,string,string,number,number][]):ShopItem[]=>rows.map(([id,name,description,price,videos])=>({id,key:`${category}:${id}`,category,name,description,price:price*PRICE_MULTIPLIER,videos}));
 export const CATALOG:Record<Category,ShopItem[]>={
   skins:items('skins',[
     ['fruit','Фруктовая семья','11 сочных фруктовых кубиков',0,0],

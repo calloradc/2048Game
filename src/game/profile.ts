@@ -22,12 +22,12 @@ export function parseProfile(raw:string):Profile {
 }
 export function purchase(profile:Profile,item:ShopItem,coins:number) {
   if(item.exclusive||profile.owned.includes(item.key)||coins<item.price)return {profile,coins,purchased:false};
-  return {profile:{...profile,owned:[...profile.owned,item.key]},coins:coins-item.price,purchased:true};
+  return {profile:{...profile,selected:{...profile.selected,[item.category]:item.id},owned:[...profile.owned,item.key]},coins:coins-item.price,purchased:true};
 }
 export function rewardUnlock(profile:Profile,item:ShopItem) {
   if(item.exclusive||profile.owned.includes(item.key))return {profile,unlocked:false};
   const progress=Math.min(item.videos,(profile.videos[item.key]??0)+1),unlocked=progress>=item.videos;
-  return {profile:{...profile,videos:{...profile.videos,[item.key]:progress},owned:unlocked?[...profile.owned,item.key]:profile.owned},unlocked};
+  return {profile:{...profile,selected:unlocked?{...profile.selected,[item.category]:item.id}:profile.selected,videos:{...profile.videos,[item.key]:progress},owned:unlocked?[...profile.owned,item.key]:profile.owned},unlocked};
 }
 export function selectItem(profile:Profile,item:ShopItem):Profile {
   return profile.owned.includes(item.key)?{...profile,selected:{...profile.selected,[item.category]:item.id}}:profile;

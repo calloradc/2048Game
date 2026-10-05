@@ -1,6 +1,7 @@
+import { PRICE_MULTIPLIER } from './economy';
 import { FRUITS, randomDrop } from './fruits';
 
-export const BOARD = { width: 420, height: 490, left: 48, right: 372, top: 117, floor: 432, dropY: 68, danger: 156 };
+export const BOARD = { width: 420, height: 490, left: 50, right: 370, top: 117, floor: 432, dropY: 68, danger: 156 };
 export type Status = 'playing' | 'gameover' | 'won';
 export interface GameState {
   score: number; best: number; current: number; next: number;
@@ -17,7 +18,7 @@ export interface Cube {
   invMass: number; restArea: number; areaLambda: number; deformation: number; gx: Float64Array; gy: Float64Array;
 }
 export interface MergeEvent { x: number; y: number; level: number; combo: number }
-export const SHAKE_PRICE = 25;
+export const SHAKE_PRICE = 25*PRICE_MULTIPLIER;
 export const initialState = (best = 0, coins = 0, discovered = 1): GameState => ({ score: 0, best, current: 0, next: 1, highest: 0, drops: 0, shakes: 3, status: 'playing', danger: 0, combo: 0, ready: true, coins, discovered, earned:0, doubled:false, bonusCoins:0, revives:0 });
 // Clockwise perimeter: corners and edge midpoints. Ninth point is the centre.
 export const REST_POINTS = [[-0.5,-0.5],[0,-0.5],[0.5,-0.5],[0.5,0],[0.5,0.5],[0,0.5],[-0.5,0.5],[-0.5,0],[0,0]] as const;
@@ -62,11 +63,11 @@ export class FruitWorld {
     this.overflowTime=0;this.overDanger=false;this.emit();return true;
   }
   reset() {
-    const {best,coins,discovered} = this.state;
+    const {best,coins} = this.state;
     this.cubes.clear(); this.time = 0; this.lastDrop = -2; this.lastMerge = -2;
     this.overflowTime = 0; this.overDanger = false; this.nextId = 1;
     this.aim = BOARD.width / 2;
-    this.state = { ...initialState(best,coins,discovered), current: randomDrop(), next: randomDrop() };
+    this.state = { ...initialState(best,coins), current: randomDrop(), next: randomDrop() };
     this.emit();
   }
 

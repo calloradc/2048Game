@@ -4,7 +4,7 @@ export async function checkUiMotion(browser,base,errors){
   const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   page.on('pageerror',error=>errors.push(error.message));
   page.on('response',response=>{if(response.status()>=400)errors.push(`${response.status()}: ${response.url()}`);});
-  await page.addInitScript(()=>localStorage.setItem('jelly-coins','1000'));
+  await page.addInitScript(()=>localStorage.setItem('jelly-coins','5000'));
   await page.goto(base,{waitUntil:'networkidle'});await page.locator('.loading-screen').waitFor({state:'detached'});
   const open=()=>page.getByRole('button',{name:'Магазин',exact:true}).click();
   const close=async()=>{await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.locator('.overlay').waitFor({state:'detached'});};
@@ -67,14 +67,14 @@ export async function checkUiMotion(browser,base,errors){
   assert.equal(await bundle.evaluate(el=>el.dataset.entered),'true');
   await jump('Персонажи','skins');await jump('Наборы','bundles');
   assert.equal(await bundle.evaluate(el=>getComputedStyle(el).opacity),'1','Previously revealed cards never fade back out');
-  await bundle.getByRole('button',{name:'Купить Уютный набор за 360'}).click();
+  await bundle.getByRole('button',{name:'Купить Уютный набор за 1800'}).click();
   const toast=page.locator('.toast');await toast.waitFor({state:'visible'});
   const toastBounds=await toast.boundingBox();assert.ok(toastBounds.y<64,'Notifications appear at the top');
   await page.mouse.move(toastBounds.x+toastBounds.width*.4,toastBounds.y+toastBounds.height*.7);
   await page.mouse.down();await page.mouse.move(toastBounds.x+toastBounds.width*.4,toastBounds.y-55,{steps:6});await page.mouse.up();
   await toast.waitFor({state:'detached'});
   await jump('Монеты','supplies');
-  await page.getByRole('button',{name:'Купить 1 встрясок за 25'}).click();
+  await page.getByRole('button',{name:'Купить 1 встрясок за 125'}).click();
   await toast.waitFor({state:'visible'});const nextToast=await toast.boundingBox();
   await page.mouse.move(nextToast.x+nextToast.width*.35,nextToast.y+nextToast.height*.5);await page.mouse.down();
   await page.mouse.move(nextToast.x+nextToast.width*.35+110,nextToast.y+nextToast.height*.5,{steps:6});await page.mouse.up();await toast.waitFor({state:'detached'});

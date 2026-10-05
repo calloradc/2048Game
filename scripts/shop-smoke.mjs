@@ -5,7 +5,7 @@ export async function checkShop(browser,base,errors){
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()}: ${r.url()}`);});
   await page.addInitScript(()=>{
-    if(!localStorage.getItem('shop-test-seeded')){localStorage.setItem('jelly-coins','400');localStorage.setItem('shop-test-seeded','true');}
+    if(!localStorage.getItem('shop-test-seeded')){localStorage.setItem('jelly-coins','2100');localStorage.setItem('shop-test-seeded','true');}
     window.__shopCanvasDraws=0;
     const clear=CanvasRenderingContext2D.prototype.clearRect;
     CanvasRenderingContext2D.prototype.clearRect=function(...args){if(this.canvas===document.querySelector('canvas'))window.__shopCanvasDraws++;return clear.apply(this,args);};
@@ -64,24 +64,22 @@ export async function checkShop(browser,base,errors){
   await next('skins','Шушистики');
   assert.deepEqual(await layout(),fixedLayout,'Locked item actions do not move any collection or slot');
   await page.screenshot({path:'test-results/shop-skins.png'});
-  await section('skins').getByRole('button',{name:'Купить за 180'}).click();assert.equal(await coins(),220);
+  await section('skins').getByRole('button',{name:'Купить за 900'}).click();assert.equal(await coins(),1200);
   assert.deepEqual(await layout(),fixedLayout,'Buying an item does not collapse reserved action space');
-  await section('skins').getByRole('button',{name:'Выбрать',exact:true}).click();await section('skins').getByRole('button',{name:'Уже в игре'}).waitFor();
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.skins==='fuzzies');
   assert.deepEqual(await layout(),fixedLayout,'Applying an item leaves all sections in place');
   await page.waitForFunction(()=>document.querySelector('.chain-fruit img').src.includes('/skins/fuzzies/'));
   await next('backgrounds','Сакура на закате');
-  await section('backgrounds').getByRole('button',{name:'Купить за 120'}).click();assert.equal(await coins(),100);
-  await section('backgrounds').getByRole('button',{name:'Выбрать',exact:true}).click();await section('backgrounds').getByRole('button',{name:'Уже в игре'}).waitFor();
+  await section('backgrounds').getByRole('button',{name:'Купить за 600'}).click();assert.equal(await coins(),600);
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.backgrounds==='sunset');
   assert.ok(await page.locator('.ambient-background').evaluate(el=>getComputedStyle(el,'::before').backgroundImage.includes('backgrounds/sunset.webp')));
   await page.screenshot({path:'test-results/shop-backgrounds.png'});
-  await next('boxes','Розовый кварц');assert.ok(await section('boxes').getByRole('button',{name:'Нужно ещё 50'}).isDisabled());
-  await page.getByRole('button',{name:'+75 монет за видео',exact:true}).click();await page.getByRole('button',{name:'Закрыть без награды'}).click();assert.equal(await coins(),100);
+  await next('boxes','Розовый кварц');assert.ok(await section('boxes').getByRole('button',{name:'Нужно ещё 150'}).isDisabled());
+  await page.getByRole('button',{name:'+150 монет за видео',exact:true}).click();await page.getByRole('button',{name:'Закрыть без награды'}).click();assert.equal(await coins(),600);
   assert.equal(await section('boxes').locator('.shop-current').textContent(),'Розовый кварц');
-  await watch(page.getByRole('button',{name:'+75 монет за видео',exact:true}));assert.equal(await coins(),175);await page.waitForTimeout(400);assert.equal(await coins(),175);
-  await section('boxes').getByRole('button',{name:'Купить за 150'}).click();assert.equal(await coins(),25);
-  const beforeAppearance=await page.evaluate(()=>window.__shopCanvasDraws);
-  await section('boxes').getByRole('button',{name:'Выбрать',exact:true}).click();await section('boxes').getByRole('button',{name:'Уже в игре'}).waitFor();
-  await page.waitForFunction(previous=>window.__shopCanvasDraws>previous,beforeAppearance);
+  await watch(page.getByRole('button',{name:'+150 монет за видео',exact:true}));assert.equal(await coins(),750);await page.waitForTimeout(400);assert.equal(await coins(),750);
+  await section('boxes').getByRole('button',{name:'Купить за 750'}).click();assert.equal(await coins(),0);
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.boxes==='rose');
   await page.screenshot({path:'test-results/shop-boxes.png'});
   assert.equal(await section('skins').locator('.shop-current').textContent(),'Шушистики','Rails keep independent selections');
   await next('skins','Суши-пати');
@@ -90,9 +88,9 @@ export async function checkShop(browser,base,errors){
     const profile=await page.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')));
     assert.equal(profile.videos['skins:sushi'],i);assert.equal(profile.owned.includes('skins:sushi'),i===3);
   }
-  assert.equal(await coins(),25);
-  await section('skins').getByRole('button',{name:'Выбрать',exact:true}).click();await section('skins').getByRole('button',{name:'Уже в игре'}).waitFor();await close();
-  await page.getByRole('button',{name:'Подарки',exact:true}).click();assert.equal(await page.locator('.daily-prize').count(),14);assert.equal(await page.getByRole('dialog',{name:'Подарки'}).getByRole('button',{name:/видео/i}).count(),0,'Rewards only contains daily prizes');await page.getByRole('button',{name:'Забрать ежедневный подарок'}).click();assert.equal(await coins(),50);
+  assert.equal(await coins(),0);
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('jelly-profile')).selected.skins==='sushi');await close();
+  await page.getByRole('button',{name:'Подарки',exact:true}).click();assert.equal(await page.locator('.daily-prize').count(),14);assert.equal(await page.getByRole('dialog',{name:'Подарки'}).getByRole('button',{name:/видео/i}).count(),0,'Rewards only contains daily prizes');await page.getByRole('button',{name:'Забрать ежедневный подарок'}).click();assert.equal(await coins(),25);
   assert.equal(await page.getByRole('button',{name:'Забрать ежедневный подарок'}).count(),0,'A prize can only be claimed once today');await page.screenshot({path:'test-results/daily-rewards.png',animations:'disabled'});
   await page.locator('.rewards-scroll').evaluate(el=>el.scrollTop=el.scrollHeight);await page.screenshot({path:'test-results/daily-rewards-bottom.png',animations:'disabled'});await close();await openShop();await waitItem('skins','Суши-пати');await waitItem('backgrounds','Сакура на закате');await waitItem('boxes','Розовый кварц');await page.getByRole('navigation',{name:'Разделы магазина'}).getByRole('button',{name:'Монеты',exact:true}).click();
   await page.waitForFunction(()=>{const el=document.querySelector('.shop-scroll'),target=el.querySelector('[data-shop-section=supplies]');return Math.abs(el.scrollTop-Math.min(el.scrollHeight-el.clientHeight,target.offsetTop-8))<2;});
@@ -101,7 +99,7 @@ export async function checkShop(browser,base,errors){
   await page.getByRole('button',{name:'Настройки',exact:true}).click();
   const sound=page.getByRole('switch',{name:'Звук'}),vibration=page.getByRole('switch',{name:'Вибрация'});
   await sound.click();assert.equal(await sound.getAttribute('aria-checked'),'false');await vibration.click();assert.equal(await vibration.getAttribute('aria-checked'),'false');await page.screenshot({path:'test-results/settings.png'});await close();
-  await page.reload({waitUntil:'networkidle'});await page.locator('.loading').waitFor({state:'detached'});assert.equal(await coins(),50);
+  await page.reload({waitUntil:'networkidle'});await page.locator('.loading').waitFor({state:'detached'});assert.equal(await coins(),25);
   const restored=await page.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')));assert.equal(restored.selected.skins,'sushi');assert.equal(restored.selected.backgrounds,'sunset');assert.equal(restored.selected.boxes,'rose');
   await page.getByRole('button',{name:'Настройки',exact:true}).click();assert.equal(await sound.getAttribute('aria-checked'),'false');assert.equal(await vibration.getAttribute('aria-checked'),'false');await close();
   const field=await page.locator('canvas').boundingBox();await page.touchscreen.tap(field.x+field.width*.5,field.y+field.height*.13);await page.waitForTimeout(1500);await page.screenshot({path:'test-results/selected-theme.png'});

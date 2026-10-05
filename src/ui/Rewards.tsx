@@ -6,6 +6,7 @@ import type { Profile } from '../game/profile';
 import { Icon } from './Icon';
 import { PreviewImage } from './PreviewImage';
 import { useReveal } from './useReveal';
+import { SoftScroll } from './SoftScroll';
 
 type Props={profile:Profile;day:string;busy:boolean;onClaim:()=>void;onSelect:(item:ShopItem)=>void;onClose:()=>void};
 function PrizeArt({prize}:{prize:DailyPrize}) {
@@ -20,7 +21,7 @@ export function Rewards({profile,day,busy,onClaim,onSelect,onClose}:Props) {
   const completed=claimedToday&&profile.dailyCount%cycle===0&&profile.dailyCount>0?cycle:profile.dailyCount%cycle;
   return <>
     <header className="rewards-heading"><Icon name="gift" size={32}/><div><span className="eyebrow">КАЖДЫЙ ДЕНЬ ЧТО-ТО ПРИЯТНОЕ</span><h1>Ежедневные награды</h1></div></header>
-    <div className="rewards-scroll" ref={scroll}>
+    <SoftScroll className="rewards-scroll" viewportRef={scroll}>
       <section className="daily-hero" data-reveal><div><span className="exclusive-tag">14 ДНЕЙ МАЛЕНЬКИХ ЧУДЕС</span><h2>Две недели подарков</h2><p>Лунная коллекция и кристальный финал</p><span className="daily-week-progress">{completed} / {cycle} подарков</span><div className="daily-progress-track" role="progressbar" aria-label="Получено подарков" aria-valuemin={0} aria-valuemax={cycle} aria-valuenow={completed}><span style={{transform:`scaleX(${completed/cycle})`}}/></div></div><PreviewImage src={fruitAsset(10,'mochi')} alt="Лунный король" eager/></section>
       <div className="daily-list" role="list" aria-label="Подарки на 14 дней">{DAILY_PRIZES.map((original,index)=>{
         const received=index<completed,available=index===completed&&!claimedToday;
@@ -36,7 +37,7 @@ export function Rewards({profile,day,busy,onClaim,onSelect,onClose}:Props) {
         </article>;
       })}</div>
       <p className="daily-note">Заходи за новым подарком каждый день. Пропуск дня не сбрасывает прогресс.</p>
-    </div>
+    </SoftScroll>
     <footer className="rewards-footer"><button className="primary-button" onClick={onClose}><Icon name="play" size={24}/>В игру</button></footer>
   </>;
 }
