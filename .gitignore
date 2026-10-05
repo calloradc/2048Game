@@ -3,6 +3,7 @@ dist/
 *.tsbuildinfo
 playwright-report/
 test-results/
+exports/
 .DS_Store
 .env
 __pycache__/

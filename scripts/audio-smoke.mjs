@@ -15,12 +15,19 @@ try {
   await page.addInitScript(() => {
     localStorage.setItem('jelly-coins', '5000');
     window.audioStarts = [];
+    window.musicStarts = [];
     window.musicElements = [];
     const NativeAudio = window.Audio;
     window.Audio = class extends NativeAudio {
       constructor(src) { super(src); window.musicElements.push(this); }
     };
     const scheduledValues = new WeakMap();
+    const musicSources = new WeakSet();
+    const connect = AudioBufferSourceNode.prototype.connect;
+    AudioBufferSourceNode.prototype.connect = function(destination, ...args) {
+      if (destination instanceof GainNode && Math.abs(destination.gain.value - .2)<1e-6) musicSources.add(this);
+      return connect.call(this, destination, ...args);
+    };
     const setValue = AudioParam.prototype.setValueAtTime;
     AudioParam.prototype.setValueAtTime = function(value, time) {
       scheduledValues.set(this, value);
@@ -28,7 +35,9 @@ try {
     };
     const start = AudioBufferSourceNode.prototype.start;
     AudioBufferSourceNode.prototype.start = function(time, ...args) {
-      window.audioStarts.push({ time, pitch: scheduledValues.get(this.playbackRate) ?? this.playbackRate.value, duration: this.buffer.duration, loop: this.loop });
+      const event = { time, pitch: scheduledValues.get(this.playbackRate) ?? this.playbackRate.value, duration: this.buffer.duration, loop: this.loop };
+      if (musicSources.has(this)) window.musicStarts.push({ ...event, context:this.context });
+      else window.audioStarts.push(event);
       return start.call(this, time, ...args);
     };
   });
@@ -38,10 +47,10 @@ await page.goto(process.env.GAME_URL || 'http://localhost:5173/', { waitUntil: '
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.waitForFunction(() => window.audioStarts.filter(source => !source.loop).length === 2);
   const button = await page.evaluate(() => window.audioStarts);
-  await page.waitForFunction(() => window.musicElements.some(music => !music.paused && music.currentTime > 0));
-  assert.equal(await page.evaluate(() => window.musicElements.filter(music => music.getAttribute('src')).length), 1, 'Music uses one streaming audio element after StrictMode cleanup');
-  assert.ok(await page.evaluate(() => { const music = window.musicElements.find(music => music.getAttribute('src')); return music.loop && !music.controls && !music.isConnected; }), 'Music loops without a visible player');
-  assert.ok(musicRequests.length && musicRequests.every(type => type === 'media'), 'Music streams through media requests instead of fetching a full decoded buffer');
+  await page.waitForFunction(() => window.musicStarts.some(music => music.context.state === 'running' && music.context.currentTime > music.time));
+  assert.equal(await page.evaluate(() => window.musicElements.length), 0, 'No audio element is created, including after StrictMode cleanup');
+  assert.equal(await page.locator('audio,video').count(), 0);
+  assert.ok(musicRequests.length && musicRequests.every(type => type === 'fetch'), 'Music arrives through the streaming fetch decoder');
   assert.equal(button[0].time, button[1].time, 'Both button layers start together');
   button.map(source => source.duration).sort((a,b) => a-b).forEach((duration,i) => assert.ok(Math.abs(duration - [0.144, 0.230][i]) < 0.02));
   await page.getByRole('button', { name: 'Вернуться в игру', exact: true }).click();

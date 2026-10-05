@@ -1,3 +1,5 @@
+import { StreamingMusic } from './streamingMusic';
+
 const AUDIO_FILES = {
   button: 'button-pressed.ogg', highlight: 'highlight.ogg', currency: 'currency.ogg',
   splash14: 'splash-14.ogg', splash03: 'splash-03.ogg', sell: 'sell.ogg',
@@ -15,7 +17,7 @@ export class GameAudio {
   private context?: AudioContext;
   private master?: GainNode;
   private samples = new Map<Sample, Promise<AudioBuffer | undefined>>();
-  private music?: HTMLAudioElement;
+  private music?: StreamingMusic;
   private activeSources = new Set<AudioScheduledSourceNode>();
   private mergeSources = new Set<AudioBufferSourceNode>();
   private active = !document.hidden && document.hasFocus();
@@ -38,15 +40,10 @@ export class GameAudio {
       this.master = context.createGain();
       const limiter = context.createDynamicsCompressor();
       this.master.connect(limiter); limiter.connect(context.destination);
-      // An unattached audio element streams the music; no player is added to the page.
-      this.music = new Audio(`${import.meta.env.BASE_URL}assets/audio/playground.ogg`);
-      this.music.controls = false;
-      this.music.disableRemotePlayback = true;
-      this.music.preload = 'auto';
-      this.music.loop = true;
-      const musicSource = context.createMediaElementSource(this.music), musicGain = context.createGain();
+      const musicGain = context.createGain();
       musicGain.gain.value = 0.2;
-      musicSource.connect(musicGain); musicGain.connect(this.master);
+      musicGain.connect(this.master);
+      this.music = new StreamingMusic(context,musicGain,`${import.meta.env.BASE_URL}assets/audio/playground.ogg`);
       for (const [sample, file] of Object.entries(AUDIO_FILES)) {
         this.samples.set(sample as Sample, fetch(`${import.meta.env.BASE_URL}assets/audio/${file}`)
           .then(response => { if (!response.ok) throw new Error(`Audio: ${response.status}`); return response.arrayBuffer(); })
@@ -94,7 +91,6 @@ export class GameAudio {
     const audible = this.active && !this.muted && !this.paused;
     this.master?.gain.setValueAtTime(audible ? 1 : 0, context.currentTime);
     if (!audible) {
-      this.music?.pause();
       for (const source of this.activeSources) source.stop();
       this.activeSources.clear();
       this.mergeSources.clear();
@@ -103,8 +99,8 @@ export class GameAudio {
       void context.suspend().catch(() => {});
     } else if (this.unlocked) {
       void context.resume().catch(() => {});
-      if (audible && this.music?.paused) void this.music.play().catch(() => {});
     }
+    this.music?.setPlaying(audible && this.unlocked);
     if (audible && this.purchasePending) {
       this.purchasePending = false;
       this.play('purchase');
@@ -158,7 +154,7 @@ export class GameAudio {
     window.removeEventListener('blur', this.blurred);
     window.removeEventListener('pagehide', this.blurred);
     window.removeEventListener('pageshow', this.focusChanged);
-    if (this.music) { this.music.pause(); this.music.removeAttribute('src'); this.music.load(); }
+    this.music?.destroy();
     for (const source of this.activeSources) source.stop();
     this.activeSources.clear();
     this.mergeSources.clear();

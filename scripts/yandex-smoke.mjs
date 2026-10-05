@@ -8,9 +8,11 @@ try {
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await installYandexMock(page,{language:'ru',manualAds:true,startPaused:true,cloud:{jellySave:{version:1,updatedAt:Date.now(),best:400,coins:250,settings:{muted:false,language:'it'}}}});
   await page.addInitScript(()=>{
-    const OriginalAudio=window.Audio;
-    window.__music=[];
-    window.Audio=function(...args){const media=new OriginalAudio(...args);window.__music.push(media);return media;};
+    const OriginalAudioContext=window.AudioContext;
+    window.__audioContexts=[];
+    window.AudioContext=class extends OriginalAudioContext {
+      constructor(...args){super(...args);window.__audioContexts.push(this);}
+    };
   });
   let release;
   const gate=new Promise(resolve=>{release=resolve;});
@@ -23,7 +25,7 @@ try {
   release();await page.locator('.loading').waitFor({state:'detached'});
   assert.equal(await page.evaluate(()=>window.__sdkMock.calls.filter(call=>call.method==='ready').length),0,'Startup advertisement still pauses the platform');
   assert.ok(await page.locator('.scene').evaluate(el=>el.inert));
-  assert.ok(await page.evaluate(()=>window.__music.every(media=>media.paused)),'Startup ad stays silent');
+  assert.ok(await page.evaluate(()=>window.__audioContexts.length>0&&window.__audioContexts.every(context=>context.state!=='running')),'Startup ad stays silent');
   await page.evaluate(()=>window.__sdkMock.emit('game_api_resume'));
   await page.waitForFunction(()=>window.__sdkMock.calls.some(call=>call.method==='start'));
   assert.equal(await page.evaluate(()=>window.__sdkMock.calls.filter(call=>call.method==='init').length),1);
@@ -44,7 +46,7 @@ try {
   assert.equal(stops,1,'Opening a menu stops real gameplay once');
   await page.getByRole('button',{name:/150 монет.*За короткое видео/}).click();
   await page.locator('.mock-platform-ad').waitFor();
-  assert.ok(await page.evaluate(()=>window.__music.every(media=>media.paused)),'Rewarded advertisement pauses streaming music');
+  assert.ok(await page.evaluate(()=>window.__audioContexts.length>0&&window.__audioContexts.every(context=>context.state!=='running')),'Rewarded advertisement pauses streaming music');
   await page.evaluate(()=>window.__sdkMock.ad.finish(false));await page.locator('.ad-overlay').waitFor({state:'detached'});
   assert.equal(await page.getByTestId('coins').getAttribute('data-coins'),'250','Closing without reward grants nothing');
   assert.equal(await page.evaluate(()=>window.__sdkMock.calls.filter(call=>call.method==='start').length),1,'Closing an ad does not resume gameplay behind the menu');

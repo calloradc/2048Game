@@ -159,6 +159,31 @@ img { pointer-events: none; -webkit-user-drag: none; }
 .primary-button:disabled, .shake-button:disabled { opacity: 1; background: #d7edcb; color: #83a978; box-shadow: none; }
 .primary-button { width: 100%; }
 .shake-button { width: 100%; }
+/* A short sheen crosses the surface, then leaves a quiet gap between passes. */
+:is(.shake-button, .primary-button, .reward-button, .supply-video, .shop-quick-coins) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+:is(.shake-button, .primary-button, .reward-button, .supply-video, .shop-quick-coins):not(:disabled)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 35%, #fff0 40%, #ffffff60 50%, #fff0 60%, transparent 65%);
+  transform: translateX(-120%);
+  animation: button-sheen 5.6s ease-in-out infinite;
+}
+.reward-button:not(:disabled)::after, .supply-video:not(:disabled)::after { animation-delay: 1.5s; }
+.primary-button:not(:disabled)::after { animation-delay: 2.8s; }
+.shop-quick-coins:not(:disabled)::after { animation-delay: .8s; }
+@keyframes button-sheen {
+  0%, 72% { transform: translateX(-120%); opacity: 0; }
+  73% { opacity: 1; }
+  92% { transform: translateX(120%); opacity: 1; }
+  93%, 100% { transform: translateX(120%); opacity: 0; }
+}
 .shake-button > .ui-icon { width: 26px !important; height: 26px !important; }
 .shake-button > b { display: flex; align-items: center; justify-content: center; gap: 3px; min-width: 25px; height: 26px; padding: 0 6px; border-radius: 10px; background: #ffffff30; color: #fffdf4; font-size: 12px; }
 .shake-button > b img { width: 16px; height: 16px; }
