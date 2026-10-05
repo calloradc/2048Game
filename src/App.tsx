@@ -49,8 +49,9 @@ export default function App() {
   const [scale, setScale] = useState(1),[loaded, setLoaded] = useState(false),[error, setError] = useState(false),[progress, setProgress] = useState(0),[splashDone, setSplashDone] = useState(false);
   const [landscape,setLandscape]=useState(false),[interstitial,setInterstitial]=useState(false);
   useEffect(()=>{
-    if(state.status!=='gameover')return;
+    if(state.status==='playing')return;
     saveCloudData(true);void submitLeaderboardScore(state.best);
+    if(state.status!=='gameover')return;
     setInterstitial(true);void showFullscreenAd().finally(()=>setInterstitial(false));
   },[state.status]);
   const [modal, setModal] = useState<Modal>(null);
