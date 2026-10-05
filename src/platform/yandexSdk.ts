@@ -110,9 +110,12 @@ export function saveCloudData(important = false) {
   if (!player || !cloudLoaded) return;
   dirty = true; flushRequested ||= important;
   if (saving) return;
+  // Keep the first deadline: continuous merge chains must not postpone the
+  // cloud save forever. Important events can promote the scheduled write.
+  if (saveTimer !== undefined && !important) return;
   clearTimeout(saveTimer);
   const delay = Math.max(important ? 0 : 2000, 5000 - (Date.now() - lastSave));
-  saveTimer = setTimeout(() => { void sendCloudSave(); }, delay);
+  saveTimer = setTimeout(() => { saveTimer = undefined; void sendCloudSave(); }, delay);
 }
 async function sendCloudSave() {
   if (!player || !cloudLoaded || saving || !dirty) return;
@@ -127,7 +130,7 @@ async function sendCloudSave() {
 }
 function flushBeforeLeaving() {
   if (!dirty || !player || !cloudLoaded) return;
-  clearTimeout(saveTimer); flushRequested = true;
+  clearTimeout(saveTimer); saveTimer = undefined; flushRequested = true;
   // A final best-effort write must not wait for a timer after the tab closes.
   // Regular writes are capped at 60/5min, leaving room below the SDK's 100 limit.
   void sendCloudSave();

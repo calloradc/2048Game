@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 function fixture(cloud:Record<string,unknown>={}, authorized=true) {
   const values=new Map<string,string>(),storage={getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>{values.set(key,value);}};
   const events=new Map<string,()=>void>();
-  const player={isAuthorized:()=>authorized,getData:vi.fn(async()=>cloud),setData:vi.fn(async()=>{})};
+  const player={isAuthorized:()=>authorized,getData:vi.fn(async()=>cloud),setData:vi.fn(async(_data:Record<string,unknown>,_flush?:boolean)=>{})};
   const sdk={environment:{i18n:{lang:'tr'}},features:{LoadingAPI:{ready:vi.fn()},GameplayAPI:{start:vi.fn(),stop:vi.fn()}},
     on:vi.fn((name:string,listener:()=>void)=>events.set(name,listener)),off:vi.fn(),getPlayer:vi.fn(async()=>player),getStorage:vi.fn(async()=>storage),
     isAvailableMethod:vi.fn(async()=>true),auth:{openAuthDialog:vi.fn(async()=>{})},
@@ -73,6 +73,15 @@ describe('Yandex cloud, ads and current leaderboard contract',()=>{
     const f=fixture();f.values.set('jelly-coins','777');f.player.getData.mockRejectedValueOnce(Error('network'));
     const service=await import('./yandexSdk');await service.initYandexSDK();service.saveCloudData(true);await vi.runAllTimersAsync();
     expect(f.values.get('jelly-coins')).toBe('777');expect(f.player.setData).not.toHaveBeenCalled();
+  });
+  it('saves periodically even when merges keep changing the wallet',async()=>{
+    const f=fixture(),service=await import('./yandexSdk');await service.initYandexSDK();
+    const storage=await import('./storage');
+    for(let coins=1;coins<=20;coins++){
+      storage.writeStorage('jelly-coins',String(coins));await vi.advanceTimersByTimeAsync(500);
+    }
+    expect(f.player.setData).toHaveBeenCalledTimes(2);
+    expect(f.player.setData.mock.calls[1][0]).toMatchObject({jellySave:{coins:14}});
   });
   it('rewards only once in onRewarded, never onClose, and excludes concurrent ads',async()=>{
     const f=fixture(),service=await import('./yandexSdk');await service.initYandexSDK();
