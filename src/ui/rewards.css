@@ -1,15 +1,16 @@
 .rewards-fullscreen.overlay { padding: 0; background: #f9f3ecd1; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); z-index: 40; animation: overlay-in .32s cubic-bezier(.22, 1, .36, 1) both; }
 .rewards-dialog.dialog { width: 100%; height: 100%; max-width: none; border-radius: 0; box-shadow: none; background: transparent; animation: none; }
-.rewards-fullscreen.is-leaving .rewards-dialog { animation: none; }
+.rewards-dialog.dialog { animation: sheet-in .26s cubic-bezier(.2,.85,.2,1) both; }
+.rewards-fullscreen.is-leaving .rewards-dialog { animation: sheet-out .22s cubic-bezier(.4,0,.8,.2) both; }
 .rewards-dialog > .dialog-content { position: relative; width: min(100%, 560px); height: 100%; margin: auto; display: grid; grid-template-rows: calc(84px + var(--safe-top)) minmax(0, 1fr) calc(76px + var(--safe-bottom)); padding: 0; overflow: hidden; }
 .rewards-dialog .dialog-close { top: calc(24px + var(--safe-top)); right: 16px; background: #eee5df; }
-.rewards-heading { display: flex; align-items: center; gap: 10px; padding: calc(16px + var(--safe-top)) 58px 12px 20px; background: #fffdf4c4; text-align: left; animation: overlay-in .4s cubic-bezier(.22, 1, .36, 1) both; }
+.rewards-heading { display: flex; align-items: center; gap: 10px; padding: calc(16px + var(--safe-top)) 58px 12px 20px; background: #fffdf4c4; text-align: left; animation: none; }
 .rewards-heading > .ui-icon { flex-shrink: 0; }
 .rewards-heading .eyebrow { font-size: 6px; letter-spacing: 1px; color: #af9abe; }
 .rewards-heading h1 { font-size: 21px; margin: 4px 0 0; letter-spacing: -.4px; }
 .rewards-scroll { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; padding: 18px 16px 24px; }
 .rewards-scroll::-webkit-scrollbar { display: none; }
-.daily-hero { position: relative; display: flex; align-items: center; min-height: 155px; padding: 19px; margin-bottom: 16px; border-radius: 25px; corner-shape: squircle; background: linear-gradient(110deg, #e9d6fb, #fff1dc); text-align: left; overflow: hidden; animation: reward-arrive .5s .04s cubic-bezier(.22, 1, .36, 1) both; }
+.daily-hero { position: relative; display: flex; align-items: center; min-height: 155px; padding: 19px; margin-bottom: 16px; border-radius: 25px; corner-shape: squircle; background: linear-gradient(110deg, #e9d6fb, #fff1dc); text-align: left; overflow: hidden; }
 .daily-hero > div { position: relative; z-index: 1; width: 66%; }
 .daily-hero h2 { font-size: 23px; line-height: 1.1; font-weight: 900; margin: 8px 0 6px; color: #795397; }
 .daily-hero p { font-size: 10px; line-height: 1.4; color: #a086b0; margin: 0 0 8px; }
@@ -21,7 +22,7 @@
 
 /* Six small cells and a special seventh-day gift in each week. */
 .daily-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.daily-prize { position: relative; display: grid; grid-template-rows: 14px 55px minmax(38px, 1fr) 32px; justify-items: center; align-items: center; gap: 7px; min-width: 0; min-height: 184px; padding: 12px 9px; border-radius: 21px; corner-shape: squircle; background: #fffdf5; text-align: center; box-shadow: 0 4px 12px #35594e0a; animation: reward-arrive .48s cubic-bezier(.22, 1, .36, 1) both; animation-delay: var(--prize-delay); transition: background-color .3s; }
+.daily-prize { position: relative; display: grid; grid-template-rows: 14px 55px minmax(38px, 1fr) 32px; justify-items: center; align-items: center; gap: 7px; min-width: 0; min-height: 184px; padding: 12px 9px; border-radius: 21px; corner-shape: squircle; background: #fffdf5; text-align: center; box-shadow: 0 4px 12px #35594e0a; transition: background-color .3s; }
 .daily-prize.available { background: #edf7dc; box-shadow: 0 6px 18px #83ad5422; }
 .daily-prize.exclusive { background: #f3e8fc; }
 .daily-prize.exclusive.available { background: #ead8fa; }
@@ -56,7 +57,7 @@
 .daily-prize.milestone > :last-child { grid-column: 3; grid-row: 1 / -1; }
 .daily-prize.milestone.available { background: linear-gradient(110deg, #dfc8f6, #ffedc6); }
 .daily-note { text-align: center; color: #a9a38e; font-size: 10px; line-height: 1.5; margin: 20px 12px 0; }
-.rewards-footer { display: flex; align-items: center; justify-content: center; padding: 12px 20px calc(14px + var(--safe-bottom)); background: #fffdf4cf; animation: overlay-in .4s .08s cubic-bezier(.22, 1, .36, 1) both; }
+.rewards-footer { display: flex; align-items: center; justify-content: center; padding: 12px 20px calc(14px + var(--safe-bottom)); background: #fffdf4cf; animation: none; }
 .rewards-footer .primary-button { width: 200px; height: 50px; }
 
 @keyframes reward-arrive { from { opacity: 0; transform: translate3d(0, 12px, 0) scale(.98); } to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
@@ -84,3 +85,7 @@
   .rewards-footer { padding-block: 7px; }
 }
 @media (prefers-reduced-motion: reduce) { .daily-prize.available .daily-prize-art, .daily-prize.received .daily-prize-art { animation: none; } }
+
+.daily-background-preview { width: 60px; height: 55px; padding: 4px 4px 9px; border-radius: 9px; corner-shape: squircle; background: #fffdf8; box-shadow: 0 3px 7px #35594e16; }
+.daily-background-preview .card-art { border-radius: 5px; }
+.daily-background-preview .item-image { object-fit: cover; }

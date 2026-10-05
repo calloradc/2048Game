@@ -39,7 +39,7 @@ export async function checkShop(browser,base,errors){
   assert.equal(await page.locator('svg').count(),0,'Every visible icon is raster artwork');
   assert.deepEqual(await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox(),{x:0,y:0,width:390,height:844});
   assert.ok(await page.locator('.scene').evaluate(el=>el.inert));
-  assert.ok(await section('skins').locator('.snap-viewport').evaluate(el=>getComputedStyle(el).scrollSnapType.includes('mandatory')));
+  assert.ok(await section('skins').locator('.snap-viewport').evaluate(el=>getComputedStyle(el).scrollSnapType==='none'));
   const fixedLayout=await layout();
   assert.equal(await section('skins').locator('.rail-card').count(),7,'Every item appears exactly once');
   assert.ok(await section('skins').locator('.shop-arrow.prev').isDisabled(),'The first card has a hard beginning');

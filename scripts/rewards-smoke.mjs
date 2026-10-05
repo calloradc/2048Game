@@ -28,7 +28,7 @@ export async function checkRewardsAndOffers(browser,base,errors){
   await page.getByRole('button',{name:'Магазин',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('[data-category=boxes] .shop-current').textContent.startsWith('Лунное стекло'));
   assert.ok(await page.locator('[data-category=boxes] .shop-arrow.next').isDisabled(),'Shop opens on the equipped last box');
-  await page.waitForFunction(()=>document.querySelector('.shop-toolbar').getAnimations().every(animation=>animation.playState==='finished'));
+  await page.waitForFunction(()=>document.querySelector('.shop-dialog').getAnimations().every(animation=>animation.playState==='finished'));
   const header=await page.locator('.shop-heading').boundingBox(),quick=await page.locator('.shop-quick-coins').boundingBox();
   assert.ok(quick.y>=header.y+header.height-1&&quick.x>195,'Coin video button stays at the top right under the header');
   const nav=page.getByRole('navigation',{name:'Разделы магазина'}),navPosition=await nav.boundingBox();

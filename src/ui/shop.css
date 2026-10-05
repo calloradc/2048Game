@@ -56,18 +56,17 @@
 .collection-heading .eyebrow { color: #8a9985; font-size: 8px; letter-spacing: 1.5px; }
 .collection-heading h2 { font-size: 27px; line-height: 1.2; margin: 5px 0 0; font-weight: 900; }
 .snap-rail { position: relative; width: 100%; height: 212px; min-width: 0; }
-.snap-viewport { position: relative; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; cursor: grab; }
+.snap-viewport { position: relative; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scroll-snap-type: none; scrollbar-width: none; cursor: grab; }
 .snap-viewport::-webkit-scrollbar { display: none; }
 .snap-viewport:focus-visible { outline-offset: -4px; }
 .snap-track { position: relative; display: flex; gap: 28px; width: max-content; height: 100%; align-items: center; }
 .rail-card { position: relative; width: var(--card-size); flex: 0 0 var(--card-size); height: var(--card-size); scroll-snap-align: center; scroll-snap-stop: normal; cursor: pointer; }
-.rail-card-visual, .rail-card-arrival { width: 100%; height: 100%; transform-origin: center; }
-.rail-card[data-nearby="true"] .rail-card-visual { will-change: transform; }
-.rail-card-arrival { animation: photo-arrive .48s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(min(var(--rail-index), 4) * 35ms); }
+.rail-card-visual, .rail-card-wave { width: 100%; height: 100%; transform-origin: center; backface-visibility: hidden; will-change: transform; }
+.rail-card-wave { animation: photo-wave 5.8s ease-in-out infinite; animation-delay: calc(var(--rail-index) * .42s - 5.8s); animation-play-state: paused; }
+.snap-viewport[data-visible="true"][data-moving="false"] .rail-card-wave { animation-play-state: running; }
 
 /* A square paper photo with a wider bottom margin. No raster frame. */
-.shop-card { position: relative; width: 100%; height: 100%; padding: 10px 10px 32px; margin: 0; border-radius: 14px; corner-shape: squircle; background: #fffdf8; box-shadow: 0 9px 18px #34543d1f; animation: photo-wave 5.8s ease-in-out infinite; animation-delay: calc(var(--rail-index) * .42s - 5.8s); animation-play-state: paused; }
-.rail-card[data-nearby="true"] .shop-card { animation-play-state: running; }
+.shop-card { position: relative; width: 100%; height: 100%; padding: 10px 10px 32px; margin: 0; border-radius: 14px; corner-shape: squircle; background: #fffdf8; box-shadow: 0 9px 18px #34543d1f; }
 .card-art { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 12px; corner-shape: squircle; background: #e5f1e0; }
 .skins [data-theme="fuzzies"] .card-art { background: #eee4f3; }
 .skins [data-theme="sushi"] .card-art { background: #f7e7da; }
@@ -87,6 +86,7 @@
 .shop-arrow { position: absolute; top: calc(50% - 18px); z-index: 110; width: 36px; height: 36px; display: grid; place-items: center; padding: 7px; border-radius: 13px; background: #fffdf4ed; box-shadow: var(--soft-shadow); }
 .shop-arrow.prev { left: 16px; }
 .shop-arrow.next { right: 16px; }
+.shop-arrow.prev .ui-icon { transform: scaleX(-1); }
 .shop-arrow:disabled { opacity: .28; box-shadow: none; }
 .collection-info { overflow: hidden; padding: 2px 24px 0; }
 .collection-info h3 { font-size: 21px; font-weight: 900; letter-spacing: -.4px; line-height: 26px; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -105,13 +105,10 @@
 .shop-footer { display: flex; align-items: center; justify-content: center; padding: 12px 20px calc(14px + var(--safe-bottom)); background: #fffdf4c4; }
 .shop-play { width: 200px; height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border-radius: 20px; background: var(--green); color: #fffdf4; font-size: 18px; font-weight: 900; box-shadow: 0 5px 12px #339b7526; }
 .shop-play .ui-icon { width: 26px; height: 26px; }
-.shop-fullscreen.is-leaving .shop-dialog { animation: none; }
-.shop-heading, .shop-toolbar, .shop-footer { animation: overlay-in .4s cubic-bezier(.22, 1, .36, 1) both; }
-.shop-toolbar { animation-delay: .04s; }
-.shop-footer { animation-delay: .08s; }
-.shop-feature { animation: shop-arrive .45s .06s cubic-bezier(.22, 1, .36, 1) both; }
+.shop-dialog.dialog { animation: sheet-in .26s cubic-bezier(.2,.85,.2,1) both; }
+.shop-fullscreen.is-leaving .shop-dialog { animation: sheet-out .22s cubic-bezier(.4,0,.8,.2) both; }
+.shop-heading, .shop-toolbar, .shop-footer { animation: none; }
 @keyframes shop-arrive { from { opacity: 0; transform: translate3d(0, 8px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
-@keyframes photo-arrive { from { opacity: 0; transform: translate3d(0, 10px, 0) scale(.96); } to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
 @keyframes photo-wave { 0%, 100% { transform: rotate(-1.4deg) translate3d(0, 1px, 0); } 50% { transform: rotate(1.4deg) translate3d(0, -1px, 0); } }
 .shop-dialog .ad-overlay { position: fixed; inset: 0; z-index: 20; border-radius: 0; }
 
@@ -138,10 +135,14 @@
 .shop-toolbar-top > span { font-size: 10px; font-weight: 800; color: #98a18e; }
 .shop-quick-coins { display: flex; align-items: center; justify-content: center; gap: 6px; width: 102px; height: 32px; padding: 4px 10px; border-radius: 12px; background: #a567e4; color: white; font-size: 14px; font-weight: 900; }
 .shop-quick-coins img { width: 21px; height: 21px; object-fit: contain; }
-.shop-nav { display: flex; justify-content: space-between; align-items: center; gap: 5px; width: 100%; height: 38px; overflow-x: auto; scrollbar-width: none; }
+.shop-nav { position: relative; isolation: isolate; display: flex; justify-content: space-between; align-items: center; gap: 5px; width: 100%; height: 38px; overflow-x: auto; scrollbar-width: none; }
 .shop-nav::-webkit-scrollbar { display: none; }
 .shop-nav > button { height: 31px; min-width: 0; flex: 1 0 auto; padding: 0 10px; border-radius: 12px; background: transparent; color: #84917d; font-size: 11px; font-weight: 900; white-space: nowrap; }
-.shop-nav > button[aria-current="true"] { background: #e7d5fb; color: #8b51c7; }
+.shop-nav > button[aria-current="true"] { color: #8b51c7; }
+.shop-nav > button { position: relative; z-index: 1; transition: color .18s; }
+.shop-nav > button:not(:disabled):active { transform: none; }
+.shop-nav-pill { position: absolute; left: 0; top: 3.5px; height: 31px; border-radius: 12px; corner-shape: squircle; background: #e7d5fb; pointer-events: none; will-change: transform; }
+.shop-nav-pill[data-ready="true"] { transition: transform .26s cubic-bezier(.22,1,.36,1), width .26s cubic-bezier(.22,1,.36,1); }
 .shop-feature { position: relative; width: calc(100% - 32px); height: 108px; margin: 0 16px 18px; padding: 14px 18px; border-radius: 24px; background: linear-gradient(110deg, #eedcff, #ffebd2); color: #735190; text-align: left; overflow: hidden; }
 .feature-copy { position: relative; z-index: 1; max-width: 65%; }
 .shop-feature h2 { font-size: 19px; font-weight: 900; margin: 4px 0 1px; line-height: 1.2; }
@@ -162,7 +163,14 @@
 .bundle-card { position: relative; height: 344px; display: grid; grid-template-rows: 132px 116px 48px; gap: 8px; padding: 16px; border-radius: 27px; corner-shape: squircle; background: #fffdf5; box-shadow: var(--soft-shadow); text-align: left; overflow: hidden; }
 .bundle-art { position: relative; height: 132px; border-radius: 22px; corner-shape: squircle; background: radial-gradient(ellipse at 50% 100%, #ffe7ad, #f4deef 80%); overflow: hidden; }
 .crystal .bundle-art { background: radial-gradient(ellipse at 50% 100%, #e5deff, #dceffc 80%); }
-.bundle-preview { position: absolute; object-fit: contain; }
+.bundle-preview { position: absolute; padding: 0; background: transparent; object-fit: contain; }
+.bundle-preview > img { width: 100%; height: 100%; object-fit: contain; }
+.bundle-preview.backgrounds { overflow: hidden; }
+.bundle-preview.backgrounds > img { object-fit: cover; }
+.bundle-preview:hover { scale: 1.04; }
+.bundle-art .bundle-preview:active { scale: .97; }
+.bundle-art .bundle-preview.backgrounds:active { transform: rotate(-11deg); }
+.bundle-art .bundle-preview.boxes:active { transform: rotate(9deg); }
 .bundle-preview.skins { z-index: 2; left: calc(50% - 59px); bottom: 4px; width: 118px; height: 118px; filter: drop-shadow(0 7px 4px #6f5c4a20); }
 .bundle-preview.backgrounds { left: 10px; bottom: 15px; width: 74px; height: 95px; object-fit: cover; border-radius: 13px; corner-shape: squircle; transform: rotate(-11deg); box-shadow: 0 4px 8px #835e5b20; }
 .bundle-preview.boxes { right: 12px; bottom: 21px; width: 70px; height: 82px; transform: rotate(9deg); }
@@ -193,12 +201,10 @@
 .exclusive-card { overflow: hidden; }
 .supply-card .sale-ribbon { width: 113px; height: 20px; top: 14px; right: -29px; font-size: 7px; }
 .item-copy { animation: item-change .2s ease-out; }
-[data-reveal][data-revealed="true"] { animation: shop-arrive .48s cubic-bezier(.22,1,.36,1) both; }
-.supplies-grid [data-reveal]:nth-child(2n)[data-revealed="true"] { animation-delay: .05s; }
 @media (min-width: 520px) { .bundle-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 350px) { .shop-nav > button { font-size: 10px; padding-inline: 7px; } .shop-feature { padding-inline: 12px; } .feature-mascot { width: 95px; height: 95px; right: 19px; } .shop-feature h2 { font-size: 16px; } .supply-card h3 { font-size: 15px; } .bundle-copy h3 { font-size: 19px; } .bundle-preview.skins { width: 102px; height: 102px; left: calc(50% - 51px); } .bundle-preview.backgrounds { width: 61px; height: 82px; left: 7px; } .bundle-preview.boxes { width: 60px; right: 8px; } }
 @media (max-height: 650px) { .shop-feature { display: none; } }
-@media (max-height: 480px) { .shop-toolbar { padding-bottom: 3px; } .shop-toolbar-top { height: 30px; } .shop-nav { height: 31px; } .shop-nav > button { height: 27px; } }
+@media (max-height: 480px) { .shop-toolbar { padding-bottom: 3px; } .shop-toolbar-top { height: 30px; } .shop-nav { height: 31px; } .shop-nav > button { height: 27px; } .shop-nav-pill { height: 27px; top: 2px; } }
 .supply-card > * { flex-shrink: 0; }
 .supply-card > button { margin-top: auto; }
-@media (prefers-reduced-motion: reduce) { .shop-card { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .rail-card-wave { animation: none; } }

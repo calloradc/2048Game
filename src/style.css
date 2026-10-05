@@ -110,9 +110,9 @@ img { pointer-events: none; -webkit-user-drag: none; }
 .playfield { position: relative; width: 420px; height: 490px; }
 .playfield canvas { display: block; width: 420px; height: 490px; touch-action: none; cursor: crosshair; outline-offset: -15px; }
 .shop-launch { position: absolute; left: 4px; top: 6px; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 1px; width: 70px; height: 85px; padding: 0; background: transparent; color: #794c36; font-size: 11px; font-weight: 900; text-align: center; }
-.shop-launch-art { display: grid; place-items: center; width: 66px; height: 66px; background: transparent; }
+.shop-launch-art { display: grid; place-items: center; width: 70px; height: 70px; border-radius: 50%; background: #fffdf47a; box-shadow: 0 3px 10px #35594e10; }
 .shop-launch .ui-icon { width: 66px; height: 66px; filter: drop-shadow(0 4px 3px #9a423129); }
-.shop-launch-label { line-height: 15px; letter-spacing: .5px; -webkit-text-stroke: 2.5px #fffdf4; paint-order: stroke fill; }
+.shop-launch-label { position: relative; z-index: 1; margin-top: -9px; color: #fff; line-height: 17px; font-size: 12px; font-weight: 900; letter-spacing: .5px; -webkit-text-stroke: 2.2px #161a18; paint-order: stroke fill; text-shadow: 0 1px 1px #161a18; }
 .preview-image { opacity: 0; transition: opacity .32s cubic-bezier(.22, 1, .36, 1); }
 .preview-image.is-decoded { opacity: 1; }
 .next-fruit { position: absolute; right: 30px; top: 5px; width: 108px; height: 44px; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 4px 8px; pointer-events: none; border-radius: 18px; background: var(--paper); box-shadow: var(--soft-shadow); }
@@ -204,7 +204,13 @@ h1 { font-size: 26px; line-height: 1.2; margin: 9px 0 16px; font-weight: 900; le
 .ad-bar > span { display: block; height: 100%; border-radius: inherit; background: #8ac69f; transition: width .05s; }
 .ad-countdown { display: block; font-size: 11px; font-weight: 900; color: #99a68b; margin-top: 10px; }
 .ad-dialog .text-button { margin-top: 24px; }
-.toast { position: absolute; bottom: calc(24px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); width: max-content; max-width: min(350px, calc(100vw - 32px)); min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 17px; background: var(--paper); box-shadow: 0 6px 25px #294d3726; font-size: 12px; font-weight: 900; z-index: 60; pointer-events: none; animation: toast-in .25s ease-out; }
+.toast-position { position: absolute; top: calc(16px + var(--safe-top)); left: 50%; transform: translateX(-50%); width: max-content; max-width: min(370px, calc(100vw - 24px)); z-index: 60; pointer-events: none; }
+.toast { width: 100%; min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 11px 10px 11px 15px; border-radius: 17px; background: var(--paper); box-shadow: 0 6px 25px #294d3726; font-size: 12px; font-weight: 900; pointer-events: auto; touch-action: none; user-select: none; cursor: grab; transition: transform .2s ease-out, opacity .2s; animation: toast-in .22s ease-out backwards; }
+.toast > span { flex: 1; }
+.toast[data-dragging="true"] { transition: none; cursor: grabbing; }
+.toast.is-leaving { animation: toast-out .18s ease-in both; pointer-events: none; }
+.toast-close { flex-shrink: 0; width: 28px; height: 28px; display: grid; place-items: center; padding: 4px; border-radius: 10px; background: #eee5df; }
+
 
 .loading-screen { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 30px; background: radial-gradient(ellipse at 50% 42%, #fffdf4, #edf4dc 70%, #d3e8cc); transition: opacity .3s; touch-action: none; }
 .loading-screen.finished { opacity: 0; pointer-events: none; }
@@ -233,8 +239,8 @@ h1 { font-size: 26px; line-height: 1.2; margin: 9px 0 16px; font-weight: 900; le
 .scene.is-ready .next-fruit { animation: ui-arrive .45s .18s both; }
 .scene.is-ready .evolution { animation: ui-arrive .45s .24s both; }
 .scene.is-ready .controls { animation: ui-arrive .45s .3s both; }
-.overlay.is-leaving { animation: overlay-out .19s ease-in both; }
-.overlay.is-leaving .dialog { animation: dialog-out .19s ease-in both; }
+.overlay.is-leaving { animation: overlay-out .22s ease-in both; }
+.overlay.is-leaving .dialog { animation: dialog-out .22s ease-in both; }
 .shaking { animation: shake .5s ease-out; }
 
 @keyframes coin-pop { from { transform: scale(1.18); } to { transform: scale(1); } }
@@ -246,7 +252,18 @@ h1 { font-size: 26px; line-height: 1.2; margin: 9px 0 16px; font-weight: 900; le
 @keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes dialog-in { 0% { opacity: 0; transform: translateY(24px) scale(.88); } 70% { opacity: 1; transform: translateY(-2px) scale(1.015); } 100% { opacity: 1; transform: none; } }
 @keyframes dialog-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(12px) scale(.96); } }
-@keyframes toast-in { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes toast-in { from { opacity: 0; translate: 0 -12px; } to { opacity: 1; translate: 0 0; } }
+@keyframes toast-out { from { opacity: 1; transform: translate3d(var(--from-x, 0px), var(--from-y, 0px), 0); } to { opacity: 0; transform: translate3d(var(--exit-x, 0px), var(--exit-y, -70px), 0); } }
+@keyframes sheet-in { from { transform: translate3d(0, 100%, 0); } to { transform: translate3d(0, 0, 0); } }
+@keyframes sheet-out { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, 100%, 0); } }
+@keyframes item-enter { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+.shop-scroll [data-reveal], .rewards-scroll [data-reveal] { opacity: 0; animation: none; }
+.shop-scroll [data-reveal][data-revealed="true"], .rewards-scroll [data-reveal][data-revealed="true"] { animation: item-enter .34s var(--enter-delay, 0ms) cubic-bezier(.22,1,.36,1) both; }
+.shop-scroll [data-reveal][data-entered="true"], .rewards-scroll [data-reveal][data-entered="true"] { opacity: 1; animation: none; }
+.ad-dialog { animation: dialog-in .24s ease-out both; }
+.ad-overlay.is-leaving { animation: overlay-out .18s ease-in both; }
+.ad-overlay.is-leaving .ad-dialog { animation: dialog-out .18s ease-in both; }
+
 @keyframes ripen { from { transform: translateY(-5px) rotate(-3deg); } to { transform: translateY(5px) rotate(3deg); } }
 @keyframes content-arrive { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
 @keyframes card-arrive { 0% { opacity: 0; translate: 0 16px; scale: .96; } 75% { opacity: 1; translate: 0 -2px; scale: 1.005; } 100% { opacity: 1; translate: 0 0; scale: 1; } }
@@ -263,4 +280,5 @@ h1 { font-size: 26px; line-height: 1.2; margin: 9px 0 16px; font-weight: 900; le
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; }
   .shaking, .loading-hero, .wallet strong { animation: none; }
+  .shop-scroll [data-reveal], .rewards-scroll [data-reveal] { opacity: 1; }
 }

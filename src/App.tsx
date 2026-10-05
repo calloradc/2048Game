@@ -14,6 +14,7 @@ import { Icon } from './ui/Icon';
 import { Shop } from './ui/Shop';
 import { Rewards } from './ui/Rewards';
 import { RewardedAd, type AdReward } from './ui/RewardedAd';
+import { Toast } from './ui/Toast';
 
 const read = (key: string, fallback: string) => { try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; } };
 const save = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch { /* Storage is optional in embedded web games. */ } };
@@ -36,6 +37,7 @@ export default function App() {
   const [shaking, setShaking] = useState(false),[appearanceBusy,setAppearanceBusy]=useState(false);
   const appearanceLock=useRef(false);
   const [ad,setAd]=useState<{id:number;reward:AdReward}|null>(null),adRef=useRef<typeof ad>(null),adId=useRef(0);
+  const {rendered:renderedAd,leaving:adLeaving}=usePresence(ad,180);
   const [toast,setToast]=useState<string|null>(null),toastTimer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
   const canvasRef = useRef<HTMLCanvasElement>(null),rendererRef = useRef<GameRenderer | null>(null),worldRef = useRef<FruitWorld | null>(null),audioRef = useRef<GameAudio | null>(null),dragRef = useRef<number | null>(null);
   const shellRef = useRef<HTMLDivElement>(null),dialogRef = useRef<HTMLDivElement>(null);
@@ -88,7 +90,7 @@ export default function App() {
     return () => { document.removeEventListener('visibilitychange', cancel); window.removeEventListener('blur', cancel); };
   }, []);
   useEffect(() => {
-    if (!overlay||ad) return;
+    if (!overlay||renderedAd||dialogLeaving) return;
     dialogRef.current?.focus({preventScroll:true});
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setModal(null);
@@ -100,7 +102,7 @@ export default function App() {
       }
     };
     document.addEventListener('keydown', key); return () => document.removeEventListener('keydown', key);
-  }, [dialogKind, overlay, ad]);
+  }, [dialogKind, overlay, renderedAd, dialogLeaving]);
 
   const aim = (event: PointerEvent<HTMLCanvasElement>) => { const bounds = event.currentTarget.getBoundingClientRect();worldRef.current?.setAim((event.clientX - bounds.left) / bounds.width * BOARD.width); };
   const pointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
@@ -164,9 +166,9 @@ export default function App() {
   };
   const daily=()=>{const world=worldRef.current;if(!world)return;const result=claimDaily(profileRef.current,calendarDay());if(!result.prize)return;commitProfile(result.profile);if(result.coins)world.grantCoins(result.coins);setDay(calendarDay());notify(`Твой подарок: ${prizeName(result.prize)}!`);};
   const skin=profile.selected.skins;
-  const dialog=overlay&&<div className={`overlay ${dialogKind==='shop'?'shop-fullscreen':dialogKind==='rewards'?'rewards-fullscreen':''} ${dialogLeaving?'is-leaving':''}`} onPointerDown={e=>e.stopPropagation()}>
+  const dialog=overlay&&<div key={dialogKind} className={`overlay ${dialogKind==='shop'?'shop-fullscreen':dialogKind==='rewards'?'rewards-fullscreen':''} ${dialogLeaving?'is-leaving':''}`} onPointerDown={e=>e.stopPropagation()}>
         <div className={`dialog ${dialogKind==='shop'?'shop-dialog':dialogKind==='rewards'?'rewards-dialog':''}`} role="dialog" aria-modal="true" aria-label={dialogKind?dialogLabels[dialogKind]:''} tabIndex={-1} ref={dialogRef}>
-          <div className="dialog-content" inert={!!ad}>
+          <div className="dialog-content" inert={!!renderedAd||dialogLeaving}>
             {dialogKind!=='gameover'&&dialogKind!=='won'&&<button className="dialog-close" aria-label="Закрыть" onClick={()=>setModal(null)}><Icon name="close" size={21}/></button>}
             {dialogKind==='shop'?<Shop profile={profile} coins={state.coins} busy={appearanceBusy} onBuy={buy} onSelect={item=>void apply(item)} onVideo={item=>watch({type:'unlock',key:item.key})} onCoins={()=>watch({type:'coins'})} onCoinPack={()=>watch({type:'coin-pack'})} onShakeVideo={()=>watch({type:'shake'})} onShakes={buyShakes} onBundle={buyBundle} onRewards={()=>setModal('rewards')} onClose={()=>setModal(null)}/>:dialogKind==='settings'?<>
               <Icon name="settings" size={65}/><span className="eyebrow">УСТРОИМ ВСЁ ПО-ТВОЕМУ</span><h1>Настройки</h1>
@@ -192,7 +194,7 @@ export default function App() {
               <img className="dialog-mascot" src={fruitAsset(0,skin)} alt=""/><h1>Новый урожай?</h1><p>Начнём с пустого счёта и трёх встрясок. Рекорд, монеты и коллекция сохранятся.</p><button className="primary-button" onClick={restart}><Icon name="restart" size={20}/>Начать заново</button><button className="text-button" onClick={()=>setModal(null)}>Продолжить эту игру</button>
             </>:null}
           </div>
-          {ad&&<RewardedAd key={ad.id} reward={ad.reward} onComplete={()=>completeAd(ad.id)} onCancel={cancelAd}/>}
+          {renderedAd&&<RewardedAd key={renderedAd.id} reward={renderedAd.reward} leaving={adLeaving} onComplete={()=>completeAd(renderedAd.id)} onCancel={cancelAd}/>}
         </div>
       </div>;
 
@@ -225,7 +227,7 @@ export default function App() {
       </footer>
     </div>
     {shellRef.current&&createPortal(dialog,shellRef.current)}
-    {toast&&<div className="toast" role="status"><Icon name="check" size={19}/>{toast}</div>}
+    <Toast text={toast} onDismiss={()=>{clearTimeout(toastTimer.current);setToast(null);}}/>
     {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label="Загрузка игры"><div className="loading-content"><div className="loading-logo">jelly <span>fruit.</span></div><div className="loading-mascots"><img className="loading-side left" src={fruitAsset(1)} alt=""/><img className="loading-hero" src={fruitAsset(0)} alt=""/><img className="loading-side right" src={fruitAsset(2)} alt=""/><span className="loading-spark s1">✦</span><span className="loading-spark s2">✦</span></div><h1>{error?'Фрукты задержались':'Скоро будет сочно!'}</h1><p>{error?'Не удалось загрузить ассеты. Попробуй ещё раз.':'Собираем маленькую фруктовую семью'}</p>{!error?<><div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{width:`${progress}%`}}/></div><span className="loading-percent">{progress}%</span></>:<button className="primary-button" onClick={()=>window.location.reload()}>Попробовать ещё</button>}</div><span className="loading-caption">НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА</span></section>}
     <div className="desktop-note"><Icon name="left" size={14}/><span>Наведи мышку и нажми, чтобы бросить</span><Icon name="right" size={14}/></div>
   </main>;

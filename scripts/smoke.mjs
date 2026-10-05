@@ -4,6 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import { checkShop } from './shop-smoke.mjs';
 import { checkGameover } from './gameover-smoke.mjs';
 import { checkRewardsAndOffers } from './rewards-smoke.mjs';
+import { checkUiMotion } from './ui-motion-smoke.mjs';
 
 const browser = await chromium.launch({
   ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
@@ -61,7 +62,7 @@ try {
       const canvas = page.locator('canvas'), bounds = await canvas.boundingBox();
       assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
       assert.ok(await page.locator('.utility-button').evaluateAll(els=>els.every(el=>el.textContent.trim()==='')),'Help and gift buttons have no visual labels');
-      assert.ok(await page.locator('.shop-launch').evaluate(el=>{const art=el.querySelector('.shop-launch-art'),s=getComputedStyle(art);return getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)'&&s.backgroundColor==='rgba(0, 0, 0, 0)'&&s.boxShadow==='none'&&el.querySelector('img').src.includes('icon-shop-basket-red.webp');}),'Shop uses the refreshed red basket artwork with no backing panel');
+      assert.ok(await page.locator('.shop-launch').evaluate(el=>{const art=el.querySelector('.shop-launch-art'),s=getComputedStyle(art);return getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)'&&s.backgroundColor!=='rgba(0, 0, 0, 0)'&&s.borderRadius==='50%'&&getComputedStyle(el.querySelector('.shop-launch-label')).color==='rgb(255, 255, 255)'&&el.querySelector('img').src.includes('icon-shop-basket-red.webp');}),'Shop has a translucent circle and a white outlined label');
       assert.ok(await page.locator('.hint').evaluate(el=>parseFloat(getComputedStyle(el.querySelector('span')).webkitTextStrokeWidth)>0&&getComputedStyle(el.querySelector('img')).filter.includes('drop-shadow')),'Hint and hand have a white outline');
       assert.ok(await page.locator('.score-card').evaluate(el=>{
         const number=el.querySelector('strong'),label=el.querySelector('.small-label');
@@ -196,6 +197,7 @@ try {
   await paid.close();
   await checkShop(browser,base,errors);
   await checkRewardsAndOffers(browser,base,errors);
+  await checkUiMotion(browser,base,errors);
   await checkGameover(browser,base,errors);
   assert.deepEqual(errors, [], 'No browser errors or missing assets');
   console.log('✓ preview tilt, elastic edges, inertia, fading masks, animated dialogs, touch drop, merges and saved progress');
