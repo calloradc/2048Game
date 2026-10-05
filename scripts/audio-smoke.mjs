@@ -52,6 +52,29 @@ try {
   await skins.getByRole('button', { name: /Купить за/ }).click();
   await page.waitForFunction(() => window.audioStarts.some(source => Math.abs(source.duration - 0.8485) < 0.02));
   assert.equal(await page.evaluate(() => window.audioStarts.filter(source => Math.abs(source.duration - 0.8485) < 0.02).length), 1, 'A successful purchase plays Sell once');
+  const sellCount = () => page.evaluate(() => window.audioStarts.filter(source => Math.abs(source.duration - 0.8485) < 0.02).length);
+  const watch = async button => {
+    await page.evaluate(() => { window.audioStarts = []; });
+    await button.click();
+    await page.locator('.ad-overlay').waitFor({ state: 'visible' });
+    await page.locator('.ad-overlay').waitFor({ state: 'detached' });
+  };
+  await watch(page.locator('.shop-quick-coins'));
+  assert.equal(await sellCount(), 1, 'Advertising coins play Sell once');
+  await watch(page.locator('.supply-card.coins .supply-video'));
+  assert.equal(await sellCount(), 0, 'The first coin-pack video gives no coins and no Sell');
+  await watch(page.locator('.supply-card.coins .supply-video'));
+  assert.equal(await sellCount(), 1, 'The completed coin pack plays Sell once');
+  await page.locator('.dialog-close').click();
+  await page.locator('.overlay').waitFor({ state: 'detached' });
+  await page.evaluate(() => {
+    window.audioStarts = []; window.oscillatorStarts = 0;
+    const start = OscillatorNode.prototype.start;
+    OscillatorNode.prototype.start = function(...args) { window.oscillatorStarts++; return start.apply(this, args); };
+  });
+  await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+  await page.locator('canvas').press('Enter');
+  assert.equal(await page.evaluate(() => window.oscillatorStarts), 0, 'Pointer and keyboard drops have no synthesized sound');
 
   const result = await page.evaluate(async () => {
     const { GameAudio } = await import('/src/game/audio.ts');
@@ -65,11 +88,19 @@ try {
     let now = 0;
     Object.defineProperty(performance, 'now', { configurable: true, value: () => now });
     const groups = [];
-    for (const time of [0, 2000, 4000, 7000]) {
+    for (const time of [0, 700, 1400, 2900]) {
       now = time; audio.play('merge');
       await new Promise(resolve => setTimeout(resolve, 20));
       groups.push(window.audioStarts.splice(0));
     }
+    now = 4900;
+    for (const offset of [0, 0, 10, 30, 79]) { now = 4900 + offset; audio.play('merge'); }
+    await new Promise(resolve => setTimeout(resolve, 20));
+    const burst = window.audioStarts.splice(0);
+    now = 4980; audio.play('merge');
+    await new Promise(resolve => setTimeout(resolve, 30));
+    const nextMerge = window.audioStarts.splice(0);
+    const liveMergeSources = audio.activeSources.size;
     audio.muted = true;
     audio.play('merge'); audio.play('button'); audio.play('purchase');
     await new Promise(resolve => setTimeout(resolve, 20));
@@ -98,7 +129,7 @@ try {
     audio.destroy();
     await new Promise(resolve => setTimeout(resolve, 20));
     Object.defineProperty(performance, 'now', { configurable: true, value: originalNow });
-    return { durations, groups, mutedGain, mutedStarts, mutedMusic, restoredGain, blurred, focused, hidden, state: audio.context.state };
+    return { durations, groups, burst, nextMerge, liveMergeSources, mutedGain, mutedStarts, mutedMusic, restoredGain, blurred, focused, hidden, state: audio.context.state };
   });
   assert.equal(result.durations.length, 6);
   assert.ok(result.durations.every(duration => duration > 0), 'All six OGG effects decode in the browser');
@@ -108,7 +139,11 @@ try {
     assert.equal(new Set(group.map(source => source.pitch)).size, 1, 'All merge layers share their pitch');
     group.map(source => source.duration).sort((a,b) => a-b).forEach((duration,i) => assert.ok(Math.abs(duration - [0.230, 0.559, 0.712, 0.772][i]) < 0.02));
   }
-  result.groups.forEach((group, i) => assert.ok(Math.abs(group[0].pitch - [1, 1.06, 1.12, 1][i]) < 0.00001, 'Pitch rises within the rolling three-second window and resets at three seconds'));
+  result.groups.forEach((group, i) => assert.ok(Math.abs(group[0].pitch - [1, 1.06, 1.12, 1][i]) < 0.00001, 'Pitch rises within the rolling 1.5-second window and resets at 1.5 seconds'));
+  assert.equal(result.burst.length, 4, 'Simultaneous and nearby merges play just one four-layer cue');
+  assert.equal(result.nextMerge.length, 4, 'The next distinct merge still plays');
+  assert.ok(Math.abs(result.nextMerge[0].pitch - 1.06) < 0.00001, 'Suppressed duplicates do not raise the pitch');
+  assert.ok(result.liveMergeSources <= 4, 'New merge audio replaces the previous cue instead of overlapping');
   assert.equal(result.mutedGain, 0); assert.equal(result.mutedStarts, 0); assert.equal(result.restoredGain, 1);
   assert.equal(result.mutedMusic, true);
   assert.deepEqual(result.blurred, { state: 'suspended', paused: true, sources: 0 });

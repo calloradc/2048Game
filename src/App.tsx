@@ -137,7 +137,7 @@ export default function App() {
   const pointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
     if (dragRef.current !== event.pointerId) return;
     aim(event); dragRef.current = null;
-    if (!overlay && worldRef.current?.drop()) audioRef.current?.play('drop');
+    if (!overlay) worldRef.current?.drop();
   };
   const restart = () => {
     const world=worldRef.current;if(!world)return;
@@ -213,13 +213,14 @@ export default function App() {
   const cancelAd=()=>{adRef.current=null;setAd(null);};
   const completeAd=(id:number)=>{
     const request=adRef.current,world=worldRef.current;if(!request||request.id!==id||!world)return;
-    cancelAd();const reward=request.reward;
+    cancelAd();const reward=request.reward,coinsBefore=world.state.coins;
     if(reward.type==='coins'){world.grantCoins(AD_COINS);notify(t("+{n} монет в копилку!",{n:AD_COINS}));}
     else if(reward.type==='coin-pack'){const result=rewardCoinPack(profileRef.current);commitProfile(result.profile);if(result.coins){world.grantCoins(result.coins);notify(t("+{n} монет в копилку!",{n:AD_COIN_PACK}));}else notify(t("Ещё одно видео до +{n} монет",{n:AD_COIN_PACK}));}
     else if(reward.type==='shake'){commitProfile({...profileRef.current,shakeTokens:profileRef.current.shakeTokens+1});notify(t("+1 встряска в запасе!"));}
     else if(reward.type==='revive'){if(world.revive()){setModal(null);notify(t("Верхние кубики убраны. Продолжаем!"));}}
     else if(reward.type==='double'){if(world.doubleEarnings())notify(t("Монеты за игру удвоены!"));}
     else {const item=itemByKey(reward.key);if(!item)return;const result=rewardUnlock(profileRef.current,item);commitProfile(result.profile);if(result.unlocked)void showAppearance({...appearanceRef.current,[item.category]:item.id});notify(result.unlocked?t("{item} открыт!",{item:item.name}):t("Ещё {n} видео до открытия",{n:item.videos-(result.profile.videos[item.key]??0)}));}
+    if(world.state.coins>coinsBefore)audioRef.current?.play('purchase');
   };
   const daily=()=>{const world=worldRef.current;if(!world)return;const result=claimDaily(profileRef.current,calendarDay());if(!result.prize)return;commitProfile(result.profile);if(result.coins)world.grantCoins(result.coins);setDay(calendarDay());notify(t("Твой подарок: {item}!",{item:prizeName(result.prize)}));};
   const skin=appearance.skins;
@@ -274,7 +275,7 @@ export default function App() {
       <div className={`playfield ${shaking?'shaking':''} ${state.danger?'danger':''}`}>
         <canvas ref={canvasRef} aria-label={t("Игровой контейнер. Веди пальцем и отпусти, чтобы бросить фрукт.")} tabIndex={0}
           onPointerDown={pointerDown} onPointerMove={e=>{if(dragRef.current===e.pointerId||e.pointerType==='mouse')aim(e);}} onPointerUp={pointerUp} onPointerCancel={()=>{dragRef.current=null;}} onLostPointerCapture={()=>{dragRef.current=null;}}
-          onKeyDown={e=>{if(overlay||state.status!=='playing'||!loaded)return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();if(world.drop())audioRef.current?.play('drop');}}}/>
+          onKeyDown={e=>{if(overlay||state.status!=='playing'||!loaded)return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();world.drop();}}}/>
         {state.danger>0&&<div className="danger-message">{t("Контейнер почти полон!")} {state.status==='playing'?t("Освободи место"):''}</div>}
       </div>
       <FruitCarousel discovered={state.discovered} skin={skin}/>

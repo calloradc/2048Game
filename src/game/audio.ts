@@ -3,8 +3,8 @@ const AUDIO_FILES = {
   splash14: 'splash-14.ogg', splash03: 'splash-03.ogg', sell: 'sell.ogg',
 } as const;
 type Sample = keyof typeof AUDIO_FILES;
-type Sound = 'button' | 'merge' | 'purchase' | 'drop';
-const LAYERS: Record<Exclude<Sound, 'drop'>, Sample[]> = {
+type Sound = 'button' | 'merge' | 'purchase';
+const LAYERS: Record<Sound, Sample[]> = {
   button: ['button', 'highlight'],
   merge: ['button', 'currency', 'splash14', 'splash03'],
   purchase: ['sell'],
@@ -16,6 +16,7 @@ export class GameAudio {
   private samples = new Map<Sample, Promise<AudioBuffer | undefined>>();
   private music?: HTMLAudioElement;
   private activeSources = new Set<AudioScheduledSourceNode>();
+  private mergeSources = new Set<AudioBufferSourceNode>();
   private active = !document.hidden && document.hasFocus();
   private unlocked = false;
   private focusChanged = () => { this.active = !document.hidden && document.hasFocus(); this.updatePlayback(); };
@@ -23,6 +24,7 @@ export class GameAudio {
   private destroyed = false;
   private isMuted = false;
   private lastMerge = -Infinity;
+  private lastMergeSound = -Infinity;
   private mergeStreak = 0;
 
   constructor(muted = false) {
@@ -77,6 +79,7 @@ export class GameAudio {
       this.music?.pause();
       for (const source of this.activeSources) source.stop();
       this.activeSources.clear();
+      this.mergeSources.clear();
     }
     if (!this.active) {
       void context.suspend().catch(() => {});
@@ -90,44 +93,40 @@ export class GameAudio {
     let pitch = 1;
     if (type === 'merge') {
       const now = performance.now();
-      this.mergeStreak = now - this.lastMerge >= 3000 ? 0 : this.mergeStreak + 1;
+      const reset = now - this.lastMerge >= 1500;
       this.lastMerge = now;
+      // One cue for collisions in the same physics frame or a nearby frame.
+      if (now - this.lastMergeSound < 80) return;
+      this.lastMergeSound = now;
+      this.mergeStreak = reset ? 0 : this.mergeStreak + 1;
       pitch = 1 + this.mergeStreak * 0.06;
     }
     if (this.muted || !this.active || !this.context || this.destroyed) return;
     this.unlock();
-    if (type === 'drop') { this.drop(); return; }
     const resumed = this.context.state === 'suspended' ? this.context.resume() : Promise.resolve();
     void Promise.all([Promise.all(LAYERS[type].map(sample => this.samples.get(sample))), resumed]).then(([buffers]) => {
       if (this.muted || !this.active || this.destroyed || this.context?.state !== 'running') return;
       // Schedule every layer at the same instant, even during fast merge chains.
       const time = this.context.currentTime + 0.005;
-      for (const buffer of buffers) if (buffer) this.source(buffer, time, pitch, 0.45);
+      if (type === 'merge') {
+        // A new cue replaces the previous merge tail instead of stacking it.
+        for (const source of this.mergeSources) source.stop(time);
+        this.mergeSources.clear();
+      }
+      for (const buffer of buffers) if (buffer) this.source(buffer, time, pitch, 0.45, type === 'merge');
     }).catch(() => {});
   }
 
-  private source(buffer: AudioBuffer, time: number, pitch: number, volume: number) {
+  private source(buffer: AudioBuffer, time: number, pitch: number, volume: number, merge: boolean) {
     const context = this.context!, source = context.createBufferSource(), gain = context.createGain();
     source.buffer = buffer; source.playbackRate.setValueAtTime(pitch, time);
     gain.gain.setValueAtTime(volume, time);
     source.connect(gain); gain.connect(this.master!);
     this.activeSources.add(source);
-    source.onended = () => { this.activeSources.delete(source); source.disconnect(); gain.disconnect(); };
+    if (merge) this.mergeSources.add(source);
+    source.onended = () => { this.activeSources.delete(source); this.mergeSources.delete(source); source.disconnect(); gain.disconnect(); };
     source.start(time);
     return source;
-  }
-
-  private drop() {
-    const context = this.context!, oscillator = context.createOscillator(), gain = context.createGain();
-    const time = context.currentTime;
-    oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(210, time);
-    oscillator.frequency.exponentialRampToValueAtTime(168, time + 0.19);
-    gain.gain.setValueAtTime(0, time); gain.gain.linearRampToValueAtTime(0.075, time + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.23);
-    oscillator.connect(gain); gain.connect(this.master!);
-    this.activeSources.add(oscillator);
-    oscillator.onended = () => { this.activeSources.delete(oscillator); oscillator.disconnect(); gain.disconnect(); };
-    oscillator.start(time); oscillator.stop(time + 0.25);
   }
 
   destroy() {
@@ -140,6 +139,7 @@ export class GameAudio {
     if (this.music) { this.music.pause(); this.music.removeAttribute('src'); this.music.load(); }
     for (const source of this.activeSources) source.stop();
     this.activeSources.clear();
+    this.mergeSources.clear();
     void this.context?.close().catch(() => {});
   }
 }
