@@ -1,6 +1,7 @@
 import { t } from '../i18n';
 import { Children, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Icon } from './Icon';
+import { getReducedMotion, subscribeMotion } from './motion';
 
 /** Deliberate, one-card swipes with vertical gestures delegated to the page. */
 export function SnapRail({count,initial=0,current=0,onChange,onActivate,children}:{count:number;initial?:number;current?:number;onChange:(index:number)=>void;onActivate:(index:number)=>void;children:ReactNode}) {
@@ -12,7 +13,6 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
     const el=viewport.current!,row=track.current!,cards=Array.from(row.children) as HTMLElement[];
     if(!cards.length)return;
     const visuals=cards.map(card=>card.querySelector<HTMLElement>('.rail-card-visual')!);
-    const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
     let frame=0,animation:{from:number;to:number;start:number;duration:number}|null=null;
     let drag:{x:number;y:number;scroll:number;ratio:number;moved:boolean;index:number}|null=null,suppressClick=false;
     let settleTimer:ReturnType<typeof setTimeout>|undefined,wheelUntil=0;
@@ -25,7 +25,7 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
       const centre=el.scrollLeft+width/2;
       cards.forEach((card,index)=>{
         const offset=(centres[index]-centre)/step,t=Math.min(2.5,Math.abs(offset));
-        visuals[index].style.transform=`translate3d(0,${Math.min(16,t*t*9)}px,0) rotate(${reducedMotion.matches?0:Math.max(-3,Math.min(3,offset*2.4))}deg) scale(${1-Math.min(.45,t*t*.18)})`;
+        visuals[index].style.transform=`translate3d(0,${Math.min(16,t*t*9)}px,0) rotate(${getReducedMotion()?0:Math.max(-3,Math.min(3,offset*2.4))}deg) scale(${1-Math.min(.45,t*t*.18)})`;
         // Keep alpha and compositor layers stable during rapid direction changes.
         const centred=String(Math.abs(offset)<.5);
         if(card.dataset.centred!==centred)card.dataset.centred=centred;
@@ -54,7 +54,7 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
     go.current=(index)=>{
       cancel();const next=clamp(index),from=el.scrollLeft,to=target(next);
       select(next);
-      if(reducedMotion.matches||Math.abs(from-to)<.5){el.scrollLeft=to;finish();return;}
+      if(getReducedMotion()||Math.abs(from-to)<.5){el.scrollLeft=to;finish();return;}
       animation={from,to,start:performance.now(),duration:Math.min(650,440+Math.abs(to-from)*.25)};
       schedule();
     };
@@ -78,6 +78,10 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
       el.scrollLeft=target(clamp(active.current));finish();
     };
     const observer=new ResizeObserver(resize);observer.observe(el);resize();
+    const unsubscribeMotion=subscribeMotion(()=>{
+      if(getReducedMotion()&&animation){el.scrollLeft=animation.to;finish();}
+      paint();
+    });
     const visibility=new IntersectionObserver(entries=>{el.dataset.visible=String(entries[0].isIntersecting);},{threshold:0});visibility.observe(el);
     const wheel=(event:WheelEvent)=>{
       if(Math.abs(event.deltaX)<=Math.abs(event.deltaY)&&!event.shiftKey)return;
@@ -116,6 +120,7 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
     el.addEventListener('pointerdown',down);el.addEventListener('pointermove',move);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('click',click);
     return()=>{
       cancelAnimationFrame(frame);clearTimeout(settleTimer);observer.disconnect();visibility.disconnect();
+      unsubscribeMotion();
       el.removeEventListener('scroll',scroll);el.removeEventListener('scrollend',settle);el.removeEventListener('wheel',wheel);
       el.removeEventListener('pointerdown',down);el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);el.removeEventListener('click',click);
     };

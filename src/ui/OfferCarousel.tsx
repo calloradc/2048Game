@@ -6,6 +6,7 @@ import type { Profile } from '../game/profile';
 import { asset } from '../game/fruits';
 import { ElasticScroll } from './ElasticScroll';
 import { PreviewImage } from './PreviewImage';
+import { getReducedMotion } from './motion';
 
 export function OfferCarousel({profile,onOpen}:{profile:Profile;onOpen:()=>void}) {
   const viewport=useRef<HTMLDivElement>(null),track=useRef<HTMLDivElement>(null),motion=useRef<ElasticScroll|null>(null);
@@ -23,7 +24,7 @@ export function OfferCarousel({profile,onOpen}:{profile:Profile;onOpen:()=>void}
     el.addEventListener('pointerdown',down);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
     let visible=false;const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;});observer.observe(el);
     const timer=setInterval(()=>{
-      if(!visible||held.current||document.hidden||document.querySelector('.contents-overlay')||el.closest("[inert]")||performance.now()-lastInput.current<4500||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      if(!visible||held.current||document.hidden||document.querySelector('.contents-overlay')||el.closest("[inert]")||performance.now()-lastInput.current<4500||getReducedMotion())return;
       go(active.current+1);
     },4500);
     return()=>{clearInterval(timer);resize.disconnect();observer.disconnect();scroll.destroy();motion.current=null;el.removeEventListener('pointerdown',down);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);};

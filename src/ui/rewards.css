@@ -84,7 +84,7 @@
   .rewards-dialog .dialog-close { top: calc(15px + var(--safe-top)); }
   .rewards-footer { padding-block: 7px; }
 }
-@media (prefers-reduced-motion: reduce) { .daily-prize.available .daily-prize-art, .daily-prize.received .daily-prize-art { animation: none; } }
+html[data-motion="reduced"] :is(.daily-prize.available, .daily-prize.received) .daily-prize-art { animation: none; }
 
 .daily-background-preview { width: 60px; height: 55px; padding: 4px 4px 9px; border-radius: 9px; corner-shape: squircle; background: #fffdf8; box-shadow: 0 3px 7px #35594e16; }
 .daily-background-preview .card-art { border-radius: 5px; }

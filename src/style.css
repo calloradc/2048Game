@@ -286,11 +286,9 @@ h1 { font-size: 26px; line-height: 1.2; margin: 9px 0 16px; font-weight: 900; le
 
 @container game-viewport (max-width: 600px) or (max-height: 960px) { .desktop-note { display: none; } }
 @container game-viewport (max-height: 520px) { .loading-content { transform: scale(.72); } .loading-caption { display: none; } }
-@media (prefers-reduced-motion: reduce) {
-  * { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; }
-  .shaking, .loading-hero, .wallet strong, .gift-alert { animation: none; }
-  .shop-scroll [data-reveal], .rewards-scroll [data-reveal] { opacity: 1; }
-}
+html[data-motion="reduced"] * { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; }
+html[data-motion="reduced"] :is(.shaking, .loading-hero, .wallet strong, .gift-alert) { animation: none; }
+html[data-motion="reduced"] :is(.shop-scroll, .rewards-scroll) [data-reveal] { opacity: 1; }
 
 .carousel-arrow.prev .ui-icon { transform: scaleX(-1); }
 .small-dialog-scroll, .contents-scroll { height: 100%; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: none; scrollbar-width: none; touch-action: pan-x; }

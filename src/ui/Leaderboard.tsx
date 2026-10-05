@@ -3,11 +3,13 @@ import { t, localeTag } from '../i18n';
 import { DEMO_PLAYERS, type RankProgress } from '../game/leaderboard';
 import { fruitAsset } from '../game/fruits';
 import { Icon } from './Icon';
+import { useAnimationsEnabled } from './motion';
 
 export function Leaderboard({progress,onContinue}:{progress:RankProgress;onContinue:()=>void}) {
+  const animations = useAnimationsEnabled();
   const [amount,setAmount]=useState(0);
   useEffect(()=>{
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches){setAmount(1);return;}
+    if(!animations){setAmount(1);return;}
     let frame=0,elapsed=0,previous=0;
     const tick=(now:number)=>{
       if(previous&&!document.hidden)elapsed+=Math.min(64,now-previous);
@@ -17,7 +19,7 @@ export function Leaderboard({progress,onContinue}:{progress:RankProgress;onConti
       if(part<1)frame=requestAnimationFrame(tick);
     };
     frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame);
-  },[]);
+  },[animations]);
   const position=progress.fromRank+(progress.toRank-progress.fromRank)*amount;
   const rank=Math.round(position),gained=progress.fromRank-rank;
   const format=(n:number)=>n.toLocaleString(localeTag());

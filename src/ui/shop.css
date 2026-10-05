@@ -207,7 +207,7 @@
 @container game-viewport (max-height: 480px) { .shop-toolbar { padding-bottom: 3px; } .shop-toolbar-top { height: 30px; } .shop-nav { height: 31px; } .shop-nav > button { height: 27px; } .shop-nav-pill { height: 27px; top: 2px; } }
 .supply-card > * { flex-shrink: 0; }
 .supply-card > button { margin-top: auto; }
-@media (prefers-reduced-motion: reduce) { .rail-card-wave { animation: none; } }
+html[data-motion="reduced"] .rail-card-wave { animation: none; }
 
 .shop-scroll-content { position: relative; padding: 16px 0 28px; }
 .shop-offers { margin: 0 16px 14px; }

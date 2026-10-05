@@ -21,6 +21,7 @@ import { SoftScroll } from './ui/SoftScroll';
 import { AD_COINS, AD_COIN_PACK } from './game/economy';
 import { compactBalance } from './ui/compactBalance';
 import { useGameViewport } from './ui/useGameViewport';
+import { useAnimationsEnabled, setAnimationsEnabled } from './ui/motion';
 import { LanguagePicker } from './ui/LanguagePicker';
 import { Leaderboard } from './ui/Leaderboard';
 import { roundRankProgress, type RankProgress } from './game/leaderboard';
@@ -34,6 +35,7 @@ const format = (n: number) => n.toLocaleString(localeTag());
 const dialogLabels={gameover:'Игра окончена',won:'Победа',help:'Как играть',wallet:'Монеты',restart:'Новая игра',settings:'Настройки',shop:'Магазин',rewards:'Подарки',leaderboard:'Лидерборд'};
 
 export default function App() {
+  const animations = useAnimationsEnabled();
   const language=useLanguage();
   const viewport=useGameViewport();
   const [state, setState] = useState(() => initialState(readNumber('jelly-best'), readNumber('jelly-coins')));
@@ -232,6 +234,7 @@ export default function App() {
               <Icon name="settings" size={65}/><span className="eyebrow settings-caption">{t("УСТРОИМ ВСЁ ПО-ТВОЕМУ")}</span><h1>{t("Настройки")}</h1>
               <div className="settings-list">
                 <button className="setting-row" role="switch" aria-checked={!muted} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={27}/><span>{t("Звук")}</span><i className={!muted?'on':''}/></button>
+                <button className="setting-row" role="switch" aria-checked={animations} onClick={()=>setAnimationsEnabled(!animations)}><Icon name="sparkle" size={27}/><span>{t("Анимации")}</span><i className={animations?'on':''}/></button>
                 <button className="setting-row" onClick={fullscreen}><Icon name="fullscreen" size={27}/><span>{t("На весь экран")}</span><Icon name="right" size={17}/></button>
                 <button className="setting-row" onClick={()=>setModal('restart')}><Icon name="restart" size={27}/><span>{t("Начать заново")}</span><Icon name="right" size={17}/></button>
                 <LanguagePicker language={language}/>

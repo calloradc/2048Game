@@ -5,6 +5,7 @@ import { bodyUV, bodyRect, spriteFans, textureTransform, type UV } from './sprit
 import { AimPreview } from './aimPreview';
 import { backgroundAsset, wideBackgroundAsset, boxAsset } from './catalog';
 import { UI_ARTWORK } from '../ui/assets';
+import { getReducedMotion } from '../ui/motion';
 
 interface Particle { x: number; y: number; vx: number; vy: number; age: number; life: number; texture: number; size: number; angle: number; spin: number }
 interface Burst { x: number; y: number; age: number; color: string; radius: number }
@@ -32,7 +33,6 @@ export class GameRenderer {
   private appearanceVersion=0;
   private needsDraw=true;
   private suspended=false;
-  private reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   paused = false;
 
   constructor(private canvas: HTMLCanvasElement, public world: FruitWorld) {
@@ -92,7 +92,7 @@ export class GameRenderer {
         this.world.step(1 / 60); this.accumulator -= 1 / 60; steps++;
       }
       if (steps === 3) this.accumulator = 0;
-      this.preview.step(this.world.aim,this.world.state.drops,dt,this.reducedMotion);
+      this.preview.step(this.world.aim,this.world.state.drops,dt,getReducedMotion());
       for (const p of this.particles) { p.age += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 320 * dt; p.vx *= Math.pow(0.985, dt * 60); p.angle += p.spin * dt; }
       this.particles = this.particles.filter(p => p.age < p.life);
       for (const b of this.bursts) b.age += dt;

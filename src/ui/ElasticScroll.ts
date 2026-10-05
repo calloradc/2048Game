@@ -1,3 +1,5 @@
+import { getReducedMotion } from './motion';
+
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 type Options={axis?:'x'|'y';onSettled?:()=>void;onInterrupt?:()=>void};
 
@@ -14,7 +16,7 @@ export class ElasticScroll {
   private edges={left:false,right:false};
   private drag:{id:number;x:number;y:number;startX:number;startY:number;time:number;moved:boolean;scale:number}|null=null;
   private observer:ResizeObserver;
-  private reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private get reduced(){return getReducedMotion();}
   private suppressClick=false;
   private get vertical(){return this.options.axis==='y';}
   private get size(){return this.viewportSize;}

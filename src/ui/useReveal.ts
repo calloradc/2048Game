@@ -1,11 +1,13 @@
 import { useLayoutEffect, type RefObject } from 'react';
+import { useAnimationsEnabled } from './motion';
 
 /** Reveal each item once, in screen order, before it can flash into view. */
 export function useReveal(root:RefObject<HTMLElement|null>) {
+  const animations = useAnimationsEnabled();
   useLayoutEffect(()=>{
     const el=root.current;if(!el)return;
     const nodes=Array.from(el.querySelectorAll<HTMLElement>('[data-reveal]'));
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    if(!animations){
       nodes.forEach(node=>{node.dataset.revealed='true';node.dataset.entered='true';});return;
     }
     const observer=new IntersectionObserver(entries=>{
@@ -22,5 +24,5 @@ export function useReveal(root:RefObject<HTMLElement|null>) {
     };
     el.addEventListener('animationend',finish);
     return()=>{observer.disconnect();el.removeEventListener('animationend',finish);};
-  },[root]);
+  },[root,animations]);
 }
