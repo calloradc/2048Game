@@ -3,6 +3,7 @@ import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import { checkShop } from './shop-smoke.mjs';
 import { checkGameover } from './gameover-smoke.mjs';
+import { checkRewardsAndOffers } from './rewards-smoke.mjs';
 
 const browser = await chromium.launch({
   ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
@@ -59,6 +60,9 @@ try {
     if (width === 390) {
       const canvas = page.locator('canvas'), bounds = await canvas.boundingBox();
       assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
+      assert.ok(await page.locator('.utility-button').evaluateAll(els=>els.every(el=>el.textContent.trim()==='')),'Help and gift buttons have no visual labels');
+      assert.ok(await page.locator('.shop-launch').evaluate(el=>{const square=el.querySelector('.shop-launch-square').getBoundingClientRect();return Math.abs(square.width-square.height)<1&&getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)';}),'Shop has a square icon with a separate centered label');
+      assert.ok(await page.locator('.hint').evaluate(el=>parseFloat(getComputedStyle(el.querySelector('span')).webkitTextStrokeWidth)>0&&getComputedStyle(el.querySelector('img')).filter.includes('drop-shadow')),'Hint and hand have a white outline');
       assert.ok(await page.locator('.score-card').evaluate(el=>{
         const number=el.querySelector('strong'),label=el.querySelector('.small-label');
         return Math.abs(number.getBoundingClientRect().left-label.getBoundingClientRect().left)<1&&parseFloat(getComputedStyle(number).webkitTextStrokeWidth)===0&&getComputedStyle(el.parentElement).backgroundImage==='none';
@@ -191,6 +195,7 @@ try {
   assert.ok(await shake.isDisabled(),'An unaffordable shake is disabled');
   await paid.close();
   await checkShop(browser,base,errors);
+  await checkRewardsAndOffers(browser,base,errors);
   await checkGameover(browser,base,errors);
   assert.deepEqual(errors, [], 'No browser errors or missing assets');
   console.log('✓ preview tilt, elastic edges, inertia, fading masks, animated dialogs, touch drop, merges and saved progress');

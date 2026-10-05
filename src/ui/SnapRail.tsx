@@ -19,9 +19,9 @@ export function SnapRail({count,initial=0,current=0,onChange,children}:{count:nu
       const step=cards.length>1?cards[1].offsetLeft-cards[0].offsetLeft:cards[0].offsetWidth;
       let nearest=0,distance=Infinity;
       cards.forEach((card,index)=>{
-        const d=Math.abs(card.offsetLeft+card.offsetWidth/2-centre),t=Math.min(1,d/step);
-        card.style.transform=`translateY(${t*5}px) scale(${1-t*.09})`;
-        card.style.opacity=String(1-t*.25);
+        const d=Math.abs(card.offsetLeft+card.offsetWidth/2-centre),t=Math.min(2.5,d/step);
+        card.style.transform=`translateY(${Math.min(18,t*12)}px) scale(${Math.max(.55,1-t*.25)})`;
+        card.style.opacity=String(Math.max(.35,1-t*.23));
         card.dataset.centred=String(d<step/2);
         if(d<distance){distance=d;nearest=index;}
       });

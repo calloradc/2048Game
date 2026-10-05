@@ -30,7 +30,7 @@ export async function checkShop(browser,base,errors){
   assert.ok(await page.locator('.scene').evaluate(el=>el.inert));
   assert.ok(await section('skins').locator('.snap-viewport').evaluate(el=>getComputedStyle(el).scrollSnapType.includes('mandatory')));
   const fixedLayout=await layout();
-  assert.equal(await section('skins').locator('.rail-card').count(),6,'Every item appears exactly once');
+  assert.equal(await section('skins').locator('.rail-card').count(),7,'Every item appears exactly once');
   assert.ok(await section('skins').locator('.shop-arrow.prev').isDisabled(),'The first card has a hard beginning');
   assert.ok(await section('skins').locator('.snap-track').evaluate(el=>{
     const cards=[...el.children];
@@ -46,9 +46,9 @@ export async function checkShop(browser,base,errors){
   });
   assert.ok(photoStyle.image==='none'&&photoStyle.border==='0px'&&(!photoStyle.supportsSquircle||photoStyle.corners.every(shape=>shape==='squircle'||shape==='superellipse(2)')),`Native CSS photo frames have squircles and no border: ${JSON.stringify(photoStyle)}`);
   await section('skins').locator('.snap-viewport').focus();await page.keyboard.press('ArrowLeft');await waitItem('skins','Фруктовая семья');
-  await page.keyboard.press('End');await waitItem('skins','Кристаллики');
+  await page.keyboard.press('End');await waitItem('skins','Лунные моти');
   assert.ok(await section('skins').locator('.shop-arrow.next').isDisabled(),'The last card has a hard end');
-  await page.keyboard.press('ArrowRight');await waitItem('skins','Кристаллики');
+  await page.keyboard.press('ArrowRight');await waitItem('skins','Лунные моти');
   await page.keyboard.press('Home');await waitItem('skins','Фруктовая семья');
   await next('skins','Шушистики');
   assert.deepEqual(await layout(),fixedLayout,'Locked item actions do not move any collection or slot');
@@ -79,10 +79,10 @@ export async function checkShop(browser,base,errors){
   }
   assert.equal(await coins(),25);
   await section('skins').getByRole('button',{name:'Выбрать',exact:true}).click();await section('skins').getByRole('button',{name:'Уже в игре'}).waitFor();await close();
-  await page.getByRole('button',{name:'Подарки',exact:true}).click();await page.getByRole('button',{name:/Ежедневный подарок/}).click();assert.equal(await coins(),50);
-  assert.ok(await page.getByRole('button',{name:/До завтра!/}).isDisabled());
-  const shakeCount=await page.locator('.shake-button>b').textContent();await watch(page.getByRole('button',{name:/Добавить встряску/}));assert.equal(Number(await page.locator('.shake-button>b').textContent()),Number(shakeCount)+1);
-  await page.screenshot({path:'test-results/gifts.png'});await close();
+  await page.getByRole('button',{name:'Подарки',exact:true}).click();assert.equal(await page.locator('.daily-prize').count(),7);assert.equal(await page.getByRole('dialog',{name:'Подарки'}).getByRole('button',{name:/видео/i}).count(),0,'Rewards only contains daily prizes');await page.getByRole('button',{name:'Забрать ежедневный подарок'}).click();assert.equal(await coins(),50);
+  assert.equal(await page.getByRole('button',{name:'Забрать ежедневный подарок'}).count(),0,'A prize can only be claimed once today');await page.screenshot({path:'test-results/daily-rewards.png'});await close();await openShop();await waitItem('skins','Суши-пати');await waitItem('backgrounds','Сакура на закате');await waitItem('boxes','Розовый кварц');await page.getByRole('navigation',{name:'Разделы магазина'}).getByRole('button',{name:'Монеты',exact:true}).click();
+  const shakeCount=await page.locator('.shake-button>b').textContent();await watch(page.getByRole('button',{name:'Добавить встряску за видео'}));assert.equal(Number(await page.locator('.shake-button>b').textContent()),Number(shakeCount)+1);
+  await page.screenshot({path:'test-results/shop-supplies.png'});await close();
   await page.getByRole('button',{name:'Настройки',exact:true}).click();
   const sound=page.getByRole('switch',{name:'Звук'}),vibration=page.getByRole('switch',{name:'Вибрация'});
   await sound.click();assert.equal(await sound.getAttribute('aria-checked'),'false');await vibration.click();assert.equal(await vibration.getAttribute('aria-checked'),'false');await page.screenshot({path:'test-results/settings.png'});await close();
@@ -90,7 +90,7 @@ export async function checkShop(browser,base,errors){
   const restored=await page.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')));assert.equal(restored.selected.skins,'sushi');assert.equal(restored.selected.backgrounds,'sunset');assert.equal(restored.selected.boxes,'rose');
   await page.getByRole('button',{name:'Настройки',exact:true}).click();assert.equal(await sound.getAttribute('aria-checked'),'false');assert.equal(await vibration.getAttribute('aria-checked'),'false');await close();
   const field=await page.locator('canvas').boundingBox();await page.touchscreen.tap(field.x+field.width*.5,field.y+field.height*.13);await page.waitForTimeout(1500);await page.screenshot({path:'test-results/selected-theme.png'});
-  await openShop();await page.waitForTimeout(350);
+  await openShop();await waitItem('skins','Суши-пати');await page.waitForTimeout(350);
   const rail=await section('skins').locator('.snap-viewport').boundingBox(),touch=await page.context().newCDPSession(page);
   await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:rail.x+rail.width*.62,y:rail.y+rail.height*.45}]});
   for(let i=1;i<=8;i++){await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:rail.x+rail.width*.62-i*18,y:rail.y+rail.height*.45}]});await page.waitForTimeout(70);}

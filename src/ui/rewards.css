@@ -1,0 +1,43 @@
+.rewards-fullscreen.overlay { padding: 0; background: #f9f3ecd1; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); z-index: 40; }
+.rewards-dialog.dialog { width: 100%; height: 100%; max-width: none; border-radius: 0; box-shadow: none; background: transparent; animation: overlay-in .25s ease-out; }
+.rewards-dialog > .dialog-content { position: relative; width: min(100%, 560px); height: 100%; margin: auto; display: grid; grid-template-rows: calc(84px + var(--safe-top)) minmax(0, 1fr) calc(76px + var(--safe-bottom)); padding: 0; overflow: hidden; }
+.rewards-dialog .dialog-close { top: calc(24px + var(--safe-top)); right: 16px; background: #eee5df; }
+.rewards-heading { display: flex; align-items: center; gap: 10px; padding: calc(16px + var(--safe-top)) 58px 12px 20px; background: #fffdf4c4; text-align: left; }
+.rewards-heading .eyebrow { font-size: 6px; letter-spacing: 1px; color: #af9abe; }
+.rewards-heading h1 { font-size: 21px; margin: 4px 0 0; letter-spacing: -.4px; }
+.rewards-scroll { min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; padding: 18px 16px 24px; }
+.rewards-scroll::-webkit-scrollbar { display: none; }
+.daily-hero { position: relative; display: flex; align-items: center; height: 139px; padding: 19px; margin-bottom: 18px; border-radius: 25px; corner-shape: squircle; background: linear-gradient(110deg, #e9d6fb, #fff1dc); text-align: left; overflow: hidden; }
+.daily-hero > div { position: relative; z-index: 1; max-width: 65%; }
+.daily-hero h2 { font-size: 20px; line-height: 1.1; font-weight: 900; margin: 8px 0 5px; color: #795397; }
+.daily-hero p { font-size: 10px; line-height: 1.4; color: #a086b0; margin: 0 0 8px; }
+.daily-hero > img { position: absolute; right: -4px; bottom: -3px; width: 129px; height: 129px; object-fit: contain; transform: rotate(8deg); }
+.exclusive-tag { font-size: 7px; font-weight: 900; letter-spacing: 1.1px; color: #ab79c1; }
+.daily-week-progress { display: inline-block; padding: 4px 9px; border-radius: 8px; corner-shape: squircle; background: #fffdf4a6; font-size: 9px; font-weight: 900; color: #a182b8; }
+.daily-list { display: grid; gap: 10px; }
+.daily-prize { display: grid; grid-template-columns: 55px minmax(0, 1fr) 66px; align-items: center; gap: 10px; width: 100%; min-height: 88px; padding: 12px; border-radius: 23px; corner-shape: squircle; background: #fffdf5; text-align: left; box-shadow: var(--soft-shadow); }
+.daily-prize.available { background: #eff8dd; }
+.daily-prize.exclusive { background: #f3e8fc; }
+.daily-prize.exclusive.available { background: #ead8fa; }
+.daily-prize-art { width: 55px; height: 58px; display: grid; place-items: center; border-radius: 16px; corner-shape: squircle; background: #fff2c8; }
+.daily-prize-art.shakes { background: #e5f0d5; }
+.daily-prize-art.item { background: #fff9fa9e; }
+.daily-prize-art > img { width: 43px; height: 47px; object-fit: contain; }
+.daily-prize-art.item > img { width: 48px; height: 50px; border-radius: 9px; corner-shape: squircle; }
+.daily-prize-copy { min-width: 0; }
+.daily-day { display: flex; align-items: center; gap: 5px; font-size: 8px; line-height: 1.2; letter-spacing: .7px; font-weight: 900; color: #a5aa98; }
+.daily-day > b { font-size: 6px; letter-spacing: .3px; color: #76b14d; }
+.daily-prize-copy h3 { font-size: 14px; font-weight: 900; line-height: 1.2; margin: 5px 0 3px; color: #5a7256; }
+.daily-prize.exclusive h3 { color: #9364b0; }
+.daily-prize-note { display: block; font-size: 9px; line-height: 1.3; font-weight: 800; color: #a6ad99; }
+.daily-claim { width: 66px; height: 34px; border-radius: 12px; background: var(--green); color: white; font-size: 10px; font-weight: 900; padding: 0 5px; }
+.daily-equip { width: 38px; height: 38px; justify-self: center; display: grid; place-items: center; border-radius: 13px; background: #e5d5f5; }
+.daily-equip:disabled { opacity: 1; }
+.daily-state { display: flex; flex-direction: column; align-items: center; justify-content: center; justify-self: center; gap: 4px; width: 50px; }
+.daily-state.locked { opacity: .6; }
+.daily-state small { font-size: 8px; font-weight: 900; color: #a5a48e; }
+.daily-note { text-align: center; color: #a9a38e; font-size: 10px; line-height: 1.5; margin: 20px 12px 0; }
+.rewards-footer { display: flex; align-items: center; justify-content: center; padding: 12px 20px calc(14px + var(--safe-bottom)); background: #fffdf4cf; }
+.rewards-footer .primary-button { width: 200px; height: 50px; }
+@media (max-width: 350px) { .rewards-heading { padding-left: 14px; gap: 7px; } .rewards-heading h1 { font-size: 18px; } .rewards-heading .eyebrow { font-size: 5px; } .daily-prize { grid-template-columns: 46px minmax(0, 1fr) 58px; gap: 8px; padding: 10px; } .daily-prize-art { width: 46px; height: 52px; } .daily-prize-copy h3 { font-size: 12px; } .daily-prize-note { font-size: 8px; } .daily-claim { width: 58px; font-size: 9px; } .daily-hero h2 { font-size: 18px; } .daily-hero > img { width: 111px; height: 111px; } }
+@media (max-height: 480px) { .rewards-dialog > .dialog-content { grid-template-rows: calc(66px + var(--safe-top)) minmax(0, 1fr) calc(64px + var(--safe-bottom)); } .rewards-heading { padding-top: calc(10px + var(--safe-top)); } .rewards-dialog .dialog-close { top: calc(15px + var(--safe-top)); } .rewards-footer { padding-block: 7px; } }

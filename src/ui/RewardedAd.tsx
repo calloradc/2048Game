@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from './Icon';
-export type AdReward={type:'coins'}|{type:'shake'}|{type:'revive'}|{type:'double'}|{type:'unlock';key:string};
-export const rewardLabel=(reward:AdReward)=>reward.type==='coins'?'+75 монет':reward.type==='shake'?'+1 встряска':reward.type==='revive'?'Спасение урожая':reward.type==='double'?'Монеты за игру ×2':'Шаг к новому оформлению';
+export type AdReward={type:'coins'}|{type:'coin-pack'}|{type:'shake'}|{type:'revive'}|{type:'double'}|{type:'unlock';key:string};
+export const rewardLabel=(reward:AdReward)=>reward.type==='coins'?'+75 монет':reward.type==='coin-pack'?'Шаг к +150 монетам':reward.type==='shake'?'+1 встряска':reward.type==='revive'?'Спасение урожая':reward.type==='double'?'Монеты за игру ×2':'Шаг к новому оформлению';
 
 export function RewardedAd({reward,onComplete,onCancel}:{reward:AdReward;onComplete:()=>void;onCancel:()=>void}) {
   const [progress,setProgress]=useState(0),done=useRef(false),complete=useRef(onComplete),dialog=useRef<HTMLDivElement>(null);

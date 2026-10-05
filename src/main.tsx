@@ -9,5 +9,6 @@ import '@fontsource/nunito/cyrillic-900.css';
 import App from './App';
 import './style.css';
 import './ui/shop.css';
+import './ui/rewards.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
