@@ -52,25 +52,21 @@ try {
       };
       await openSettings();
       assert.ok(parseFloat(await frame.locator('.dialog').evaluate(el => getComputedStyle(el).animationDuration)) > .1, 'Window entrance animates even when the host requests reduced motion');
-      assert.equal(await frame.getByRole('switch', { name: 'Анимации', exact: true }).getAttribute('aria-checked'), 'true');
+      assert.equal(await frame.getByRole('switch', { name: 'Анимации', exact: true }).count(), 0);
       await closeSettings(true);
       await frame.getByRole('button', { name: 'Магазин', exact: true }).click();
       assert.ok(await frame.locator('.rail-card-visual').evaluateAll(els => els.some(el => Math.abs(new DOMMatrixReadOnly(getComputedStyle(el).transform).m12) > .01)), 'Shop cards retain their rotations in the iframe');
       await frame.locator('.dialog-close').click(); await frame.locator('.overlay').waitFor({ state: 'detached' });
-      await openSettings();
-      await frame.getByRole('switch', { name: 'Анимации', exact: true }).click();
-      assert.equal(await frame.getByRole('switch', { name: 'Анимации', exact: true }).getAttribute('aria-checked'), 'false');
-      assert.ok(parseFloat(await frame.locator('.dialog').evaluate(el => getComputedStyle(el).animationDuration)) < .01);
-      await closeSettings(false); await checkAim(false);
+      // Old persisted switch values must no longer disable motion.
+      await frame.evaluate(() => localStorage.setItem('jelly-animations','false'));
       await Promise.all([frame.waitForNavigation(), frame.evaluate(() => location.reload())]);
       await frame.locator('canvas').waitFor(); await frame.locator('.loading').waitFor({ state: 'detached' });
       await openSettings();
-      assert.equal(await frame.getByRole('switch', { name: 'Анимации', exact: true }).getAttribute('aria-checked'), 'false', 'The explicit player choice survives reload');
-      await frame.getByRole('switch', { name: 'Анимации', exact: true }).click();
+      assert.equal(await frame.getByRole('switch', { name: 'Анимации', exact: true }).count(), 0);
       await closeSettings(true); await checkAim(true);
       assert.deepEqual(errors, []);
       await page.close();
-      console.log(`✓ iframe ${width}×${height}, host motion=${reducedMotion}: rotations, window entrance/exit, aim spring and saved animation switch`);
+      console.log(`✓ iframe ${width}×${height}, host motion=${reducedMotion}: rotations, window entrance/exit, aim spring and enabled motion after reload`);
     }
   }
 } finally {

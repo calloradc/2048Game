@@ -53,6 +53,7 @@ jobs:
           done
           npm run test:browser
           npm run test:iframe
+          npm run test:yandex
           node scripts/audio-stream-smoke.mjs
       - name: Check audio effects and focus behavior
         env:

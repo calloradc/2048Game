@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { installYandexMock } from './yandex-mock.mjs';
 import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import { checkShop } from './shop-smoke.mjs';
@@ -15,7 +16,7 @@ const browser = await chromium.launch({
   headless: true, args: ['--no-sandbox'],
 });
 const createPage=browser.newPage.bind(browser);
-browser.newPage=options=>createPage({locale:'ru-RU',...options});
+browser.newPage=async options=>{const page=await createPage({locale:'ru-RU',...options});await installYandexMock(page);return page;};
 const base = process.env.GAME_URL || 'http://localhost:5173/';
 const errors = [];
 await mkdir('test-results', { recursive: true });

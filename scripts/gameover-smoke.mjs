@@ -17,11 +17,9 @@ export async function checkGameover(browser,base,errors){
   }
   assert.ok(await page.getByRole('dialog',{name:'Игра окончена'}).count(),`Overflow loses after ${throws} ordinary drops`);
   assert.equal(await page.getByRole('button',{name:'Ещё разок',exact:true}).count(),0,'Ad rewards appear before replay');
-  await page.getByRole('dialog',{name:'Предупреждение о рекламе'}).waitFor();
-  await page.clock.runFor(1200);assert.equal(await page.getByRole('dialog',{name:'Межстраничная реклама'}).count(),0,'Warning lasts two visible seconds');
-  await page.clock.runFor(1000);assert.equal(await page.getByRole('dialog',{name:'Межстраничная реклама'}).count(),1);
-  await page.clock.runFor(2500);assert.equal(await page.getByRole('button',{name:'Ещё разок',exact:true}).count(),0,'Replay waits for the ad');
-  await page.clock.runFor(1900);assert.equal(await page.getByRole('button',{name:'Ещё разок',exact:true}).count(),1,'Replay appears one second after the interstitial');await page.screenshot({path:'test-results/gameover.png'});
+  await page.locator('.mock-platform-ad').waitFor();
+  await page.clock.runFor(2500);assert.equal(await page.getByRole('button',{name:'Ещё разок',exact:true}).count(),0,'Replay waits for the platform ad');
+  await page.clock.runFor(1900);assert.equal(await page.getByRole('button',{name:'Ещё разок',exact:true}).count(),1,'Replay appears one second after the SDK closes the ad');await page.screenshot({path:'test-results/gameover.png'});
   const wallet=async()=>Number(await page.getByTestId('coins').getAttribute('data-coins'));
   const earned=await wallet();assert.ok(earned>0);
   await page.getByRole('button',{name:/Монеты за игру ×2/}).click({force:true});await page.clock.runFor(3500);
@@ -42,14 +40,15 @@ export async function checkGameover(browser,base,errors){
   assert.equal(await page.getByRole('dialog',{name:'Лидерборд'}).count(),0,'A record popup waits until a new round starts');
   await page.getByRole('button',{name:'Ещё разок',exact:true}).click({force:true});await page.clock.runFor(300);
   assert.equal(await page.getByTestId('score').textContent(),'0','A fresh round resets the score before showing rank progress');
-  assert.equal(await page.getByRole('dialog',{name:'Лидерборд'}).count(),1,'A lost round beating its starting best shows the demo ranking');
+  assert.equal(await page.getByRole('dialog',{name:'Лидерборд'}).count(),1,'A lost round beating its starting best shows the platform ranking');
   const firstRank=Number((await page.getByTestId('animated-rank').textContent()).replace(/\D/g,''));
   await page.clock.runFor(900);
   const middleRank=Number((await page.getByTestId('animated-rank').textContent()).replace(/\D/g,''));
   await page.clock.runFor(1500);
   const finalRank=Number((await page.getByTestId('animated-rank').textContent()).replace(/\D/g,''));
   assert.ok(firstRank>middleRank&&middleRank>=finalRank,'The displayed global rank animates upward');
-  assert.ok(await page.locator('.leaderboard-summary').textContent().then(text=>text.includes('из 201')));
+  assert.ok(await page.locator('.leaderboard-summary').textContent().then(text=>text.includes('Твоё место:')));
+  assert.ok(await page.locator('.leaderboard-name').allTextContents().then(names=>names.includes('Real SDK rival')));
   await page.screenshot({path:'test-results/leaderboard.png'});
   await page.getByRole('button',{name:'Продолжить играть'}).click({force:true});await page.clock.runFor(400);
   await canvas.dispatchEvent('keydown',{key:'Enter'});await page.clock.runFor(700);

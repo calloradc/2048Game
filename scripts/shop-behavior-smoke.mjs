@@ -53,10 +53,19 @@ export async function checkShopBehavior(browser,base,errors){
   await page.waitForFunction(()=>document.querySelector('.offer-controls [aria-label="Предложение 2"]').getAttribute('aria-pressed')==='true',null,{timeout:12000});
   await page.getByRole('button',{name:'Предложение 1',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('.offer-controls [aria-label="Предложение 1"]').getAttribute('aria-pressed')==='true');
+  // Sample inside the wheel event and successive frames so browser-process
+  // round trips on busy CI runners cannot consume the spring before measuring it.
+  await page.locator('.shop-scroll').evaluate(el=>{
+    el.addEventListener('wheel',()=>{
+      window.__wheelStart=el.scrollTop;window.__wheelFrames=[];
+      const sample=()=>{window.__wheelFrames.push(el.scrollTop);if(window.__wheelFrames.length<5)requestAnimationFrame(sample);};
+      requestAnimationFrame(sample);
+    },{capture:true,once:true});
+  });
   await page.mouse.move(350,550);await page.mouse.wheel(0,300);
-  const first=await page.locator('.shop-scroll').evaluate(el=>el.scrollTop);await page.waitForTimeout(80);
-  const later=await page.locator('.shop-scroll').evaluate(el=>el.scrollTop);
-  assert.ok(later>first+10&&later<310,'Vertical wheel input continues with the shared soft spring');
+  await page.waitForFunction(()=>window.__wheelFrames?.length>=5);
+  const wheel=await page.evaluate(()=>({first:window.__wheelStart,frames:window.__wheelFrames}));
+  assert.ok(wheel.frames.at(-1)>wheel.first+10&&wheel.frames[1]<wheel.first+405,'Vertical wheel input continues with the shared soft spring');
   await close();
   await page.getByRole('button',{name:'Баланс монет'}).click();
   await page.getByRole('button',{name:/150 монет.*За короткое видео/}).click();

@@ -1,12 +1,13 @@
 import { useSyncExternalStore } from 'react';
 import messages from './locales/messages.json';
+import { readStorage, writeStorage } from './platform/storage';
 
 export const LANGUAGES=[['ru','Русский'],['en','English'],['tr','Türkçe'],['it','Italiano'],['pt','Português']] as const;
 export type Language=typeof LANGUAGES[number][0];
 const supported=(value:string):value is Language=>LANGUAGES.some(([code])=>code===value);
 const detect=():Language=>{
   if(typeof window==='undefined')return 'ru';
-  try {const saved=localStorage.getItem('jelly-language');if(saved&&supported(saved))return saved;}catch{/* Optional storage. */}
+  const saved=readStorage('jelly-language');if(saved&&supported(saved))return saved;
   for(const candidate of navigator.languages??[navigator.language]){
     const code=candidate.split('-')[0];if(supported(code))return code;
   }
@@ -25,7 +26,7 @@ export function t(source:string,params:Record<string,string|number>={}) {
 export function setLanguage(next:Language) {
   if(!supported(next)||next===language)return;
   language=next;
-  try{localStorage.setItem('jelly-language',next);}catch{/* Optional storage. */}
+  writeStorage('jelly-language',next);
   syncDocument();listeners.forEach(listener=>listener());
 }
 export function syncDocument() {
@@ -42,3 +43,9 @@ export const localizedProperty=(object:object,key:string)=>{
   Object.defineProperty(object,key,{enumerable:true,get:()=>t(source)});
 };
 syncDocument();
+
+export function initializeLanguage(sdkLanguage?: string) {
+  if (sdkLanguage !== undefined) language = supported(sdkLanguage) ? sdkLanguage : 'en';
+  else language = detect();
+  syncDocument();
+}

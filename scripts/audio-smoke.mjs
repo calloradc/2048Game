@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { installYandexMock } from './yandex-mock.mjs';
 import { chromium } from '@playwright/test';
 
 const browser = await chromium.launch({
@@ -31,7 +32,8 @@ try {
       return start.call(this, time, ...args);
     };
   });
-  await page.goto(process.env.GAME_URL || 'http://localhost:5173/', { waitUntil: 'networkidle' });
+  await installYandexMock(page);
+await page.goto(process.env.GAME_URL || 'http://localhost:5173/', { waitUntil: 'networkidle' });
   await page.locator('.loading').waitFor({ state: 'detached' });
   await page.getByRole('button', { name: 'Настройки', exact: true }).click();
   await page.waitForFunction(() => window.audioStarts.filter(source => !source.loop).length === 2);

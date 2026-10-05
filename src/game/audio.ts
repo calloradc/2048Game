@@ -23,12 +23,15 @@ export class GameAudio {
   private blurred = () => { this.active = false; this.updatePlayback(); };
   private destroyed = false;
   private isMuted = false;
+  private isPaused = false;
+  private purchasePending = false;
   private lastMerge = -Infinity;
   private lastMergeSound = -Infinity;
   private mergeStreak = 0;
 
-  constructor(muted = false) {
+  constructor(muted = false, paused = false) {
     this.isMuted = muted;
+    this.isPaused = paused;
     try {
       const context = this.context = new AudioContext();
       this.master = context.createGain();
@@ -59,13 +62,27 @@ export class GameAudio {
   }
 
   get muted() { return this.isMuted; }
+  get paused() { return this.isPaused; }
+  set paused(value: boolean) {
+    this.isPaused = value;
+    // Attempt allowed autoplay after loading/platform resume. Gesture-only
+    // browsers still retry through the existing pointer/click unlock path.
+    if (!value && this.active) this.unlock(); else this.updatePlayback();
+  }
   set muted(value: boolean) {
     this.isMuted = value;
+    if (value) this.purchasePending = false;
+    this.updatePlayback();
+  }
+
+  rewardPurchase() {
+    if (this.muted || this.destroyed) return;
+    this.purchasePending = true;
     this.updatePlayback();
   }
 
   unlock() {
-    if (!this.context || this.destroyed || !this.active) return;
+    if (!this.context || this.destroyed || !this.active || this.paused) return;
     this.unlocked = true;
     this.updatePlayback();
   }
@@ -73,7 +90,7 @@ export class GameAudio {
   private updatePlayback() {
     const context = this.context;
     if (!context || this.destroyed) return;
-    const audible = this.active && !this.muted;
+    const audible = this.active && !this.muted && !this.paused;
     this.master?.gain.setValueAtTime(audible ? 1 : 0, context.currentTime);
     if (!audible) {
       this.music?.pause();
@@ -81,11 +98,15 @@ export class GameAudio {
       this.activeSources.clear();
       this.mergeSources.clear();
     }
-    if (!this.active) {
+    if (!this.active || this.paused) {
       void context.suspend().catch(() => {});
     } else if (this.unlocked) {
       void context.resume().catch(() => {});
       if (audible && this.music?.paused) void this.music.play().catch(() => {});
+    }
+    if (audible && this.purchasePending) {
+      this.purchasePending = false;
+      this.play('purchase');
     }
   }
 
@@ -101,11 +122,11 @@ export class GameAudio {
       this.mergeStreak = reset ? 0 : this.mergeStreak + 1;
       pitch = 1 + this.mergeStreak * 0.06;
     }
-    if (this.muted || !this.active || !this.context || this.destroyed) return;
+    if (this.muted || this.paused || !this.active || !this.context || this.destroyed) return;
     this.unlock();
     const resumed = this.context.state === 'suspended' ? this.context.resume() : Promise.resolve();
     void Promise.all([Promise.all(LAYERS[type].map(sample => this.samples.get(sample))), resumed]).then(([buffers]) => {
-      if (this.muted || !this.active || this.destroyed || this.context?.state !== 'running') return;
+      if (this.muted || this.paused || !this.active || this.destroyed || this.context?.state !== 'running') return;
       // Schedule every layer at the same instant, even during fast merge chains.
       const time = this.context.currentTime + 0.005;
       if (type === 'merge') {

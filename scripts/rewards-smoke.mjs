@@ -12,7 +12,7 @@ export async function checkRewardsAndOffers(browser,base,errors){
   const profile=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')));
   const coins=async()=>Number(await page.getByTestId('coins').getAttribute('data-coins'));
   const close=async()=>{await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.locator('.overlay').waitFor({state:'detached'});};
-  const watch=async(button)=>{await button.click();await page.getByRole('dialog',{name:'Имитация рекламы'}).waitFor();await page.locator('.ad-overlay').waitFor({state:'detached'});};
+  const watch=async(button)=>{await button.click();await page.locator('.mock-platform-ad').waitFor();await page.locator('.ad-overlay').waitFor({state:'detached'});};
   await page.getByRole('button',{name:'Подарки',exact:true}).click();
   assert.equal(await page.locator('.daily-prize').count(),21);
   await page.locator('[data-day="14"]').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));

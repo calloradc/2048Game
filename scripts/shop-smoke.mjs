@@ -27,7 +27,7 @@ export async function checkShop(browser,base,errors){
     },{category,name});
   };
   const next=async(category,name)=>{await section(category).getByRole('button',{name:'Следующий товар'}).click();await waitItem(category,name);};
-  const watch=async(button)=>{await button.click();await page.getByRole('dialog',{name:'Имитация рекламы'}).waitFor();await page.locator('.ad-overlay').waitFor({state:'detached'});};
+  const watch=async(button)=>{await button.click();await page.locator('.mock-platform-ad').waitFor();await page.locator('.ad-overlay').waitFor({state:'detached'});};
   await openShop();await page.waitForTimeout(400);
   assert.ok(await page.locator('.dialog-close img').evaluate(el=>el.src.includes('icon-close-coral.webp')&&el.naturalWidth>0),'Close uses generated raster artwork');
   assert.ok(await page.locator('.shop-quick-coins .ui-icon').evaluate(el=>getComputedStyle(el).filter==='none'),'Ad icon preserves its generated colors');
@@ -77,7 +77,7 @@ export async function checkShop(browser,base,errors){
   assert.ok(await page.locator('.ambient-background').evaluate(el=>getComputedStyle(el,'::before').backgroundImage.includes('backgrounds/sunset.webp')));
   await page.screenshot({path:'test-results/shop-backgrounds.png'});
   await next('boxes','Розовый кварц');assert.ok(await section('boxes').getByRole('button',{name:'Нужно ещё 150'}).isDisabled());
-  await page.getByRole('button',{name:'+150 монет за видео',exact:true}).click();await page.getByRole('button',{name:'Закрыть без награды'}).click();assert.equal(await coins(),600);
+  await page.getByRole('button',{name:'+150 монет за видео',exact:true}).click();await page.locator('[data-test-ad-close]').click();assert.equal(await coins(),600);
   assert.equal(await section('boxes').locator('.shop-current').textContent(),'Розовый кварц');
   await watch(page.getByRole('button',{name:'+150 монет за видео',exact:true}));assert.equal(await coins(),750);await page.waitForTimeout(400);assert.equal(await coins(),750);
   await section('boxes').getByRole('button',{name:'Купить за 750'}).click();assert.equal(await coins(),0);

@@ -2422,5 +2422,71 @@
     "Animasyonlar",
     "Animazioni",
     "Animações"
+  ],
+  "Загрузка рекламы…": [
+    "Loading ad…",
+    "Reklam yükleniyor…",
+    "Caricamento pubblicità…",
+    "Carregando anúncio…"
+  ],
+  "Реклама сейчас недоступна. Попробуй позже.": [
+    "Ads are unavailable right now. Try again later.",
+    "Reklamlar şu an kullanılamıyor. Daha sonra dene.",
+    "Pubblicità non disponibile. Riprova più tardi.",
+    "Anúncios indisponíveis. Tente mais tarde."
+  ],
+  "Не удалось показать рекламу. Попробуй позже.": [
+    "The ad could not be shown. Try again later.",
+    "Reklam gösterilemedi. Daha sonra dene.",
+    "Impossibile mostrare la pubblicità. Riprova più tardi.",
+    "Não foi possível exibir o anúncio. Tente mais tarde."
+  ],
+  "Загрузка рейтинга…": [
+    "Loading leaderboard…",
+    "Sıralama yükleniyor…",
+    "Caricamento classifica…",
+    "Carregando classificação…"
+  ],
+  "Игрок": [
+    "Player",
+    "Oyuncu",
+    "Giocatore",
+    "Jogador"
+  ],
+  "Твоё место: {rank}": [
+    "Your rank: {rank}",
+    "Sıralaman: {rank}",
+    "La tua posizione: {rank}",
+    "Sua posição: {rank}"
+  ],
+  "Рейтинг доступен в Яндекс Играх.": [
+    "The leaderboard is available on Yandex Games.",
+    "Sıralama Yandex Games’te kullanılabilir.",
+    "La classifica è disponibile su Yandex Games.",
+    "A classificação está disponível no Yandex Games."
+  ],
+  "Рейтинг сейчас недоступен. Попробуй позже.": [
+    "The leaderboard is unavailable. Try again later.",
+    "Sıralama şu an kullanılamıyor. Daha sonra dene.",
+    "Classifica non disponibile. Riprova più tardi.",
+    "Classificação indisponível. Tente mais tarde."
+  ],
+  "В рейтинге пока нет результатов.": [
+    "No scores yet.",
+    "Henüz sonuç yok.",
+    "Ancora nessun risultato.",
+    "Ainda não há resultados."
+  ],
+  "Войди в Яндекс, чтобы отправлять свой рекорд в рейтинг.": [
+    "Sign in to Yandex to submit your best score.",
+    "Rekorunu göndermek için Yandex’e giriş yap.",
+    "Accedi a Yandex per inviare il tuo record.",
+    "Entre no Yandex para enviar seu recorde."
+  ],
+  "Войти в Яндекс": [
+    "Sign in to Yandex",
+    "Yandex’e giriş yap",
+    "Accedi a Yandex",
+    "Entrar no Yandex"
   ]
 }
