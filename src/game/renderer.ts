@@ -44,7 +44,7 @@ export class GameRenderer {
 
   async start(progress: (loaded: number, total: number) => void = () => {},skin='fruit',box='glass',background='meadow') {
     this.skin=skin;
-    const files=[...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),asset('wood-sign.webp'),backgroundAsset(background),...UI_ARTWORK];
+    const files=[...FRUITS.map((_,level)=>fruitAsset(level,skin)),boxAsset(box),...Array.from({length:12},(_,i)=>asset(`particles/${i}.webp`)),backgroundAsset(background),...UI_ARTWORK];
     let completed=0;const total=files.length+1;
     const images=await Promise.all(files.map(async src=>{const image=await loadImage(src);if(!this.destroyed)progress(++completed,total);return image;}));
     await document.fonts.ready;

@@ -15,7 +15,7 @@ try {
   const loading = await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   let releaseAsset;
   const assetGate=new Promise(resolve=>{releaseAsset=resolve;});
-  await loading.route('**/wood-sign.webp',async route=>{await assetGate;await route.continue();});
+  await loading.route('**/countryside.webp',async route=>{await assetGate;await route.continue();});
   await loading.goto(base,{waitUntil:'domcontentloaded'});
   await loading.locator('.loading-screen').waitFor({state:'visible'});
   const splash=await loading.locator('.loading-screen').boundingBox();
@@ -61,8 +61,8 @@ try {
       assert.equal(await page.getByTestId('score').textContent(), '0', 'Start is empty');
       assert.ok(await page.locator('.score-card').evaluate(el=>{
         const number=el.querySelector('strong'),label=el.querySelector('.small-label');
-        return Math.abs(number.getBoundingClientRect().left-label.getBoundingClientRect().left)<1&&parseFloat(getComputedStyle(number).webkitTextStrokeWidth)>0;
-      }),'Score is left aligned and outlined');
+        return Math.abs(number.getBoundingClientRect().left-label.getBoundingClientRect().left)<1&&parseFloat(getComputedStyle(number).webkitTextStrokeWidth)===0&&getComputedStyle(el.parentElement).backgroundImage==='none';
+      }),'Score uses a real CSS panel and plain, left-aligned text');
       const aimTouch=await page.context().newCDPSession(page),aimY=bounds.y+60;
       await aimTouch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width*.3,y:aimY}]});
       for(let step=1;step<=6;step++){

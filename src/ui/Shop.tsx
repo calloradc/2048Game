@@ -16,11 +16,11 @@ function Collection({category,title,caption,profile,coins,busy,onBuy,onSelect,on
     <header className="collection-heading"><span className="eyebrow">{caption}</span><h2>{title}</h2></header>
     <SnapRail count={list.length} initial={index} current={index} onChange={setIndex}>{list.map(card=><article className={`shop-card ${category}`} data-theme={card.id} key={card.key} aria-label={card.name}>
       <div className="card-art">{category==='skins'?<><img className="skin-mini left" src={fruitAsset(0,card.id)} alt="" loading="lazy"/><img className="skin-main" src={fruitAsset(5,card.id)} alt="" loading="lazy"/><img className="skin-mini right" src={fruitAsset(10,card.id)} alt="" loading="lazy"/></>:<img className="item-image" src={itemPreview(card)} alt="" loading="lazy"/>}</div>
-      <span className="card-frame"/>
-      <span className="card-status"><Icon name={profile.owned.includes(card.key)?profile.selected[category]===card.id?'check':'sparkle':'lock'} size={23}/></span>
+      <span className="card-caption">{card.name}</span>
+      <span className="card-status"><Icon name={profile.owned.includes(card.key)?profile.selected[category]===card.id?'check':'sparkle':'lock'} size={17}/></span>
     </article>)}</SnapRail>
     <div className="collection-info" aria-live="polite"><h3 className="shop-current">{item.name}</h3><p>{item.description}</p></div>
-    <div className="shop-pagination" aria-label={`Выбор: ${title}`}>{list.map((card,i)=><button key={card.key} className={i===index?'active':''} aria-label={`Показать ${card.name}`} aria-pressed={i===index} onClick={()=>setIndex(i)}><Icon name="sparkle" size={i===index?17:11}/></button>)}</div>
+    <div className="shop-pagination" aria-label={`Выбор: ${title}`}>{list.map((card,i)=><button key={card.key} className={i===index?'active':''} aria-label={`Показать ${card.name}`} aria-pressed={i===index} onClick={()=>setIndex(i)}><span/></button>)}</div>
     <div className="shop-actions">
       {owned?<button className="primary-button" disabled={selected||busy} onClick={()=>onSelect(item)}><Icon name={selected?'check':'sparkle'} size={25}/>{busy?'Загружаем…':selected?'Уже в игре':'Выбрать'}</button>:<>
         <button className="primary-button gold-button" disabled={coins<item.price||busy} onClick={()=>onBuy(item)}><img className="button-coin" src={asset('particles/11.webp')} alt=""/>{coins<item.price?`Нужно ещё ${item.price-coins}`:`Купить за ${item.price}`}</button>

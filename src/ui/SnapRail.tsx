@@ -1,56 +1,55 @@
 import { Children, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { Icon } from './Icon';
 
-/** Three copies keep two neighbours visible even when the first item is selected. */
+/** One finite row: end padding lets the first and last photo reach the centre. */
 export function SnapRail({count,initial=0,current=0,onChange,children}:{count:number;initial?:number;current?:number;onChange:(index:number)=>void;children:ReactNode}) {
   const viewport=useRef<HTMLDivElement>(null),track=useRef<HTMLDivElement>(null),callback=useRef(onChange);
-  const go=useRef<(index:number)=>void>(()=>{}),active=useRef(initial),physical=useRef(count+initial);
+  const go=useRef<(index:number)=>void>(()=>{}),active=useRef(initial);
   callback.current=onChange;
+
   useLayoutEffect(()=>{
     const el=viewport.current!,row=track.current!,cards=Array.from(row.children) as HTMLElement[];
+    if(!cards.length)return;
+    const clamp=(index:number)=>Math.max(0,Math.min(count-1,index));
     let frame=0,pending:number|null=null,drag:{x:number;scroll:number;moved:boolean}|null=null,suppressClick=false;
-    const target=(i:number)=>cards[i].offsetLeft-(el.clientWidth-cards[i].offsetWidth)/2;
+    const target=(index:number)=>cards[index].offsetLeft-(el.clientWidth-cards[index].offsetWidth)/2;
     const paint=()=>{
       frame=0;
-      const centre=el.scrollLeft+el.clientWidth/2,step=cards[1].offsetLeft-cards[0].offsetLeft;
+      const centre=el.scrollLeft+el.clientWidth/2;
+      const step=cards.length>1?cards[1].offsetLeft-cards[0].offsetLeft:cards[0].offsetWidth;
       let nearest=0,distance=Infinity;
-      cards.forEach((card,i)=>{
-        const d=Math.abs(card.offsetLeft+card.offsetWidth/2-centre),t=d/step;
-        card.style.transform=`translateY(${Math.min(22,t*7)}px) scale(${Math.max(.4,1-t*.24)})`;
-        card.style.opacity=String(Math.max(.25,1-t*.21));
-        card.style.zIndex=String(100-Math.round(t*10));
+      cards.forEach((card,index)=>{
+        const d=Math.abs(card.offsetLeft+card.offsetWidth/2-centre),t=Math.min(1,d/step);
+        card.style.transform=`translateY(${t*5}px) scale(${1-t*.09})`;
+        card.style.opacity=String(1-t*.25);
         card.dataset.centred=String(d<step/2);
-        card.setAttribute('aria-hidden',String(d>=step/2));
-        if(d<distance){distance=d;nearest=i;}
+        if(d<distance){distance=d;nearest=index;}
       });
-      physical.current=nearest;
-      if(pending!==null&&Math.abs(el.scrollLeft-target(pending))<1){pending=null;el.style.scrollSnapType='';}
-      if(pending===null){
-        const index=nearest%count;
-        if(active.current!==index){active.current=index;callback.current(index);}
-        if(distance<1&&(nearest<count||nearest>=count*2)){
-          const middle=count+index;el.scrollTo({left:target(middle),behavior:'instant'});physical.current=middle;paint();return;
-        }
-      }
+      if(pending!==null&&Math.abs(el.scrollLeft-target(pending))<2)pending=null;
+      if(pending===null&&active.current!==nearest){active.current=nearest;callback.current(nearest);}
     };
     const scroll=()=>{if(!frame)frame=requestAnimationFrame(paint);};
     const resize=()=>{
       row.style.paddingInline=`${Math.max(0,(el.clientWidth-cards[0].offsetWidth)/2)}px`;
-      el.scrollTo({left:target(pending??physical.current),behavior:'instant'});paint();
+      el.scrollTo({left:target(clamp(pending??active.current)),behavior:'instant'});
+      paint();
     };
     go.current=(index)=>{
-      const logical=(index%count+count)%count;
-      pending=[logical,count+logical,count*2+logical].reduce((best,i)=>Math.abs(i-physical.current)<Math.abs(best-physical.current)?i:best,count+logical);
-      el.style.scrollSnapType='none';el.scrollTo({left:el.scrollLeft,behavior:'instant'});
-      el.scrollTo({left:target(pending),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});scroll();
+      pending=clamp(index);
+      el.scrollTo({left:target(pending),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+      scroll();
     };
     const observer=new ResizeObserver(resize);observer.observe(el);resize();
     const wheel=(e:WheelEvent)=>{
       if(Math.abs(e.deltaX)<=Math.abs(e.deltaY)&&!e.shiftKey)return;
-      e.preventDefault();pending=null;el.style.scrollSnapType='';el.scrollLeft+=e.shiftKey?e.deltaY:e.deltaX;
+      e.preventDefault();pending=null;
+      const unit=e.deltaMode===1?16:e.deltaMode===2?el.clientWidth:1;
+      el.scrollLeft+=(e.shiftKey?e.deltaY:e.deltaX)*unit;
     };
     const down=(e:PointerEvent)=>{
-      pending=null;el.style.scrollSnapType='';suppressClick=false;
+      pending=null;suppressClick=false;
+      // Cancel a running smooth scroll before direct manipulation.
+      el.scrollTo({left:el.scrollLeft,behavior:'instant'});
       if(e.pointerType==='mouse'&&e.button===0)drag={x:e.clientX,scroll:el.scrollLeft,moved:false};
     };
     const move=(e:PointerEvent)=>{
@@ -59,8 +58,12 @@ export function SnapRail({count,initial=0,current=0,onChange,children}:{count:nu
       if(Math.abs(delta)>5){drag.moved=true;el.setPointerCapture(e.pointerId);el.style.scrollSnapType='none';}
       if(drag.moved)el.scrollLeft=drag.scroll-delta;
     };
-    const up=()=>{
-      if(drag?.moved){paint();suppressClick=true;el.style.scrollSnapType='';go.current(physical.current%count);}drag=null;
+    const up=(e:PointerEvent)=>{
+      if(drag?.moved){
+        paint();suppressClick=true;el.style.scrollSnapType='';go.current(active.current);
+        if(el.hasPointerCapture(e.pointerId))el.releasePointerCapture(e.pointerId);
+      }
+      drag=null;
     };
     const click=(e:MouseEvent)=>{
       if(suppressClick){suppressClick=false;return;}
@@ -72,6 +75,17 @@ export function SnapRail({count,initial=0,current=0,onChange,children}:{count:nu
     return()=>{cancelAnimationFrame(frame);observer.disconnect();el.removeEventListener('scroll',scroll);el.removeEventListener('wheel',wheel);el.removeEventListener('pointerdown',down);el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);el.removeEventListener('click',click);};
   },[count]);
   useLayoutEffect(()=>{if(current!==active.current)go.current(current);},[current]);
-  const items=Children.toArray(children);
-  return <div className="snap-rail"><div className="snap-viewport" ref={viewport} tabIndex={0} aria-label="Карточки. Листай влево или вправо." onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();go.current(current+(e.key==='ArrowRight'?1:-1));}}}><div className="snap-track" ref={track}>{Array.from({length:3},(_,copy)=>items.map((item,i)=><div className="rail-card" data-rail-index={i} key={`${copy}-${i}`}>{item}</div>))}</div></div><button className="shop-arrow prev" aria-label="Предыдущий товар" onClick={()=>go.current(current-1)}><Icon name="left" size={23}/></button><button className="shop-arrow next" aria-label="Следующий товар" onClick={()=>go.current(current+1)}><Icon name="right" size={23}/></button></div>;
+
+  return <div className="snap-rail">
+    <div className="snap-viewport" ref={viewport} tabIndex={0} role="region" aria-roledescription="карусель" aria-label="Карточки. Листай влево или вправо." onKeyDown={e=>{
+      if(['ArrowRight','ArrowLeft','Home','End'].includes(e.key)){
+        e.preventDefault();
+        go.current(e.key==='Home'?0:e.key==='End'?count-1:current+(e.key==='ArrowRight'?1:-1));
+      }
+    }}>
+      <div className="snap-track" ref={track}>{Children.toArray(children).map((item,index)=><div className="rail-card" data-rail-index={index} key={index} role="group" aria-roledescription="карточка" aria-label={`${index+1} из ${count}`} aria-current={current===index?'true':undefined}>{item}</div>)}</div>
+    </div>
+    <button className="shop-arrow prev" aria-label="Предыдущий товар" disabled={current<=0} onClick={()=>go.current(current-1)}><Icon name="left" size={23}/></button>
+    <button className="shop-arrow next" aria-label="Следующий товар" disabled={current>=count-1} onClick={()=>go.current(current+1)}><Icon name="right" size={23}/></button>
+  </div>;
 }

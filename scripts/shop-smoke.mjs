@@ -10,6 +10,10 @@ export async function checkShop(browser,base,errors){
   const openShop=()=>page.getByRole('button',{name:'Магазин',exact:true}).click();
   const close=async()=>{await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.locator('.overlay').waitFor({state:'detached'});};
   const section=category=>page.locator(`[data-category=${category}]`);
+  const layout=()=>page.locator('.shop-collection').evaluateAll(els=>els.map(el=>({
+    top:el.offsetTop,height:el.offsetHeight,
+    slots:[...el.children].map(child=>({top:child.offsetTop,height:child.offsetHeight})),
+  })));
   const waitItem=async(category,name)=>{
     await page.waitForFunction(({category,name})=>{
       const s=document.querySelector(`[data-category=${category}]`),card=s.querySelector('.rail-card[data-centred=true]'),rail=s.querySelector('.snap-viewport'),item=s.querySelector('.shop-current');
@@ -25,15 +29,32 @@ export async function checkShop(browser,base,errors){
   assert.deepEqual(await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox(),{x:0,y:0,width:390,height:844});
   assert.ok(await page.locator('.scene').evaluate(el=>el.inert));
   assert.ok(await section('skins').locator('.snap-viewport').evaluate(el=>getComputedStyle(el).scrollSnapType.includes('mandatory')));
-  assert.ok(await section('skins').locator('.snap-viewport').evaluate(el=>{
-    const rail=el.getBoundingClientRect(),cards=[...el.querySelectorAll('.rail-card')].filter(c=>{const r=c.getBoundingClientRect();return r.right>rail.left&&r.left<rail.right;}),central=cards.find(c=>c.dataset.centred==='true'),centre=rail.left+rail.width/2;
-    return cards.filter(c=>c.getBoundingClientRect().left+c.getBoundingClientRect().width/2<centre-5).length>=2&&cards.filter(c=>c.getBoundingClientRect().left+c.getBoundingClientRect().width/2>centre+5).length>=2&&new DOMMatrixReadOnly(getComputedStyle(central).transform).a>.98&&cards.some(c=>new DOMMatrixReadOnly(getComputedStyle(c).transform).a<.6);
-  }),'Two smaller cards are visible on each side of the full-size card');
-  await section('skins').getByRole('button',{name:'Предыдущий товар'}).click();await waitItem('skins','Кристаллики');
-  await next('skins','Фруктовая семья');await next('skins','Шушистики');
+  const fixedLayout=await layout();
+  assert.equal(await section('skins').locator('.rail-card').count(),6,'Every item appears exactly once');
+  assert.ok(await section('skins').locator('.shop-arrow.prev').isDisabled(),'The first card has a hard beginning');
+  assert.ok(await section('skins').locator('.snap-track').evaluate(el=>{
+    const cards=[...el.children];
+    return cards.every(card=>Math.abs(card.offsetWidth-card.offsetHeight)<1)&&cards.slice(1).every((card,i)=>card.offsetLeft-cards[i].offsetLeft-cards[i].offsetWidth>=27);
+  }),'Photos are square with separate, non-overlapping slots');
+  assert.ok(await page.locator('.shop-fullscreen').evaluate(el=>{
+    const s=getComputedStyle(el),dialog=getComputedStyle(el.querySelector('.shop-dialog'));
+    return s.backdropFilter.includes('blur(18px)')&&s.backgroundImage==='none'&&dialog.backgroundImage==='none'&&dialog.backgroundColor==='rgba(0, 0, 0, 0)';
+  }),'Shop blurs the actual game without a replacement wallpaper');
+  assert.ok(await section('skins').locator('.shop-card').first().evaluate(el=>{
+    const s=getComputedStyle(el);return s.backgroundImage==='none'&&s.borderTopWidth==='0px'&&(!CSS.supports('corner-shape','squircle')||s.cornerShape==='squircle');
+  }),'Native CSS photo frames have squircles and no border');
+  await section('skins').locator('.snap-viewport').focus();await page.keyboard.press('ArrowLeft');await waitItem('skins','Фруктовая семья');
+  await page.keyboard.press('End');await waitItem('skins','Кристаллики');
+  assert.ok(await section('skins').locator('.shop-arrow.next').isDisabled(),'The last card has a hard end');
+  await page.keyboard.press('ArrowRight');await waitItem('skins','Кристаллики');
+  await page.keyboard.press('Home');await waitItem('skins','Фруктовая семья');
+  await next('skins','Шушистики');
+  assert.deepEqual(await layout(),fixedLayout,'Locked item actions do not move any collection or slot');
   await page.screenshot({path:'test-results/shop-skins.png'});
   await section('skins').getByRole('button',{name:'Купить за 180'}).click();assert.equal(await coins(),220);
+  assert.deepEqual(await layout(),fixedLayout,'Buying an item does not collapse reserved action space');
   await section('skins').getByRole('button',{name:'Выбрать',exact:true}).click();await section('skins').getByRole('button',{name:'Уже в игре'}).waitFor();
+  assert.deepEqual(await layout(),fixedLayout,'Applying an item leaves all sections in place');
   await page.waitForFunction(()=>document.querySelector('.chain-fruit img').src.includes('/skins/fuzzies/'));
   await next('backgrounds','Сакура на закате');
   await section('backgrounds').getByRole('button',{name:'Купить за 120'}).click();assert.equal(await coins(),100);
@@ -70,7 +91,7 @@ export async function checkShop(browser,base,errors){
   await openShop();await page.waitForTimeout(350);
   const rail=await section('skins').locator('.snap-viewport').boundingBox(),touch=await page.context().newCDPSession(page);
   await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:rail.x+rail.width*.62,y:rail.y+rail.height*.45}]});
-  for(let i=1;i<=8;i++){await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:rail.x+rail.width*.62-i*9,y:rail.y+rail.height*.45}]});await page.waitForTimeout(70);}
+  for(let i=1;i<=8;i++){await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:rail.x+rail.width*.62-i*18,y:rail.y+rail.height*.45}]});await page.waitForTimeout(70);}
   await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await page.waitForTimeout(900);
   assert.notEqual(await section('skins').locator('.shop-current').textContent(),'Суши-пати','Native horizontal swipe selects a new item');
   await section('skins').getByRole('button',{name:'Показать Кристаллики',exact:true}).click();await waitItem('skins','Кристаллики');
@@ -83,7 +104,7 @@ export async function checkShop(browser,base,errors){
   await page.locator('.shop-scroll').evaluate(el=>el.scrollTop=0);
   await section('skins').getByRole('button',{name:'Показать Фруктовая семья',exact:true}).click();await waitItem('skins','Фруктовая семья');
   const mouseRail=await section('skins').locator('.snap-viewport').boundingBox(),mouseX=mouseRail.x+mouseRail.width*.65,mouseY=mouseRail.y+mouseRail.height*.45;
-  await page.mouse.move(mouseX,mouseY);await page.mouse.down();await page.mouse.move(mouseX-80,mouseY,{steps:4});await page.mouse.up();await waitItem('skins','Шушистики');
+  await page.mouse.move(mouseX,mouseY);await page.mouse.down();await page.mouse.move(mouseX-140,mouseY,{steps:4});await page.mouse.up();await waitItem('skins','Шушистики');
   for(const [w,h] of [[320,568],[360,640],[844,390]]){
     await page.setViewportSize({width:w,height:h});await page.waitForTimeout(300);
     assert.deepEqual(await page.getByRole('dialog',{name:'Магазин',exact:true}).boundingBox(),{x:0,y:0,width:w,height:h});
@@ -91,5 +112,5 @@ export async function checkShop(browser,base,errors){
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth&&document.documentElement.scrollHeight===innerHeight));
     await page.locator('.shop-scroll').evaluate(el=>el.scrollTop=0);await page.screenshot({path:`test-results/shop-${w}x${h}.png`});
   }
-  await page.close();console.log('✓ stacked shop, circular floating cards, both touch gestures, purchases, theme persistence, ads, daily gift and settings');
+  await page.close();console.log('✓ finite photo rails, fixed collection slots, blurred game backdrop, both touch gestures, purchases, theme persistence, ads, daily gift and settings');
 }

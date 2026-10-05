@@ -11,7 +11,6 @@ import { usePresence } from './ui/usePresence';
 import { Icon } from './ui/Icon';
 import { Shop } from './ui/Shop';
 import { RewardedAd, type AdReward } from './ui/RewardedAd';
-import { UI_TEXTURES } from './ui/assets';
 
 const read = (key: string, fallback: string) => { try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; } };
 const save = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch { /* Storage is optional in embedded web games. */ } };
@@ -180,7 +179,7 @@ export default function App() {
         </div>
       </div>;
 
-  return <main className="game-screen" ref={shellRef} aria-busy={!loaded} style={{...UI_TEXTURES,'--scenery':`url("${new URL(backgroundAsset(profile.selected.backgrounds),document.baseURI).href}")`} as CSSProperties}>
+  return <main className="game-screen" ref={shellRef} aria-busy={!loaded} style={{'--scenery':`url("${new URL(backgroundAsset(profile.selected.backgrounds),document.baseURI).href}")`} as CSSProperties}>
     <div className="ambient-background" aria-hidden="true" />
     <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={!loaded||overlay} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
       <header className="header">
@@ -189,7 +188,6 @@ export default function App() {
         <div className="header-buttons"><button className="round-button sound-button" aria-label={muted?'Включить звук':'Выключить звук'} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={26}/></button><button className="round-button" aria-label="Настройки" onClick={()=>setModal('settings')}><Icon name="settings" size={23}/></button></div>
       </header>
       <section className="scoreboard" aria-label="Результат">
-        <img className="score-sign-art" src={asset('wood-sign.webp')} alt="" draggable={false}/>
         <div className="score-card"><span className="small-label">ТВОЙ СЧЁТ</span><strong key={state.score} data-testid="score">{format(state.score)}</strong></div>
         <div className="best-card"><span className="small-label"><Icon name="trophy" size={13}/> РЕКОРД</span><strong key={state.best}>{format(state.best)}</strong></div>
       </section>
