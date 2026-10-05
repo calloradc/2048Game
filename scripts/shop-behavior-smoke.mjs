@@ -19,6 +19,8 @@ export async function checkShopBehavior(browser,base,errors){
   assert.ok(await page.locator('.shop-launch-art').evaluate(el=>getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0.4)'&&el.clientWidth===60));
   assert.ok(await page.locator('.game-toolbar').evaluate(el=>!el.closest('.playfield')&&Math.abs(el.getBoundingClientRect().left-document.querySelector('.scoreboard').getBoundingClientRect().left)<1));
   await open();
+  assert.equal(await page.locator('.offer-controls > button').count(),0,'Offer navigation contains only dots');
+  assert.equal(await page.locator('.auto-equipped').count(),0,'Automatic equipment needs no extra label');
   assert.equal(await page.getByRole('button',{name:'Выбрать',exact:true}).count(),0,'Shop equips without a separate button');
   const keyframes=await page.locator('.shop-dialog').evaluate(el=>el.getAnimations()[0].effect.getKeyframes());
   assert.ok(keyframes[0].transform.includes('844'),'Sheet entrance begins below the viewport');
@@ -49,7 +51,7 @@ export async function checkShopBehavior(browser,base,errors){
   await jump('Персонажи');await page.locator('.shop-scroll').evaluate(el=>el.scrollTop=0);
   await page.getByRole('button',{name:'Предложение 1',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('.offer-controls [aria-label="Предложение 2"]').getAttribute('aria-pressed')==='true',null,{timeout:12000});
-  await page.getByRole('button',{name:'Предыдущее предложение'}).click();
+  await page.getByRole('button',{name:'Предложение 1',exact:true}).click();
   await page.waitForFunction(()=>document.querySelector('.offer-controls [aria-label="Предложение 1"]').getAttribute('aria-pressed')==='true');
   await page.mouse.move(350,550);await page.mouse.wheel(0,300);
   const first=await page.locator('.shop-scroll').evaluate(el=>el.scrollTop);await page.waitForTimeout(80);
@@ -59,7 +61,7 @@ export async function checkShopBehavior(browser,base,errors){
   await page.getByRole('button',{name:'Баланс монет'}).click();
   await page.getByRole('button',{name:/150 монет.*За короткое видео/}).click();
   await page.locator('.ad-overlay').waitFor({state:'detached'});
-  assert.equal(Number((await page.getByTestId('coins').textContent()).replace(/\D/g,'')),7767,'Wallet offers the doubled coin reward');
+  assert.equal(Number(await page.getByTestId('coins').getAttribute('data-coins')),7767,'Wallet offers the doubled coin reward');
   await close();await page.close();
   console.log('✓ independent game toolbar, owned focus, locked preview rollback, purchase and bundle auto-equipping, contents windows, automatic offers, soft vertical scroll and wallet ad reward');
 }

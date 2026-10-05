@@ -10,7 +10,7 @@ export async function checkRewardsAndOffers(browser,base,errors){
   });
   await page.goto(base,{waitUntil:'networkidle'});await page.locator('.loading').waitFor({state:'detached'});
   const profile=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('jelly-profile')));
-  const coins=async()=>Number((await page.getByTestId('coins').textContent()).replace(/\D/g,''));
+  const coins=async()=>Number(await page.getByTestId('coins').getAttribute('data-coins'));
   const close=async()=>{await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.locator('.overlay').waitFor({state:'detached'});};
   const watch=async(button)=>{await button.click();await page.getByRole('dialog',{name:'Имитация рекламы'}).waitFor();await page.locator('.ad-overlay').waitFor({state:'detached'});};
   await page.getByRole('button',{name:'Подарки',exact:true}).click();

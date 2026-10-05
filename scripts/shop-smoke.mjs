@@ -11,7 +11,7 @@ export async function checkShop(browser,base,errors){
     CanvasRenderingContext2D.prototype.clearRect=function(...args){if(this.canvas===document.querySelector('canvas'))window.__shopCanvasDraws++;return clear.apply(this,args);};
   });
   await page.goto(base,{waitUntil:'networkidle'});await page.locator('.loading').waitFor({state:'detached'});
-  const coins=async()=>Number((await page.getByTestId('coins').textContent()).replace(/\D/g,''));
+  const coins=async()=>Number(await page.getByTestId('coins').getAttribute('data-coins'));
   const openShop=()=>page.getByRole('button',{name:'Магазин',exact:true}).click();
   const close=async()=>{await page.getByRole('button',{name:'Закрыть',exact:true}).click();await page.locator('.overlay').waitFor({state:'detached'});};
   const section=category=>page.locator(`[data-category=${category}]`);
@@ -32,6 +32,8 @@ export async function checkShop(browser,base,errors){
   assert.ok(await page.locator('.dialog-close img').evaluate(el=>el.src.includes('icon-close-coral.webp')&&el.naturalWidth>0),'Close uses generated raster artwork');
   assert.ok(await page.locator('.shop-quick-coins .ui-icon').evaluate(el=>getComputedStyle(el).filter==='none'),'Ad icon preserves its generated colors');
   assert.equal(await page.locator('.collection-end,.shake-bank').count(),0,'Shop has no trailing promotional filler');
+  assert.equal(await page.getByTestId('coins').textContent(),'2.1K','Balance uses the compact label');
+  assert.equal(await page.locator('.shop-wallet strong').textContent(),'2.1K');
   const pausedDraws=await page.evaluate(()=>window.__shopCanvasDraws);
   await page.waitForTimeout(160);
   assert.equal(await page.evaluate(()=>window.__shopCanvasDraws),pausedDraws,'Paused game does not repaint behind the animated shop');

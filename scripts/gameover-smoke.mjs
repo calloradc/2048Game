@@ -18,7 +18,7 @@ export async function checkGameover(browser,base,errors){
   assert.ok(await page.getByRole('dialog',{name:'Игра окончена'}).count(),`Overflow loses after ${throws} ordinary drops`);
   assert.equal(await page.getByRole('button',{name:'Ещё разок',exact:true}).count(),0,'Ad rewards appear before replay');
   await page.clock.runFor(1100);assert.equal(await page.getByRole('button',{name:'Ещё разок',exact:true}).count(),1,'Replay appears after one second');await page.screenshot({path:'test-results/gameover.png'});
-  const wallet=async()=>Number((await page.getByTestId('coins').textContent()).replace(/\D/g,''));
+  const wallet=async()=>Number(await page.getByTestId('coins').getAttribute('data-coins'));
   const earned=await wallet();assert.ok(earned>0);
   await page.getByRole('button',{name:/Монеты за игру ×2/}).click({force:true});await page.clock.runFor(3500);
   assert.equal(await wallet(),earned*2);assert.equal(await page.getByRole('button',{name:/Монеты за игру ×2/}).count(),0);
