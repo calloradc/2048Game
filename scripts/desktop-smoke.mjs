@@ -38,11 +38,17 @@ export async function checkDesktop(browser,base,errors){
   await hover('.wallet');await hover('.header-buttons button:last-child');await page.locator('.header-buttons button:last-child').click();await page.waitForTimeout(400);await hover('.setting-row:first-child');await hover('.dialog-close');await page.locator('.dialog-close').click();await page.locator('.overlay').waitFor({state:'detached'});
   await page.locator('.shop-launch').click();await page.waitForTimeout(400);
   const inertia=async selector=>{
-    const el=page.locator(selector);await el.evaluate(e=>e.scrollTop=250);await page.waitForTimeout(100);
+    const el=page.locator(selector);await el.evaluate(e=>{
+      e.scrollTop=250;
+      // Read the release position in the event, without a Playwright round trip
+      // between the final move and pointerup that can drain velocity on a busy runner.
+      e.addEventListener('pointerup',()=>{window.__desktopRelease=e.scrollTop;},{once:true,capture:true});
+    });await page.waitForTimeout(100);
     const b=await el.boundingBox(),x=b.x+8,y=b.y+b.height*.65;
     await page.mouse.move(x,y);await page.mouse.down();
-    for(let i=1;i<=5;i++){await page.mouse.move(x,y-i*24);await page.waitForTimeout(16);}
-    const released=await el.evaluate(e=>e.scrollTop);await page.mouse.up();await page.waitForTimeout(200);assert.ok(await el.evaluate(e=>e.scrollTop)>released+45,`${selector} has useful release inertia`);
+    for(let i=1;i<=5;i++){await page.mouse.move(x,y-i*24);if(i<5)await page.waitForTimeout(16);}
+    await page.mouse.up();
+    await page.waitForFunction(selector=>document.querySelector(selector).scrollTop>window.__desktopRelease+45,selector,{timeout:2000});
   };
   await inertia('.shop-scroll');await page.locator('.dialog-close').click();await page.locator('.overlay').waitFor({state:'detached'});await page.locator('.utility-button:last-child').click();await page.waitForTimeout(400);await inertia('.rewards-scroll');
   await page.close();console.log('✓ desktop strip fits, pointer cursor, sharp resting cubes, stable physical size at 80–200% zoom, smooth hover feedback and stronger shop/gift inertia');
