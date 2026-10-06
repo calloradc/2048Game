@@ -17,7 +17,7 @@ export const FRUIT_NAMES=FRUITS.map(fruit=>fruit.name);
 FRUITS.forEach(fruit=>localizedProperty(fruit,'name'));
 
 // Updated art must never be paired with a cached sprite's old body geometry.
-export const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}${/^(cover.*\.webp|pointhand\.webp|glass\.webp|boxes\/(rose|amber|ice)\.webp|skins\/(mochi\/|fuzzies\/(6|7)\.webp))/.test(file)?'?v=20261006_2':''}`;
+export const asset = (file: string) => `${import.meta.env.BASE_URL}assets/${file}${/^(icon\.webp|cover.*\.webp|pointhand\.webp|glass\.webp|boxes\/(rose|amber|ice)\.webp|skins\/(mochi\/|fuzzies\/(6|7)\.webp))/.test(file)?'?v=20261006_3':''}`;
 export const fruitAsset = (level: number,skin='fruit') => asset(skin==='fruit'?`fruit-${level}.webp`:`skins/${skin}/${level}.webp`);
 
 export function randomDrop(random = Math.random): number {
