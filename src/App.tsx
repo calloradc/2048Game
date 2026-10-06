@@ -1,5 +1,5 @@
 import { t, useLanguage, localeTag } from './i18n';
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { asset, fruitAsset } from './game/fruits';
 import { BOARD, FruitWorld, initialState, SHAKE_PRICE } from './game/physics';
@@ -47,7 +47,11 @@ export default function App() {
   const appearanceVersion=useRef(0);
   const [mobileHeight,setMobileHeight]=useState(864);
   const [scale, setScale] = useState(1),[loaded, setLoaded] = useState(false),[error, setError] = useState(false),[progress, setProgress] = useState(0),[splashDone, setSplashDone] = useState(false);
-  const [landscape,setLandscape]=useState(false),[interstitial,setInterstitial]=useState(false);
+  const [landscape,setLandscape]=useState(()=>typeof window!=='undefined'&&window.innerWidth>window.innerHeight&&window.innerWidth>=600),[interstitial,setInterstitial]=useState(false);
+  const [tutorialActive,setTutorialActive]=useState(false);
+  const tutorialActiveRef=useRef(false);
+  tutorialActiveRef.current=tutorialActive;
+  const idleTimerRef=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
   useEffect(()=>{
     if(state.status==='playing')return;
     saveCloudData(true);void submitLeaderboardScore(state.best);
@@ -78,7 +82,7 @@ export default function App() {
     return()=>{clearInterval(timer);window.removeEventListener('focus',update);document.removeEventListener('visibilitychange',update);};
   },[]);
 
-  useEffect(() => { if(!loaded)return;const timer=setTimeout(()=>setSplashDone(true),300);return()=>clearTimeout(timer); },[loaded]);
+  useEffect(() => { if(!loaded)return;const timer=setTimeout(()=>{setSplashDone(true);setTutorialActive(true);},300);return()=>clearTimeout(timer); },[loaded]);
   useEffect(() => {
     const resize = () => {
       const h=viewport.height,w=viewport.width;
@@ -157,25 +161,81 @@ export default function App() {
     document.addEventListener('keydown', key); return () => document.removeEventListener('keydown', key);
   }, [dialogKind, overlay, renderedAd, interstitial, dialogLeaving, platform.platformPaused, platform.adOpen]);
 
-  const aim = (event: PointerEvent<HTMLCanvasElement>) => { const bounds = event.currentTarget.getBoundingClientRect();worldRef.current?.setAim((event.clientX - bounds.left) / bounds.width * BOARD.width); };
+  const resetIdleTimer = useCallback(() => {
+    clearTimeout(idleTimerRef.current);
+    if (!blocked && state.status === 'playing') {
+      idleTimerRef.current = setTimeout(() => {
+        if (!blocked && state.status === 'playing') setTutorialActive(true);
+      }, 20_000);
+    }
+  }, [blocked, state.status]);
+
+  const recordActivity = useCallback(() => {
+    resetIdleTimer();
+  }, [resetIdleTimer]);
+
+  const dismissTutorial = useCallback(() => {
+    if (tutorialActiveRef.current) setTutorialActive(false);
+    resetIdleTimer();
+  }, [resetIdleTimer]);
+
+  useEffect(() => {
+    if (blocked || state.status !== 'playing') {
+      clearTimeout(idleTimerRef.current);
+      return;
+    }
+    if (!tutorialActiveRef.current) resetIdleTimer();
+    let lastMove = 0;
+    const onMove = () => {
+      const now = Date.now();
+      if (now - lastMove > 150) {
+        lastMove = now;
+        recordActivity();
+      }
+    };
+    const onDown = (e: PointerEvent | MouseEvent) => {
+      if ('pointerType' in e && e.pointerType !== 'mouse') dismissTutorial();
+      else recordActivity();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'Enter') dismissTutorial();
+      else recordActivity();
+    };
+    window.addEventListener('pointerdown', onDown, { passive: true });
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('keydown', onKey, { passive: true });
+    return () => {
+      clearTimeout(idleTimerRef.current);
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [blocked, state.status, recordActivity, dismissTutorial, resetIdleTimer]);
+
+  const aim = (event: PointerEvent<HTMLCanvasElement>) => { recordActivity(); const bounds = event.currentTarget.getBoundingClientRect();worldRef.current?.setAim((event.clientX - bounds.left) / bounds.width * BOARD.width); };
   const pointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (event.pointerType !== 'mouse') dismissTutorial();
+    else recordActivity();
     if (blocked || getPlatformState().platformPaused || getPlatformState().adOpen || state.status !== 'playing' || dragRef.current !== null || (event.pointerType === 'mouse' && event.button !== 0)) return;
     event.preventDefault(); audioRef.current?.unlock();dragRef.current = event.pointerId; event.currentTarget.setPointerCapture(event.pointerId); aim(event);
   };
   const pointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
     if (dragRef.current !== event.pointerId) return;
     aim(event); dragRef.current = null;
-    if (!blocked && worldRef.current?.drop()) audioRef.current?.play('drop');
+    if (!blocked && worldRef.current?.drop()) { dismissTutorial(); audioRef.current?.play('drop'); }
   };
   const restart = () => {
     const world=worldRef.current;if(!world)return;
     const progress=roundRankProgress(world.state.status,world.state.score,roundStartingBest.current);
     roundStartingBest.current=world.state.best;
     world.reset();
+    setTutorialActive(true);
+    resetIdleTimer();
     if(progress)setRankProgress(progress);
     setModal(progress?'leaderboard':null);
   };
   const shake = () => {
+    dismissTutorial();
     const world=worldRef.current;if(!world||world.state.status!=='playing')return;
     if(world.state.shakes===0&&profileRef.current.shakeTokens>0){world.grantShake();commitProfile({...profileRef.current,shakeTokens:profileRef.current.shakeTokens-1});}
     const coinsBefore = world.state.coins;
@@ -320,7 +380,10 @@ export default function App() {
       <div className={`playfield ${shaking?'shaking':''} ${state.danger?'danger':''}`}>
         <canvas ref={canvasRef} aria-label={t("Игровой контейнер. Веди пальцем и отпусти, чтобы бросить фрукт.")} tabIndex={0}
           onPointerDown={pointerDown} onPointerMove={e=>{if(dragRef.current===e.pointerId||e.pointerType==='mouse')aim(e);}} onPointerUp={pointerUp} onPointerCancel={()=>{dragRef.current=null;}} onLostPointerCapture={()=>{dragRef.current=null;}}
-          onKeyDown={e=>{if(blocked||getPlatformState().platformPaused||getPlatformState().adOpen||state.status!=='playing')return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();if(world.drop())audioRef.current?.play('drop');}}}/>
+          onKeyDown={e=>{if(blocked||getPlatformState().platformPaused||getPlatformState().adOpen||state.status!=='playing')return;const world=worldRef.current;if(!world)return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();recordActivity();world.setAim(world.aim+(e.key==='ArrowLeft'?-15:15));}if(e.key===' '||e.key==='Enter'){e.preventDefault();audioRef.current?.unlock();if(world.drop()){dismissTutorial();audioRef.current?.play('drop');}}}}/>
+        <div className={`tutorial-hint ${tutorialActive && !blocked && state.status === 'playing' ? 'visible' : ''}`} aria-hidden="true">
+          <img className="tutorial-hand" src={asset("pointhand.webp")} alt="" draggable={false}/>
+        </div>
         {state.danger>0&&<div className="danger-message">{t("Контейнер почти полон!")} {state.status==='playing'?t("Освободи место"):''}</div>}
       </div>
       <FruitCarousel discovered={state.discovered} skin={skin}/>
