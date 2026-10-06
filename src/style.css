@@ -90,10 +90,8 @@ img { pointer-events: none; -webkit-user-drag: none; }
 }
 .scene.is-ready { opacity: 1; }
 .header { display: grid; grid-template-columns: 1fr 88px 88px; align-items: center; gap: 10px; padding: 0 30px; min-width: 0; }
-.brand { display: flex; align-items: center; gap: 7px; }
-.brand-icon { width: 39px; height: 43px; object-fit: contain; filter: drop-shadow(0 3px 3px #315b4330); flex-shrink: 0; }
-.brand-text { min-width: 0; font-weight: 900; font-size: 15px; line-height: 1.05; color: #fffdf4; letter-spacing: -.4px; text-shadow: 0 2px 5px #315b4360; }
-.brand-text > span { display: block; font-size: 20px; color: #ffe8a0; }
+.brand { display: flex; align-items: center; }
+.brand-icon { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 3px 4px #315b4340); flex-shrink: 0; }
 .header-buttons { display: flex; gap: 8px; }
 .round-button { width: 40px; height: 40px; padding: 7px; border-radius: 15px; background: var(--paper); display: grid; place-items: center; box-shadow: var(--soft-shadow); }
 .round-button:last-child { background: #eee5f8; }

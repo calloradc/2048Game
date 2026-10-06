@@ -365,7 +365,7 @@ export default function App() {
     <div className="ambient-background" aria-hidden="true" />
     <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={blocked} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
       <header className="header">
-        <div className="brand" aria-label={t("Фруктовые желейки: сочное слияние")}><img className="brand-icon" src={asset("icon.webp")} alt=""/><div className="brand-text">{t("Фруктовые")}<span>{t("желейки")}</span></div></div>
+        <div className="brand"><img className="brand-icon" src={asset("icon.webp")} alt=""/></div>
         <button className="wallet" aria-label={t("Баланс монет")} onClick={()=>setModal('wallet')}><img src={asset("particles/11.webp")} alt="" /><strong key={state.coins} data-testid="coins" data-coins={state.coins}>{compactBalance(state.coins)}</strong></button>
         <div className="header-buttons"><button className="round-button sound-button" aria-label={muted?t("Включить звук"):t("Выключить звук")} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={26}/></button><button className="round-button" aria-label={t("Настройки")} onClick={()=>setModal('settings')}><Icon name="settings" size={23}/></button></div>
       </header>
