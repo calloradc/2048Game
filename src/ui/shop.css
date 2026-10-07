@@ -56,7 +56,9 @@
 .collection-heading .eyebrow { color: #8a9985; font-size: 8px; letter-spacing: 1.5px; }
 .collection-heading h2 { font-size: 27px; line-height: 1.2; margin: 5px 0 0; font-weight: 900; }
 .snap-rail { position: relative; width: 100%; height: 212px; min-width: 0; }
-.snap-viewport { position: relative; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; overscroll-behavior-x: contain; scroll-snap-type: none; scrollbar-width: none; cursor: grab; }
+.snap-viewport { position: relative; width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden; touch-action: pan-x; overscroll-behavior-x: contain; scroll-snap-type: none; scrollbar-width: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.snap-viewport[data-moving="true"] { cursor: grabbing; }
+.snap-viewport[data-moving="true"] * { cursor: grabbing !important; }
 .snap-viewport::-webkit-scrollbar { display: none; }
 .snap-viewport:focus-visible { outline-offset: -4px; }
 .snap-track { position: relative; display: flex; gap: 28px; width: max-content; height: 100%; align-items: center; }
