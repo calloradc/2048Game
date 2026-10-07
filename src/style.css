@@ -448,3 +448,8 @@ html[data-motion="reduced"] :is(.shop-scroll, .rewards-scroll) [data-reveal] { o
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+.clean-mode,
+.clean-mode * {
+  cursor: none !important;
+}
