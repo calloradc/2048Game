@@ -92,5 +92,5 @@ html[data-motion="reduced"] :is(.daily-prize.available, .daily-prize.received) .
 
 .rewards-scroll > .soft-scroll-track { padding: 18px 16px 24px; }
 .shop-fullscreen.overlay, .rewards-fullscreen.overlay { animation: none; overflow: hidden; }
-.shop-fullscreen .shop-dialog, .rewards-fullscreen .rewards-dialog { position: absolute; inset: 0; height: 100%; animation-duration: .3s; will-change: transform; transform: translate3d(0, 0, 0); -webkit-backface-visibility: hidden; backface-visibility: hidden; }
-.shop-fullscreen.is-leaving .shop-dialog, .rewards-fullscreen.is-leaving .rewards-dialog { animation-duration: .24s; will-change: transform; }
+.shop-fullscreen .shop-dialog, .rewards-fullscreen .rewards-dialog { position: absolute; inset: 0; height: 100%; animation-duration: .3s; }
+.shop-fullscreen.is-leaving .shop-dialog, .rewards-fullscreen.is-leaving .rewards-dialog { animation-duration: .22s; }
