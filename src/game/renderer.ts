@@ -33,6 +33,7 @@ export class GameRenderer {
   private appearanceVersion=0;
   private needsDraw=true;
   private suspended=false;
+  hideText = false;
   paused = false;
 
   constructor(private canvas: HTMLCanvasElement, public world: FruitWorld) {
@@ -109,8 +110,10 @@ export class GameRenderer {
 
   merge(event: MergeEvent) {
     const { x, y, level, combo } = event;
-    this.floats.push({ x, y: y - FRUITS[level].size / 2, text: combo > 1 ? t('КОМБО!') : t('СОЧНО!'), age: 0, combo });
-    this.floats=this.floats.slice(-3);
+    if (!this.hideText) {
+      this.floats.push({ x, y: y - FRUITS[level].size / 2, text: combo > 1 ? t('КОМБО!') : t('СОЧНО!'), age: 0, combo });
+      this.floats=this.floats.slice(-3);
+    }
     this.bursts.push({x,y,age:0,color:FRUITS[level].color,radius:FRUITS[level].size*0.55});
     const juice=[0,0,1,2,3,4,5,5,2,2,0][level];
     const count=Math.min(30,17+level);
@@ -166,13 +169,14 @@ export class GameRenderer {
       if(p.texture===7)ctx.globalCompositeOperation='lighter';
       ctx.drawImage(texture,-size/2,-size/2,size,size);ctx.restore();
     }
-    ctx.globalAlpha = 1;
-    for (const f of this.floats) {
-      ctx.save(); ctx.globalAlpha = Math.min(1, (1.1 - f.age) * 3); ctx.textAlign = 'center';
-      ctx.font = '900 18px Nunito, sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#fff8e5'; ctx.fillStyle = '#438952';
-      const y = f.y - f.age * 45; ctx.strokeText(f.text, f.x, y); ctx.fillText(f.text, f.x, y);
-
-      ctx.restore();
+    if (!this.hideText) {
+      ctx.globalAlpha = 1;
+      for (const f of this.floats) {
+        ctx.save(); ctx.globalAlpha = Math.min(1, (1.1 - f.age) * 3); ctx.textAlign = 'center';
+        ctx.font = '900 18px Nunito, sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = '#fff8e5'; ctx.fillStyle = '#438952';
+        const y = f.y - f.age * 45; ctx.strokeText(f.text, f.x, y); ctx.fillText(f.text, f.x, y);
+        ctx.restore();
+      }
     }
   }
 

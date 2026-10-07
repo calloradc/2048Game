@@ -22,7 +22,7 @@ import { AD_COINS, AD_COIN_PACK } from './game/economy';
 import { compactBalance } from './ui/compactBalance';
 import { useGameViewport } from './ui/useGameViewport';
 import { readStorage as read, writeStorage as save } from './platform/storage';
-import { gameReady, getPlatformState, subscribePlatform, usePlatformState, setGameplayActive, showRewardedAd, showFullscreenAd, saveCloudData, submitLeaderboardScore } from './platform/yandexSdk';
+import { gameReady, getPlatformState, subscribePlatform, usePlatformState, setGameplayActive, showRewardedAd, showFullscreenAd, saveCloudData, submitLeaderboardScore, hasYandexSDK } from './platform/yandexSdk';
 import { LanguagePicker } from './ui/LanguagePicker';
 import { Leaderboard } from './ui/Leaderboard';
 import { roundRankProgress, type RankProgress } from './game/leaderboard';
@@ -46,12 +46,29 @@ export default function App() {
   const shopOriginal=useRef<Profile['selected']|null>(null),shopFocus=useRef<Partial<Record<Category,ShopItem>>>({});
   const appearanceVersion=useRef(0);
   const [mobileHeight,setMobileHeight]=useState(864);
-  const [scale, setScale] = useState(1),[loaded, setLoaded] = useState(false),[error, setError] = useState(false),[progress, setProgress] = useState(0),[splashDone, setSplashDone] = useState(false);
+  const [scale, setScale] = useState(1),[loaded, setLoaded] = useState(false),[error, setError] = useState(false),[progress, setProgress] = useState(0),[splashDone, setSplashDone] = useState(false),[coverReady, setCoverReady] = useState(false),[cleanMode, setCleanMode] = useState(false);
   const [landscape,setLandscape]=useState(()=>typeof window!=='undefined'&&window.innerWidth>window.innerHeight&&window.innerWidth>=600),[interstitial,setInterstitial]=useState(false);
   const [tutorialActive,setTutorialActive]=useState(false);
   const tutorialActiveRef=useRef(false);
   tutorialActiveRef.current=tutorialActive;
   const idleTimerRef=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
+  useEffect(()=>{
+    const url=new URL(asset(landscape?'cover-wide.webp':'cover.webp'),document.baseURI).href;
+    const img=new Image();
+    img.src=url;
+    if(img.complete)setCoverReady(true);
+    else{img.onload=()=>setCoverReady(true);img.onerror=()=>setCoverReady(true);}
+  },[landscape]);
+  useEffect(()=>{if(rendererRef.current)rendererRef.current.hideText=cleanMode;},[cleanMode]);
+  useEffect(()=>{
+    if(!import.meta.env.DEV)return;
+    const onKey=(e:KeyboardEvent)=>{
+      if(e.key==='Tab'){e.preventDefault();setCleanMode(prev=>!prev);}
+      else if(e.key==='Escape'&&cleanMode){setCleanMode(false);}
+    };
+    window.addEventListener('keydown',onKey);
+    return()=>window.removeEventListener('keydown',onKey);
+  },[cleanMode]);
   useEffect(()=>{
     if(state.status==='playing')return;
     saveCloudData(true);void submitLeaderboardScore(state.best);
@@ -297,7 +314,16 @@ export default function App() {
     }
     commitProfile(next);void showAppearance(next.selected);shopFocus.current={};
   },[modal]);
+  const devGrantCoins=()=>{
+    const world=worldRef.current;if(!world)return;
+    audioRef.current?.unlock();
+    world.grantCoins(AD_COINS);
+    notify(t("+{n} монет в копилку!",{n:AD_COINS}));
+    audioRef.current?.rewardPurchase();
+    saveCloudData(true);
+  };
   const watch=(reward:AdReward)=>{
+    if(import.meta.env.DEV&&reward.type==='coins'){devGrantCoins();return;}
     if(adRef.current||getPlatformState().platformPaused)return;
     const request={id:++adId.current,reward};adRef.current=request;setAd(request);
     audioRef.current?.unlock();
@@ -337,7 +363,8 @@ export default function App() {
               <Icon name="settings" size={65}/><span className="eyebrow settings-caption">{t("УСТРОИМ ВСЁ ПО-ТВОЕМУ")}</span><h1>{t("Настройки")}</h1>
               <div className="settings-list">
                 <button className="setting-row" role="switch" aria-checked={!muted} onClick={()=>{audioRef.current?.unlock();setMuted(!muted);}}><Icon name={muted?'mute':'sound'} size={27}/><span>{t("Звук")}</span><i className={!muted?'on':''}/></button>
-                <button className="setting-row" onClick={fullscreen}><Icon name="fullscreen" size={27}/><span>{t("На весь экран")}</span><Icon name="right" size={17}/></button>
+                {!platform.hasYsdk && !hasYandexSDK() && <button className="setting-row" onClick={fullscreen}><Icon name="fullscreen" size={27}/><span>{t("На весь экран")}</span><Icon name="right" size={17}/></button>}
+                {import.meta.env.DEV && <button className="setting-row" onClick={()=>{setCleanMode(true);setModal(null);}}><Icon name="sparkle" size={27}/><span>{t("Скрыть интерфейс")}</span><Icon name="right" size={17}/></button>}
                 <button className="setting-row" onClick={()=>setModal('restart')}><Icon name="restart" size={27}/><span>{t("Начать заново")}</span><Icon name="right" size={17}/></button>
                 <LanguagePicker language={language}/>
               </div><button className="primary-button" onClick={()=>setModal(null)}><Icon name="play" size={19}/> {t("Вернуться в игру")}</button>
@@ -361,7 +388,7 @@ export default function App() {
         </div>
       </div>;
 
-  return <main className={`game-screen ${landscape?'landscape':viewport.width<=600?'mobile-fit':''}`} ref={shellRef} aria-busy={!loaded} style={{width:viewport.width,height:viewport.height,zoom:1/viewport.zoom,'--viewport-height':`${viewport.height}px`,'--viewport-width':`${viewport.width}px`,'--mobile-scene-height':`${mobileHeight}px`,'--board-fit':Math.max(.35,Math.min(1,(mobileHeight-304)/490)),'--scenery':`url("${new URL(backgroundAsset(appearance.backgrounds),document.baseURI).href}")`,'--scenery-wide':`url("${new URL(wideBackgroundAsset(appearance.backgrounds),document.baseURI).href}")`,'--cover':`url("${new URL(asset("cover.webp"),document.baseURI).href}")`,'--cover-wide':`url("${new URL(asset("cover-wide.webp"),document.baseURI).href}")`} as CSSProperties}>
+  return <main className={`game-screen ${landscape?'landscape':viewport.width<=600?'mobile-fit':''} ${cleanMode?'clean-mode':''}`} ref={shellRef} aria-busy={!loaded} style={{width:viewport.width,height:viewport.height,zoom:1/viewport.zoom,'--viewport-height':`${viewport.height}px`,'--viewport-width':`${viewport.width}px`,'--mobile-scene-height':`${mobileHeight}px`,'--board-fit':Math.max(.35,Math.min(1,(mobileHeight-304)/490)),'--scenery':`url("${new URL(backgroundAsset(appearance.backgrounds),document.baseURI).href}")`,'--scenery-wide':`url("${new URL(wideBackgroundAsset(appearance.backgrounds),document.baseURI).href}")`,'--cover':`url("${new URL(asset("cover.webp"),document.baseURI).href}")`,'--cover-wide':`url("${new URL(asset("cover-wide.webp"),document.baseURI).href}")`} as CSSProperties}>
     <div className="ambient-background" aria-hidden="true" />
     <div className={`scene ${loaded ? 'is-ready' : ''}`} inert={blocked} style={{ transform: `translate(-50%, -50%) scale(${scale})` }}>
       <header className="header">
@@ -396,7 +423,7 @@ export default function App() {
     {shellRef.current&&createPortal(dialog,shellRef.current)}
     {interstitial&&<InterstitialAd/>}
     <Toast text={toast} onDismiss={()=>{clearTimeout(toastTimer.current);setToast(null);}}/>
-    {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label={t("Загрузка игры")}><div className="loading-content"><div className="loading-logo">{t("Фруктовые")}<span>{t("желейки")}</span><small>{t("Сочное слияние")}</small></div><div className="loading-status"><h1>{error?t("Фрукты задержались"):t("Скоро будет сочно!")}</h1><p>{error?t("Не удалось загрузить ассеты. Попробуй ещё раз."):t("Собираем маленькую фруктовую семью")}</p>{!error?<><div className="loading-progress" role="progressbar" aria-label={t("Загрузка игры")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span className="loading-percent">{progress}%</span><div className="loading-dots" aria-hidden="true">{[0,1,2,3,4].map(dot=><i key={dot} style={{animationDelay:`${dot*.12}s`}}/>)}</div></div></>:<button className="primary-button" onClick={()=>window.location.reload()}>{t("Попробовать ещё")}</button>}</div></div><span className="loading-caption">{t("НЕМНОГО ЖЕЛЕЙНОГО ВОЛШЕБСТВА")}</span></section>}
+    {!splashDone&&<section className={`loading loading-screen ${loaded?'finished':''}`} aria-label={t("Загрузка игры")}><div className="loading-backdrop" aria-hidden="true"><div className="loading-bg-blur"/><div className={`loading-bg-cover ${coverReady?'is-loaded':''}`}/></div><div className="loading-content"><div className="loading-status" role="progressbar" aria-label={t("Загрузка игры")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>{!error?<div className="loading-dots" aria-hidden="true">{[0,1,2,3,4].map(dot=><i key={dot} style={{animationDelay:`${dot*.12}s`}}/>)}</div>:<button className="primary-button" onClick={()=>window.location.reload()}>{t("Попробовать ещё")}</button>}</div></div></section>}
     <div className="desktop-note"><Icon name="left" size={14}/><span>{t("Наведи мышку и нажми, чтобы бросить")}</span><Icon name="right" size={14}/></div>
   </main>;
 }

@@ -36,10 +36,11 @@ const LEADERBOARD = 'leaders';
 let ysdk: YandexSDK | null = null, player: Player | null = null;
 let initialization: Promise<void> | undefined, initialized = false, ready = false;
 let gameplayWanted = false, gameplayReported = false;
-let state = { platformPaused: false, adOpen: false };
+let state = { platformPaused: false, adOpen: false, hasYsdk: false };
 const listeners = new Set<() => void>();
 function publish(next: Partial<typeof state>) { state = { ...state, ...next }; listeners.forEach(listener => listener()); }
 export const getYsdk = () => ysdk;
+export const hasYandexSDK = () => Boolean(ysdk);
 export const getPlayer = () => player;
 export const isInitialized = () => initialized;
 export const getPlatformLanguage = () => ysdk?.environment.i18n.lang;
@@ -69,6 +70,7 @@ export function initYandexSDK() {
       await loadScript();
       if (!window.YaGames) return;
       ysdk = await window.YaGames.init();
+      publish({ hasYsdk: true });
       ysdk.on('game_api_pause', platformPause); ysdk.on('game_api_resume', platformResume);
       // getStorage also protects custom-domain integrations; archive hosting
       // already wraps localStorage, so using this interface works in both cases.

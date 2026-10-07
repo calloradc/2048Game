@@ -11,6 +11,62 @@
     <link rel="icon" type="image/webp" href="./assets/icon.webp" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <title>Фруктовые желейки: сочное слияние</title>
+    <link rel="preload" as="image" href="./assets/cover.webp" media="(max-aspect-ratio: 1/1), (max-width: 599px)" />
+    <link rel="preload" as="image" href="./assets/cover-wide.webp" media="(min-aspect-ratio: 1/1) and (min-width: 600px)" />
+    <style>
+      :root {
+        --cover-lqip: url("data:image/webp;base64,UklGRmQDAABXRUJQVlA4IFgDAAAQEgCdASokAEAAPs1QnkynpKKiNUgA8BmJbACdMoR1r6J+SXsCWB/F65cVyv5+pPuf20POyekL/Fb7fvNU+j5X/ku9uWoww0ujTxDKBVh6gtMcA18ZDhsIKkjxFddG82fmtgh6rzY7z1d9jiXmofWkAvioE4pRZCVSCMmuplJLRUKOmEDYA3Grm9RWLGAn78Lrc7QXS6wHnmwA+T4Yu6INAHOlc49D9cl17IGENICR+dG6krul91C56LnpD/+xeqPfyIdbG8aOlO2gXkWnshDZYSsicWx6CT5jJ9Z+TtbjihmMzwU0APqaz/i4oCO92c4RsoOIaDiqWmaDGfFz5UAZk7Exdl4DwK1c5FI804BSeVZFuLfP/otGp7Kc6ObK5HJTn2Vgm/xCQ3NlI3G1lcJHoScgaFY1XxoE8gS3x6cZLq278m1hje4MZ28W3sH3dq8VATzYuGVf6qP0BgGOLLKWloJCaTALDFUX8D/wUNNzBrOcsnPSMwUHlE7GvuJkdpuHd9d74fs2ooGJK3OH+XMIt34oH8TdsA7JP1E6WnFW15QXpwbAaQSVl9meNOQGwyq1ir91ujG4LM74UU3ZLgATCgjV5lyWiwpIralILAe667BVwL/bApZv2wP5K4ZWAFVYXpqSkYMndo1K0zd6FNbyeifFxmADDXsvcMJ+Z6Y0K4BvoIO97IAfm/Su0fKcXzXntrzc2ZDvlX9Evwcf0IXFdtIV0wH+6VOtMI2RSG6Q+wbdKyA5OCuMgi3f/HFTFTFQ5W/7JV3h9DC9m3U5vOjZE4SZvoXctgfUFdB9HtlO16WPpK19prEFM6n3MJQaX1oyP3eqeQGOmcCvG6vNm/zGyvNBNSld/e7kkdTzry2Y68t2R6Hk/n/p9+vNDOvLxSFHvqbdItkhLTYwY75fZihIthxfKvmYSOvSG7J8fYL1/RDnvQCWHJjkX0l8SWyOp2XGAqGkui6wErvDwEegFr9cn4DrbeURUOjrF4Rq5FoYoEyiyqaEdLTPaqMb28JOHMZM3Z7dUP+F7+wH/8XZUsPbAfwWTEgu7GNjcG8gOMwxqUXz1dg4NbJU1BN7wbPvsg9QyMT79FEwvQUEa5impfx/x9+CP2Rx1wlzGRZ9Qo5Ij0KBGof9wAAA");
+        --cover-wide-lqip: url("data:image/webp;base64,UklGRk4DAABXRUJQVlA4IEIDAACQEACdASpAACQAPtFWnkyoJSKiNV34AQAaCWwAnTKz8pyLKq0xAsVwr0Z7cnzHebJ0VXUkbz5/maA61DuA2YNvaF64HJsjrI7S5y1RtagCIJox87f8yvopMuXbd82AqAC04PP893WWiedKN4EZav6a5/93Xjxdwp43qakkeoi9yKJWrSGrz8vvYn+Dy2AA/tcmNnbF+46UxGh0OvxAOW/HxqDnTWqjWbFbV3JFFo5EOjW3AOgs3xCEr1ZczrokM8V/lpsw+PxRvzfhLYMnCoDcomYdQBRKG/enbTeypeEoub/QrfpEWDYLNt2FLm1avBjgqgNJvOM9hzMM3NKW2sZMyvM9rygLXuOiI9x6KCK6tu23t/AnsmZH6/EB9Hn9O21zMDEq5j3joeI4Bam8S0xYgYb82gQj5y6df6WvGluUgXLwPgdtr5KMOcPEKFT+t/uL7M9SnMCQozgVHdHI+voCp/7qn0BlqtYqC6VXjVcEJAk6f2Z1T36HYPVuvgoUQ85ed1UEwYrED2PgGm2yOrH7SCCzjqjmfkmrRBmlnQTrKa6zoQhTgy9awrTZ/dqm0xhTnsw1lv8G1u6TrapI3ERELTuwmLlhbXWotKWj7q2XnLP+UsNNLVfXCQQPpHOXFfwHqy3uYnzSgmacKBDt3U9FdEr+ZmzAMykWItpdmsnvprHNd1g/glX8WUV2s8fqKaMJJzC5egWKQz6WKbb7nTzHRZlAfJhIMhWgVdg8SB0bZOhSPu5zCs9tVHeDw5pFLIlmFh4ufuPILmUkeYQJ2+/ZU/UUNeM1rJLFP7PQ+AUbgSl06iTZ2d3QffCMRNzo7WJbKsiTfYtAABzJTOLotz4+DFftWbFhb1OXMwrfPb2PxlqwmVreHQy/4I4l2TDs+2eIhqA8mwUN3GSixXxpnG003eHX2hsZzpNvTY6yh18/FOq5aYadk1cmDdwHAC8y7FRG4eM15UTZLqS+TbkpbKTdiYqT6zd6uU2Ap02FkwdsLqPAJKtGqO5K7/VBm7je/izYpWp6WQH7tOp8dDGx+AOL5NuDTM8dI7Ej2TSLuWcq4333I/miXsfK3l347NwD9M/i9vx+P/wb/Q/gKGL+ILugAAA=");
+      }
+      body { margin: 0; background: #9bcf93; }
+      .bootstrap-loading {
+        position: fixed; inset: 0; z-index: 100; overflow: hidden;
+        display: flex; align-items: flex-end; justify-content: center;
+        padding-bottom: calc(44px + env(safe-area-inset-bottom, 0px));
+        background: #9bcf93; touch-action: none;
+      }
+      .bootstrap-loading .loading-bg-blur {
+        position: absolute; inset: -24px;
+        background: #9bcf93 var(--cover-lqip) center / cover no-repeat;
+        filter: blur(14px); transform: scale(1.06);
+      }
+      @media (orientation: landscape) and (min-width: 600px) {
+        .bootstrap-loading .loading-bg-blur { background-image: var(--cover-wide-lqip); }
+      }
+      .bootstrap-loading .loading-status {
+        position: relative; z-index: 2; display: inline-flex; align-items: center; justify-content: center;
+        padding: 8px 20px; background: rgba(30, 58, 43, 0.65);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 9999px;
+        box-shadow: 0 8px 24px rgba(18, 44, 28, 0.35);
+      }
+      .loading-dots { height: 18px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+      .loading-dots > i {
+        width: 8px; height: 8px; border-radius: 50%; background: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        animation: loading-bounce .9s ease-in-out infinite;
+      }
+      @keyframes loading-bounce {
+        0%, 60%, 100% { transform: translateY(0); opacity: .65; }
+        30% { transform: translateY(-7px); opacity: 1; }
+      }
+    </style>
   </head>
-  <body><div id="root"><div class="bootstrap-loading" aria-busy="true">Фруктовые желейки</div></div><script type="module" src="/src/main.tsx"></script></body>
+  <body>
+    <div id="root">
+      <div class="bootstrap-loading" aria-busy="true">
+        <div class="loading-bg-blur" aria-hidden="true"></div>
+        <div class="loading-status" role="progressbar" aria-label="Загрузка игры" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="loading-dots" aria-hidden="true">
+            <i style="animation-delay:0s"></i>
+            <i style="animation-delay:0.12s"></i>
+            <i style="animation-delay:0.24s"></i>
+            <i style="animation-delay:0.36s"></i>
+            <i style="animation-delay:0.48s"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
