@@ -16,6 +16,10 @@ import './ui/rewards.css';
 import { initYandexSDK, getPlatformLanguage } from './platform/yandexSdk';
 import { initializeLanguage } from './i18n';
 
+if (typeof window !== 'undefined') {
+  window.addEventListener('touchstart', () => {}, { passive: true });
+}
+
 void initYandexSDK().then(() => {
   initializeLanguage(getPlatformLanguage());
   ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);
