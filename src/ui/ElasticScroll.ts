@@ -30,8 +30,6 @@ export class ElasticScroll {
     viewport.addEventListener('pointerup',this.up);
     viewport.addEventListener('pointercancel',this.cancel);
     viewport.addEventListener('lostpointercapture',this.cancel);
-    window.addEventListener('pointerup',this.windowUp);
-    window.addEventListener('pointercancel',this.windowCancel);
     viewport.addEventListener('click',this.click,true);
     viewport.addEventListener('scroll',this.scrolled,{passive:true});
     viewport.addEventListener('wheel',this.wheel,{passive:false});
@@ -74,7 +72,7 @@ export class ElasticScroll {
     const dx=drag.startX-event.clientX,dy=drag.startY-event.clientY;
     if(!drag.moved){
       if(Math.max(Math.abs(dx),Math.abs(dy))<6)return;
-      if(event.pointerType!=='mouse'&&(this.vertical?Math.abs(dx)>Math.abs(dy):Math.abs(dy)>Math.abs(dx))){this.drag=null;return;}
+      if(this.vertical?Math.abs(dx)>Math.abs(dy):Math.abs(dy)>Math.abs(dx)){this.drag=null;return;}
       drag.moved=true;this.viewport.dataset.dragging='true';this.viewport.setPointerCapture(event.pointerId);
     }
     event.preventDefault();
@@ -97,8 +95,6 @@ export class ElasticScroll {
     if(event.type==='lostpointercapture'&&event.target!==this.viewport)return;
     this.release(event,true);
   };
-  private windowUp=(event:PointerEvent)=>{if(this.drag&&this.drag.id===event.pointerId)this.release(event,false);};
-  private windowCancel=(event:PointerEvent)=>{if(this.drag&&this.drag.id===event.pointerId)this.release(event,true);};
   private click=(event:MouseEvent)=>{if(this.suppressClick){event.preventDefault();event.stopPropagation();this.suppressClick=false;}};
   private scrolled=()=>{
     if(Math.abs(this.offset-this.written)<1)return;
@@ -147,10 +143,7 @@ export class ElasticScroll {
     this.stop();this.observer.disconnect();this.track.style.removeProperty('transform');
     this.viewport.removeEventListener('pointerdown',this.down);this.viewport.removeEventListener('pointermove',this.move);
     this.viewport.removeEventListener('pointerup',this.up);this.viewport.removeEventListener('pointercancel',this.cancel);
-    this.viewport.removeEventListener('lostpointercapture',this.cancel);
-    window.removeEventListener('pointerup',this.windowUp);
-    window.removeEventListener('pointercancel',this.windowCancel);
-    this.viewport.removeEventListener('click',this.click,true);
+    this.viewport.removeEventListener('lostpointercapture',this.cancel);this.viewport.removeEventListener('click',this.click,true);
     this.viewport.removeEventListener('scroll',this.scrolled);this.viewport.removeEventListener('wheel',this.wheel);this.viewport.removeEventListener('keydown',this.key);
   }
 }

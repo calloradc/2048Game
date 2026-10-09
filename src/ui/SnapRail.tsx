@@ -14,13 +14,12 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
     if(!cards.length)return;
     const visuals=cards.map(card=>card.querySelector<HTMLElement>('.rail-card-visual')!);
     let frame=0,animation:{from:number;to:number;start:number;duration:number}|null=null;
-    let drag:{pointerId:number;pointerType:string;startX:number;startY:number;startScroll:number;ratio:number;moved:boolean;startIndex:number;lastX:number;lastTime:number;velocity:number}|null=null,suppressClick=false;
+    let drag:{x:number;y:number;scroll:number;ratio:number;moved:boolean;index:number}|null=null,suppressClick=false;
     let settleTimer:ReturnType<typeof setTimeout>|undefined,wheelUntil=0;
     let centres:number[]=[],width=0,step=1;
     const clamp=(index:number)=>Math.max(0,Math.min(count-1,index));
     const target=(index:number)=>centres[index]-width/2;
-    const nearestTo=(scroll:number)=>centres.reduce((best,centre,index)=>Math.abs(centre-scroll-width/2)<Math.abs(centres[best]-scroll-width/2)?index:best,0);
-    const nearest=()=>nearestTo(el.scrollLeft);
+    const nearest=()=>centres.reduce((best,centre,index)=>Math.abs(centre-el.scrollLeft-width/2)<Math.abs(centres[best]-el.scrollLeft-width/2)?index:best,0);
     const select=(index:number)=>{if(active.current!==index){active.current=index;callback.current(index);}};
     const paint=()=>{
       const centre=el.scrollLeft+width/2;
@@ -92,88 +91,25 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
       scroll();
     };
     const down=(event:PointerEvent)=>{
-      if(!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
+      if(!event.isPrimary||event.pointerType==='mouse'&&event.button!==0)return;
       cancel();suppressClick=false;
-      const rect=el.getBoundingClientRect();
-      const ratio=rect.width>0&&width>0?rect.width/width:1;
-      drag={
-        pointerId:event.pointerId,
-        pointerType:event.pointerType,
-        startX:event.clientX,
-        startY:event.clientY,
-        startScroll:el.scrollLeft,
-        ratio,
-        moved:false,
-        startIndex:nearest(),
-        lastX:event.clientX,
-        lastTime:performance.now(),
-        velocity:0,
-      };
+      drag={x:event.clientX,y:event.clientY,scroll:el.scrollLeft,ratio:el.getBoundingClientRect().width/width,moved:false,index:nearest()};
     };
     const move=(event:PointerEvent)=>{
-      if(!drag||drag.pointerId!==event.pointerId)return;
-      const dx=event.clientX-drag.startX,dy=event.clientY-drag.startY;
-      if(!drag.moved){
-        if(drag.pointerType!=='mouse'&&Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>6){drag=null;finish();return;}
-        if(Math.abs(dx)<5)return;
-        drag.moved=true;el.dataset.moving='true';
-        try{el.setPointerCapture(event.pointerId);}catch{}
-      }
-      event.preventDefault();
-      const now=performance.now();
-      const dt=Math.max(1,now-drag.lastTime);
-      const stepDx=event.clientX-drag.lastX;
-      const instantV=stepDx/dt;
-      drag.velocity=drag.velocity*0.25+instantV*0.75;
-      drag.lastX=event.clientX;
-      drag.lastTime=now;
-
-      const deltaScroll=-dx/drag.ratio;
-      const rawScroll=drag.startScroll+deltaScroll;
-      const minScroll=target(0),maxScroll=target(count-1);
-      let scrollPos=rawScroll;
-      if(rawScroll<minScroll){
-        const over=minScroll-rawScroll;
-        scrollPos=minScroll-over*0.35;
-      }else if(rawScroll>maxScroll){
-        const over=rawScroll-maxScroll;
-        scrollPos=maxScroll+over*0.35;
-      }
-      el.scrollLeft=scrollPos;
-      paint();
-      schedule();
+      if(!drag)return;
+      if(!drag.moved&&Math.abs(event.clientY-drag.y)>Math.abs(event.clientX-drag.x)&&Math.abs(event.clientY-drag.y)>6){drag=null;finish();return;}
+      const delta=(event.clientX-drag.x)/drag.ratio;
+      if(Math.abs(delta)>5&&!drag.moved){drag.moved=true;el.setPointerCapture(event.pointerId);}
+      if(drag.moved){event.preventDefault();el.scrollLeft=drag.scroll-Math.max(-step,Math.min(step,delta*.72));schedule();}
     };
-    const release=(event:PointerEvent,cancelled:boolean)=>{
-      const gesture=drag;
-      if(!gesture||gesture.pointerId!==event.pointerId)return;
-      drag=null;
-      try{if(el.hasPointerCapture(event.pointerId))el.releasePointerCapture(event.pointerId);}catch{}
-      if(!gesture.moved){finish();return;}
-      suppressClick=true;
-      if(cancelled){go.current(gesture.startIndex);return;}
-
-      const timeSinceMove=performance.now()-gesture.lastTime;
-      const effectiveV=timeSinceMove>90?0:gesture.velocity;
-      const flickOffset=-(effectiveV/gesture.ratio)*160;
-      const projectedScroll=el.scrollLeft+flickOffset;
-      let targetIndex=clamp(nearestTo(projectedScroll));
-
-      const totalDelta=el.scrollLeft-gesture.startScroll;
-      if(Math.abs(effectiveV)>0.3){
-        const flickDir=effectiveV<0?1:-1;
-        if(flickDir>0&&targetIndex<=gesture.startIndex)targetIndex=clamp(gesture.startIndex+1);
-        if(flickDir<0&&targetIndex>=gesture.startIndex)targetIndex=clamp(gesture.startIndex-1);
-      }else if(targetIndex===gesture.startIndex&&Math.abs(totalDelta)>step*0.18){
-        const dragDir=Math.sign(totalDelta);
-        targetIndex=clamp(gesture.startIndex+dragDir);
-      }
-      go.current(targetIndex);
+    const up=(event:PointerEvent)=>{
+      const gesture=drag;drag=null;
+      if(gesture?.moved){
+        suppressClick=true;const delta=(gesture.x-event.clientX)/gesture.ratio;
+        go.current(event.type==='pointercancel'?gesture.index:gesture.index+(Math.abs(delta)>step*.18?Math.sign(delta):0));
+        if(el.hasPointerCapture(event.pointerId))el.releasePointerCapture(event.pointerId);
+      } else finish();
     };
-    const onUp=(e:PointerEvent)=>release(e,false);
-    const onCancel=(e:PointerEvent)=>release(e,true);
-    const onLostCapture=(e:PointerEvent)=>release(e,false);
-    const onWindowUp=(e:PointerEvent)=>{if(drag&&drag.pointerId===e.pointerId)release(e,false);};
-    const onWindowCancel=(e:PointerEvent)=>{if(drag&&drag.pointerId===e.pointerId)release(e,true);};
     const click=(event:MouseEvent)=>{
       if(suppressClick){suppressClick=false;event.preventDefault();event.stopPropagation();return;}
       const card=(event.target as HTMLElement).closest<HTMLElement>('[data-rail-index]');
@@ -181,26 +117,12 @@ export function SnapRail({count,initial=0,current=0,onChange,onActivate,children
     };
     el.addEventListener('scroll',scroll,{passive:true});el.addEventListener('scrollend',settle);
     el.addEventListener('wheel',wheel,{passive:false});
-    el.addEventListener('pointerdown',down);
-    el.addEventListener('pointermove',move);
-    el.addEventListener('pointerup',onUp);
-    el.addEventListener('pointercancel',onCancel);
-    el.addEventListener('lostpointercapture',onLostCapture);
-    window.addEventListener('pointerup',onWindowUp);
-    window.addEventListener('pointercancel',onWindowCancel);
-    el.addEventListener('click',click);
+    el.addEventListener('pointerdown',down);el.addEventListener('pointermove',move);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('click',click);
     return()=>{
       cancelAnimationFrame(frame);clearTimeout(settleTimer);observer.disconnect();visibility.disconnect();
       unsubscribeMotion();
       el.removeEventListener('scroll',scroll);el.removeEventListener('scrollend',settle);el.removeEventListener('wheel',wheel);
-      el.removeEventListener('pointerdown',down);
-      el.removeEventListener('pointermove',move);
-      el.removeEventListener('pointerup',onUp);
-      el.removeEventListener('pointercancel',onCancel);
-      el.removeEventListener('lostpointercapture',onLostCapture);
-      window.removeEventListener('pointerup',onWindowUp);
-      window.removeEventListener('pointercancel',onWindowCancel);
-      el.removeEventListener('click',click);
+      el.removeEventListener('pointerdown',down);el.removeEventListener('pointermove',move);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);el.removeEventListener('click',click);
     };
   },[count]);
   useLayoutEffect(()=>{if(current!==active.current)go.current(current);},[current]);

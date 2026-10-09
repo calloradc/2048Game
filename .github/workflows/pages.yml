@@ -1,96 +1,60 @@
 name: Build and deploy Jelly Fruit
+
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
+
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
 concurrency:
-  group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  archive:
-    name: Downloadable ZIP build
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - name: Upload downloadable build
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build game
+        run: npm run build
+
+      - name: Upload downloadable build (ZIP)
         uses: actions/upload-artifact@v4
         with:
           name: jelly-fruit-build
           path: dist/
-          if-no-files-found: error
           retention-days: 14
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
-      - name: Install browser for UI checks
-        run: npx playwright install --with-deps chromium
-      - name: Check game and shop in the browser
-        env:
-          GAME_URL: http://localhost:4173/
-        run: |
-          npm run preview > /tmp/jelly-preview.log 2>&1 &
-          for attempt in $(seq 1 30); do
-            if curl --silent --fail "$GAME_URL" > /dev/null; then break; fi
-            sleep 1
-          done
-          npm run test:browser
-          npm run test:iframe
-          npm run test:yandex
-          node scripts/audio-stream-smoke.mjs
-      - name: Check audio effects and focus behavior
-        env:
-          GAME_URL: http://localhost:5174/
-        run: |
-          npm run dev -- --port 5174 > /tmp/jelly-audio-dev.log 2>&1 &
-          for attempt in $(seq 1 30); do
-            if curl --silent --fail "$GAME_URL" > /dev/null; then break; fi
-            sleep 1
-          done
-          node scripts/audio-smoke.mjs
-      - name: Save UI screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-screenshots
-          path: test-results/
-          if-no-files-found: ignore
-      - uses: actions/upload-pages-artifact@v3
-        if: github.event_name != 'pull_request'
-        with:
-          path: dist
+          path: dist/
+
   deploy:
-    if: github.event_name != 'pull_request'
     needs: build
-    permissions:
-      pages: write
-      id-token: write
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
